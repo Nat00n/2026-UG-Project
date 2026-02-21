@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://bm85j7tdoavkf"]
+
+[ext_resource type="Script" uid="uid://drou7y54sj3e4" path="res://scripts/code_editor.gd" id="1_q0psu"]
+
+[node name="CodeEditor" type="Control" unique_id=2056445691]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_q0psu")
+
+[node name="VSplitContainer" type="VSplitContainer" parent="." unique_id=507078836]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offsets = PackedInt32Array(0, 0)
+
+[node name="HSplitContainer" type="HSplitContainer" parent="VSplitContainer" unique_id=316253582]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VSplitContainer/HSplitContainer" unique_id=575328589]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+text = "Code Editor"
+
+[node name="Button" type="Button" parent="VSplitContainer/HSplitContainer" unique_id=1489610588]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Run"
+
+[node name="CodeEdit" type="CodeEdit" parent="VSplitContainer" unique_id=1855355128]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 5.0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VSplitContainer" unique_id=950649561]
+layout_mode = 2
+size_flags_vertical = 3
+
+[connection signal="pressed" from="VSplitContainer/HSplitContainer/Button" to="." method="_on_button_pressed"]
