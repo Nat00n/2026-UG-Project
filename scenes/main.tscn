@@ -1,3 +1,9 @@
 [gd_scene format=3 uid="uid://htb1yerdmyaq"]
 
+[ext_resource type="PackedScene" uid="uid://bm85j7tdoavkf" path="res://scenes/IDE.tscn" id="1_o5qli"]
+
 [node name="Main" type="Node2D" unique_id=2102868353]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=394478138]
+
+[node name="CodeEditor" parent="CanvasLayer" unique_id=2056445691 instance=ExtResource("1_o5qli")]
