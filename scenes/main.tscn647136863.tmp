@@ -6,4 +6,4 @@
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=394478138]
 
-[node name="IDE" parent="CanvasLayer" unique_id=2056445691 instance=ExtResource("1_o5qli")]
+[node name="CodeEditor" parent="CanvasLayer" unique_id=2056445691 instance=ExtResource("1_o5qli")]
