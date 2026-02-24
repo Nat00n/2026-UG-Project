@@ -17,10 +17,12 @@ func _on_button_pressed():
 	
 	var code = inputCE.get_text()
 	
-	print(code)
+	#print(code)
 	
 	var lex = lexer.new()
 	var tokens = lex.tokenise(code)
+	
+	outputRCT.append_text(str(tokens))
 	
 	for t in tokens:
 		outputRCT.append_text(str(t))

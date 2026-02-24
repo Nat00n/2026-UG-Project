@@ -1,7 +1,11 @@
 
 
-func tokenise(input):
-	var array : Array = input.split().strip()
+func tokenise(input: String) -> Array:
+	var tokens = []
+	var current = ""
+	
+	
+	var array = input.split(" ", false)
 	
 	for i in range(len(array)):
 		print(array[i])

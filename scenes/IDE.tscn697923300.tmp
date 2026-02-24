@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://bm85j7tdoavkf"]
+
+[ext_resource type="Script" uid="uid://drou7y54sj3e4" path="res://scripts/IDE.gd" id="1_q0psu"]
+
+[node name="IDE" type="Control" unique_id=2056445691]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_q0psu")
+
+[node name="Panel" type="Panel" parent="." unique_id=692409474]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VSplitContainer" type="VSplitContainer" parent="Panel" unique_id=507078836]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offsets = PackedInt32Array(0, 0)
+
+[node name="HSplitContainer" type="HSplitContainer" parent="Panel/VSplitContainer" unique_id=316253582]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VSplitContainer/HSplitContainer" unique_id=575328589]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+text = "Code Editor"
+
+[node name="RunButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=1489610588]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Run"
+
+[node name="CodeEditor" type="CodeEdit" parent="Panel/VSplitContainer" unique_id=1855355128]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 5.0
+gutters_draw_line_numbers = true
+
+[node name="OutputBox" type="RichTextLabel" parent="Panel/VSplitContainer" unique_id=950649561]
+layout_mode = 2
+size_flags_vertical = 3
+
+[connection signal="pressed" from="Panel/VSplitContainer/HSplitContainer/RunButton" to="." method="_on_button_pressed"]
