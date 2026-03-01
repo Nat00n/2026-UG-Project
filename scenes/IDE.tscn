@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://drou7y54sj3e4" path="res://scripts/IDE.gd" id="1_q0psu"]
 
+[sub_resource type="SyntaxHighlighter" id="SyntaxHighlighter_dnq1y"]
+
 [node name="IDE" type="Control" unique_id=2056445691]
 layout_mode = 3
 anchors_preset = 15
@@ -49,6 +51,9 @@ text = "Run"
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 5.0
+syntax_highlighter = SubResource("SyntaxHighlighter_dnq1y")
+highlight_all_occurrences = true
+highlight_current_line = true
 gutters_draw_line_numbers = true
 
 [node name="OutputBox" type="RichTextLabel" parent="Panel/VSplitContainer" unique_id=950649561]

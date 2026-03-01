@@ -10,8 +10,8 @@ func _ready():
 		JavaScriptBridge.eval("""
 				window.godotAPI = {
 					
-				talk: function(x) {
-						godotInstance.exports.talk(x);
+				talk: function(msg) {
+						godotInstance.call('talk', msg);
 					},
 					
 				};
@@ -21,6 +21,7 @@ func _ready():
 func _on_button_pressed():
 	
 	outputRCT.clear()
+	outputRCT.append_text("run pressed")
 	
 	var code = inputCE.get_text()
 	JavaScriptBridge.eval("""
@@ -29,10 +30,9 @@ func _on_button_pressed():
         })();
 	""")
 	
-	
-func talk(input):
-	outputRCT.append_text(str(input))
-	print(input,"talk function")
+func talk(msg):
+	outputRCT.append_text("talk :")
+	outputRCT.append_text("\n"+str(msg))
 	
 	
 	
