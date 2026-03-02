@@ -4,6 +4,9 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>TaskTrainUGProject</title>
+
+		<script src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"></script>
+
 		<style>
 html, body, #canvas {
 	margin: 0;
@@ -217,18 +220,22 @@ const engine = new Engine(GODOT_CONFIG);
 
 		</script>
 
-		<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+		<script type="text/javascript">
+		let pyodide;
 
-		<script>
-		let pyodideReady = loadPyodide();
+		async function initPyodide() {
+			pyodide = await loadPyodide();
+
+			pyodide.globals.set("talk", msg => {
+				if (window.godotTalk) {
+					window.godotTalk(msg);
+				}
+			});
+		}
+
+		initPyodide();
 
 		async function runPythonFromGodot(code) {
-			let pyodide = await pyodideReady;
-
-			pyodide.globals.set("talk", (msg) => {
-				window.godotAPI.talk(msg);
-			});
-
 			return pyodide.runPython(code);
 		}
 		</script>
