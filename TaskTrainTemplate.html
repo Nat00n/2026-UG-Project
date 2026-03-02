@@ -226,17 +226,19 @@ const engine = new Engine(GODOT_CONFIG);
 		async function initPyodide() {
 			pyodide = await loadPyodide();
 
-			pyodide.globals.set("talk", msg => {
+			pyodide.globals.set("talk", (msg) => {
 				if (window.godotTalk) {
-					window.godotTalk(msg);
+					window.godotTalk(String(msg));
 				}
 			});
+
+			console.log("Pyodide ready");
 		}
 
 		initPyodide();
 
 		async function runPythonFromGodot(code) {
-			return pyodide.runPython(code);
+			return await pyodide.runPythonAsync(code);
 		}
 		</script>
 
