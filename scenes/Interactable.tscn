@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://cuastweaprt2q"]
+
+[ext_resource type="Script" uid="uid://buurr3hfxrsng" path="res://scripts/interactable.gd" id="1_c6f01"]
+
+[node name="Interactable" type="Area2D" unique_id=1779530000]
+script = ExtResource("1_c6f01")
+objectName = "Bob"
+
+[node name="visual" type="ColorRect" parent="." unique_id=615142832]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.84606624, 0.5981369, 0.8300326, 1)
+
+[node name="hoverLabel" type="Label" parent="." unique_id=793281200]
+offset_left = -44.0
+offset_top = -27.0
+offset_right = 98.0
+offset_bottom = -4.0
+text = "[LMB] Open Editor"

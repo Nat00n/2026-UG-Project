@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://c2khoy27nacsl"]
+
+[ext_resource type="Script" uid="uid://e0y3asayi4ga" path="res://scripts/room.gd" id="1_ffxv4"]
+[ext_resource type="PackedScene" uid="uid://cuastweaprt2q" path="res://scenes/Interactable.tscn" id="2_85yof"]
+
+[node name="Room" type="Node2D" unique_id=470420785]
+script = ExtResource("1_ffxv4")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1634516390]
+offset_right = 1151.0
+offset_bottom = 648.0
+color = Color(0.27387273, 0.27387273, 0.27387273, 1)
+
+[node name="Floor" type="ColorRect" parent="." unique_id=356980670]
+offset_left = 146.0
+offset_top = 152.0
+offset_right = 1033.0
+offset_bottom = 552.0
+color = Color(0.004679383, 0.13212621, 0.13827685, 1)
+
+[node name="Interactable" parent="." unique_id=1779530000 instance=ExtResource("2_85yof")]
+z_index = 1
+position = Vector2(585, 389)

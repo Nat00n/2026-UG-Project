@@ -4,24 +4,20 @@
 
 [sub_resource type="SyntaxHighlighter" id="SyntaxHighlighter_dnq1y"]
 
-[node name="IDE" type="Control" unique_id=2056445691]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+[node name="CanvasLayer" type="CanvasLayer" unique_id=1106617920]
+offset = Vector2(115, 60)
+scale = Vector2(0.8, 0.8)
+transform = Transform2D(0.8, 0, 0, 0.8, 115, 60)
 script = ExtResource("1_q0psu")
 
 [node name="Panel" type="Panel" parent="." unique_id=692409474]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="VSplitContainer" type="VSplitContainer" parent="Panel" unique_id=507078836]
 layout_mode = 1
@@ -35,6 +31,7 @@ split_offsets = PackedInt32Array(0, 0)
 
 [node name="HSplitContainer" type="HSplitContainer" parent="Panel/VSplitContainer" unique_id=316253582]
 layout_mode = 2
+split_offsets = PackedInt32Array(0, 0)
 
 [node name="Label" type="Label" parent="Panel/VSplitContainer/HSplitContainer" unique_id=575328589]
 layout_mode = 2
@@ -46,6 +43,12 @@ text = "Code Editor"
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Run"
+
+[node name="CloseButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=2005574071]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+text = "Close"
 
 [node name="CodeEditor" type="CodeEdit" parent="Panel/VSplitContainer" unique_id=1855355128]
 layout_mode = 2
@@ -60,4 +63,4 @@ gutters_draw_line_numbers = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[connection signal="pressed" from="Panel/VSplitContainer/HSplitContainer/RunButton" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="Panel/VSplitContainer/HSplitContainer/CloseButton" to="." method="_on_close_button_pressed"]
