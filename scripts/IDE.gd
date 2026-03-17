@@ -22,7 +22,18 @@ func _ready():
 		JavaScriptBridge.get_interface("window").godotTalk = _talkCallback
 
 func talk(args): # test function to see that the python -> JavaScript -> Godot bridge works
-	outputRCT.append_text(str(args[0]) + "\n")
+	var msg = str(args[0])
+	if msg.begins_with("__select__:"):
+		var index = int(msg.split(":")[1])
+		_currentObject.selectNode(index)
+	elif msg.begins_with("__swap__:"):
+		# format: __swap__:i:j
+		var parts = msg.split(":")
+		_currentObject.queueSwap(int(parts[1]), int(parts[2]))
+	elif msg.begins_with("__commit__"):
+		_currentObject.commitSort()
+	else:
+		outputRCT.append_text(msg + "\n")
 
 
 func open(objectName: String, interactable):
@@ -30,10 +41,9 @@ func open(objectName: String, interactable):
 	
 	outputRCT.clear()
 	outputRCT.append_text("--- %s ---\n" % objectName)
+	panel.visible = true
 	
 	_registerPythonFunctions()
-	
-	panel.visible = true
 
 func _registerPythonFunctions():
 	JavaScriptBridge.eval("""
@@ -105,6 +115,13 @@ def select(index):
 	node = dataNodes[index]
 	talk("Selected: " + node["name"] + " (value: " + str(node["value"]) + ")")
 	return node["value"]
+	
+def swap(i, j):
+	talk("__swap__:" + str(i) + ":" + str(j))
+	dataNodes[i], dataNodes[j] = dataNodes[j], dataNodes[i]
+
+def commitSort():
+	talk("__commit__")
 
 """ + code
 
