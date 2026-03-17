@@ -2,9 +2,16 @@
 
 [ext_resource type="Script" uid="uid://buurr3hfxrsng" path="res://scripts/interactable.gd" id="1_c6f01"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c6f01"]
+size = Vector2(37.4875, 38.855)
+
 [node name="Interactable" type="Area2D" unique_id=1779530000]
 script = ExtResource("1_c6f01")
 objectName = "Bob"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=577107706]
+position = Vector2(19.25625, 20.5725)
+shape = SubResource("RectangleShape2D_c6f01")
 
 [node name="visual" type="ColorRect" parent="." unique_id=615142832]
 offset_right = 40.0
@@ -17,3 +24,16 @@ offset_top = -27.0
 offset_right = 98.0
 offset_bottom = -4.0
 text = "[LMB] Open Editor"
+
+[node name="nodeDisplay" type="HBoxContainer" parent="." unique_id=150888121]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -145.0
+offset_top = -122.0
+offset_right = 186.0
+offset_bottom = -31.394997
+grow_horizontal = 2
+grow_vertical = 2

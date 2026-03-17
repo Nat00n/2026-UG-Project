@@ -7,7 +7,8 @@ extends CanvasLayer
 @onready var runButton: Button = $Panel/VSplitContainer/HSplitContainer/RunButton
 @onready var closeButton: Button = $Panel/VSplitContainer/HSplitContainer/CloseButton
 
-var talkCallback
+var _talkCallback
+var _currentObject
 
 func _ready():
 	
@@ -17,25 +18,58 @@ func _ready():
 	runButton.pressed.connect(run)
 	
 	if OS.has_feature("web"):
-		talkCallback = JavaScriptBridge.create_callback(talk)
-		JavaScriptBridge.get_interface("window").godotTalk = talkCallback
+		_talkCallback = JavaScriptBridge.create_callback(talk)
+		JavaScriptBridge.get_interface("window").godotTalk = _talkCallback
+
+func talk(args): # test function to see that the python -> JavaScript -> Godot bridge works
+	outputRCT.append_text(str(args[0]) + "\n")
 
 
-func talk(args):
-	var msg = str(args[0])
-	outputRCT.append_text(msg + "\n")
-
-
-func open(objectName: String):
+func open(objectName: String, interactable):
+	_currentObject = interactable
+	
 	outputRCT.clear()
 	outputRCT.append_text("--- %s ---\n" % objectName)
+	
+	_registerPythonFunctions()
+	
 	panel.visible = true
 
+func _registerPythonFunctions():
+	JavaScriptBridge.eval("""
+		window.gdReadNode = function(index) {
+			return window._gdReadCallback ? window._gdReadCallback(index) : "not ready";
+		};
+		window.gdSelectNode = function(index) {
+			return window._gdSelectCallback ? window._gdSelectCallback(index) : "not ready";
+		};
+	""")
+
+	# Wire up GDScript callbacks
+	var read_cb = JavaScriptBridge.create_callback(
+		func(args):
+			var idx = int(args[0])
+			var result = _currentObject.read_node(idx)
+			JavaScriptBridge.get_interface("window").set("_lastReadResult", result)
+	)
+	var select_cb = JavaScriptBridge.create_callback(
+		func(args):
+			var idx = int(args[0])
+			var result = _currentObject.select_node(idx)
+			JavaScriptBridge.get_interface("window").set("_lastSelectResult", result)
+	)
+	JavaScriptBridge.get_interface("window").set("_gdReadCallback", read_cb)
+	JavaScriptBridge.get_interface("window").set("_gdSelectCallback", select_cb)
 
 func run():
 	
 	outputRCT.clear()
 	outputRCT.append_text("running : \n")
+	
+	var nodesStr = "["
+	for n in _currentObject.dataNodes:
+		nodesStr += '{"name": "%s", "value": %d},' % [n["name"], n["value"]]
+	nodesStr += "]"
 	
 	var code = inputCE.get_text()
 	
@@ -50,6 +84,27 @@ class GodotOutput(io.TextIOBase):
 
 sys.stdout = GodotOutput()
 sys.stderr = GodotOutput()
+
+dataNodes = """ + nodesStr + """
+
+# Custom functions
+def read(index):
+	if index < 0 or index >= len(dataNodes):
+		talk("Error: index " + str(index) + " out of range")
+		return None
+	node = dataNodes[index]
+	result = node["name"] + " = " + str(node["value"])
+	talk(result)
+	return node["value"]
+
+def select(index):
+	if index < 0 or index >= len(dataNodes):
+		talk("Error: index " + str(index) + " out of range")
+		return None
+	talk("__select__:" + str(index))
+	node = dataNodes[index]
+	talk("Selected: " + node["name"] + " (value: " + str(node["value"]) + ")")
+	return node["value"]
 
 """ + code
 

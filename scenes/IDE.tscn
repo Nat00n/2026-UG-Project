@@ -2,7 +2,11 @@
 
 [ext_resource type="Script" uid="uid://drou7y54sj3e4" path="res://scripts/IDE.gd" id="1_q0psu"]
 
-[sub_resource type="SyntaxHighlighter" id="SyntaxHighlighter_dnq1y"]
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_dnq1y"]
+number_color = Color(0.70980394, 0.80784315, 0.65882355, 1)
+symbol_color = Color(0.83137256, 0.83137256, 0.83137256, 1)
+function_color = Color(0.8627451, 0.8627451, 0.6666667, 1)
+member_variable_color = Color(0.6117647, 0.8627451, 0.99607843, 1)
 
 [node name="CanvasLayer" type="CanvasLayer" unique_id=1106617920]
 offset = Vector2(115, 60)
@@ -54,13 +58,22 @@ text = "Close"
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 5.0
-syntax_highlighter = SubResource("SyntaxHighlighter_dnq1y")
+indent_wrapped_lines = true
+syntax_highlighter = SubResource("CodeHighlighter_dnq1y")
 highlight_all_occurrences = true
 highlight_current_line = true
+draw_tabs = true
 gutters_draw_line_numbers = true
+code_completion_enabled = true
+indent_automatic = true
+auto_brace_completion_enabled = true
+auto_brace_completion_highlight_matching = true
 
 [node name="OutputBox" type="RichTextLabel" parent="Panel/VSplitContainer" unique_id=950649561]
 layout_mode = 2
 size_flags_vertical = 3
+focus_mode = 2
+bbcode_enabled = true
+selection_enabled = true
 
 [connection signal="pressed" from="Panel/VSplitContainer/HSplitContainer/CloseButton" to="." method="_on_close_button_pressed"]
