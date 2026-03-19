@@ -34,7 +34,6 @@ func _buildDisplay():
 		var card = PanelContainer.new()
 		var label = Label.new()
 		label.text = "%s : %d" % [node["name"], node["value"]]
-		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		card.add_child(label)
 		nodeDisplay.add_child(card)
 		cardNodes.append(card)
@@ -75,7 +74,6 @@ func selectNode(index: int):
 func queueSwap(i: int, j: int):
 	swapQueue.append([i,j])
 	
-
 func commitSort():
 	if not isAnimating:
 		isAnimating = true
@@ -84,6 +82,7 @@ func commitSort():
 func _playNextSwap():
 	if swapQueue.is_empty():
 		isAnimating = false
+		_buildDisplay()
 		return
 		
 	var step = swapQueue.pop_front()
@@ -104,34 +103,28 @@ func _animateSwap(i: int, j: int):
 
 	var posA = cardA.global_position
 	var posB = cardB.global_position
-
-	# Highlight swapping cards
-	cardA.get_child(0).add_theme_color_override("font_color", Color.CYAN)
-	cardB.get_child(0).add_theme_color_override("font_color", Color.CYAN)
+	
+	var sceneRoot = get_tree().current_scene
+	cardA.reparent(sceneRoot)
+	cardB.reparent(sceneRoot)
+	
+	cardA.global_position = posA
+	cardB.global_position = posB
 
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(cardA, "global_position", posB, 0.4)
 	tween.tween_property(cardB, "global_position", posA, 0.4)
-
 	tween.set_parallel(false)
+	
 	tween.tween_callback(func():
 		# Swap card references in cardNodes
 		var temp = cardNodes[i]
 		cardNodes[i] = cardNodes[j]
 		cardNodes[j] = temp
-
-		# Update labels
-		cardNodes[i].get_child(0).text = "%s\n%d" % [dataNodes[i]["name"], dataNodes[i]["value"]]
-		cardNodes[j].get_child(0).text = "%s\n%d" % [dataNodes[j]["name"], dataNodes[j]["value"]]
-
-		# Reset card positions to their layout positions
-		cardNodes[i].global_position = posA
-		cardNodes[j].global_position = posB
-
-		# Remove highlight
-		cardNodes[i].get_child(0).remove_theme_color_override("font_color")
-		cardNodes[j].get_child(0).remove_theme_color_override("font_color")
+		
+		for card in cardNodes:
+			card.reparent(nodeDisplay)
 
 		# Play next step after a short pause
 		await get_tree().create_timer(0.15).timeout
