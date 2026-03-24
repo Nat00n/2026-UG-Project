@@ -25,15 +25,9 @@ offset_right = 98.0
 offset_bottom = -4.0
 text = "[LMB] Open Editor"
 
-[node name="nodeDisplay" type="HBoxContainer" parent="." unique_id=150888121]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -145.0
-offset_top = -122.0
-offset_right = 186.0
-offset_bottom = -31.394997
-grow_horizontal = 2
-grow_vertical = 2
+[node name="nodeDisplay" type="Control" parent="." unique_id=1863098277]
+layout_mode = 3
+anchors_preset = 0
+offset_top = -100.0
+offset_right = 40.000023
+offset_bottom = -60.0
