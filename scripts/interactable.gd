@@ -4,6 +4,7 @@ extends Area2D
 @onready var visual: ColorRect = $visual
 @onready var nodeDisplay: Control = $nodeDisplay
 @export var objectName: String = "object"
+@export var objectID: String = "object_001"
 
 var _hovered := false
 var _popup: CanvasLayer
@@ -12,6 +13,7 @@ var dataNodes: Array = []
 var cardNodes: Array = []
 var swapQueue: Array = [] 
 var isAnimating : bool = false
+var savedScript: String = ""
 
 const cardWidth = 60
 const cardHeight = 60
@@ -27,6 +29,27 @@ func _ready():
 		})
 		
 	_buildDisplay()
+	_loadScript()
+	
+func _loadScript():
+	# Load from localStorage via JS
+	var result = JavaScriptBridge.eval("""
+        localStorage.getItem('script_%s') || ''
+	""" % objectID)
+	if result != null:
+		savedScript = str(result)
+
+func saveScript(code: String):
+	savedScript = code
+	JavaScriptBridge.eval("""
+        localStorage.setItem('script_%s', `%s`);
+	""" % [objectID, code.replace("`", "\\`")])
+
+func runSavedScript():
+	if savedScript.strip_edges() == "":
+		return
+	if _popup:
+		_popup.runScript(savedScript, self)
 	
 func _buildDisplay():
 	for child in nodeDisplay.get_children():
