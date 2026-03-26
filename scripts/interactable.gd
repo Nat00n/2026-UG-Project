@@ -3,8 +3,9 @@ extends Area2D
 @onready var hoverLabel: Label = $hoverLabel
 @onready var visual: ColorRect = $visual
 @onready var nodeDisplay: Control = $nodeDisplay
-@export var objectName: String = "object"
-@export var objectID: String = "object_001"
+@export var objectName: String = "NamelessObject"
+@export var objectID: String = "object_000"
+@export var taskDesc: String = "None"
 
 var _hovered := false
 var _popup: CanvasLayer

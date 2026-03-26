@@ -37,16 +37,22 @@ split_offsets = PackedInt32Array(0, 0)
 
 [node name="HSplitContainer" type="HSplitContainer" parent="Panel/VSplitContainer" unique_id=316253582]
 layout_mode = 2
-split_offsets = PackedInt32Array(0, 0)
+split_offsets = PackedInt32Array(-120, -15, 111)
+split_offset = -120
 
 [node name="Label" type="Label" parent="Panel/VSplitContainer/HSplitContainer" unique_id=575328589]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 3.0
 theme_override_font_sizes/font_size = 24
 text = "Code Editor"
 
-[node name="RunButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=1489610588]
+[node name="AIButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=1489610588]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "AI Tips"
+
+[node name="RunButton2" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=346033384]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
@@ -55,7 +61,6 @@ text = "Run"
 [node name="CloseButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=2005574071]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.5
 theme_override_font_sizes/font_size = 24
 text = "Close"
 

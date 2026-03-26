@@ -21,3 +21,4 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 [node name="Interactable" parent="." unique_id=1779530000 instance=ExtResource("2_85yof")]
 z_index = 1
 position = Vector2(802, 500)
+objectID = "object_001"
