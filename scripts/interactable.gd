@@ -32,7 +32,6 @@ func _ready():
 	_loadScript()
 	
 func _loadScript():
-	# Load from localStorage via JS
 	var result = JavaScriptBridge.eval("""
         localStorage.getItem('script_%s') || ''
 	""" % objectID)
@@ -41,9 +40,11 @@ func _loadScript():
 
 func saveScript(code: String):
 	savedScript = code
+	# Encode string with json
+	var jsonCode = JSON.stringify(code)
 	JavaScriptBridge.eval("""
-        localStorage.setItem('script_%s', `%s`);
-	""" % [objectID, code.replace("`", "\\`")])
+        localStorage.setItem('script_%s', %s);
+	""" % [objectID, jsonCode])
 
 func runSavedScript():
 	if savedScript.strip_edges() == "":

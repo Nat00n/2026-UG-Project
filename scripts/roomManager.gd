@@ -21,6 +21,8 @@ func _showRoom(index: int):
 	for i in range(rooms.size()):
 		rooms[i].visible = (i == index)
 
+	rooms[index].onShow()
+
 	# Pass popup reference to all interactables in the current room
 	for interactable in rooms[index].getInteractables():
 		interactable._popup = IDE

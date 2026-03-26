@@ -28,6 +28,8 @@ body {
 }
 
 #canvas {
+	width: 100vw;
+    height: 100vh;
 	display: block;
 }
 
@@ -243,7 +245,11 @@ const engine = new Engine(GODOT_CONFIG);
 
 		initPyodide();
 
-		async function runPythonFromGodot(code) {
+		async function runPythonFromGodot() {
+			const code = window._pendingCode;
+			if (!code) {
+				throw new Error("No code to run");
+			}
 			return await pyodide.runPythonAsync(code);
 		}
 

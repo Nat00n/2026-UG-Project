@@ -14,8 +14,8 @@ func _ready():
 	
 	panel.visible = false
 	
-	closeButton.pressed.connect(close)
-	runButton.pressed.connect(run)
+	closeButton.pressed.connect(onClose)
+	runButton.pressed.connect(onRun)
 	
 	if OS.has_feature("web"):
 		_talkCallback = JavaScriptBridge.create_callback(talk)
@@ -36,53 +36,47 @@ func talk(args): # test function to see that the python -> JavaScript -> Godot b
 		outputRCT.append_text(msg + "\n")
 
 
+func onClose() -> void:
+	if _currentObject:
+		_currentObject.saveScript(inputCE.text)
+		# Run silently on close
+		_currentObject.runSavedScript()
+
+	panel.visible = false
+	_currentObject = null
+
+
 func open(objectName: String, interactable):
 	_currentObject = interactable
 	
 	outputRCT.clear()
 	outputRCT.append_text("--- %s ---\n" % objectName)
+	
+	inputCE.text = interactable.savedScript
+	
 	panel.visible = true
 	
-	_registerPythonFunctions()
 
-func _registerPythonFunctions():
-	JavaScriptBridge.eval("""
-		window.gdReadNode = function(index) {
-			return window._gdReadCallback ? window._gdReadCallback(index) : "not ready";
-		};
-		window.gdSelectNode = function(index) {
-			return window._gdSelectCallback ? window._gdSelectCallback(index) : "not ready";
-		};
-	""")
+func onRun():
+	if _currentObject:
+		_currentObject.saveScript(inputCE.text)
+	_executeCode(inputCE.text, false)
 
-	# Wire up GDScript callbacks
-	var read_cb = JavaScriptBridge.create_callback(
-		func(args):
-			var idx = int(args[0])
-			var result = _currentObject.read_node(idx)
-			JavaScriptBridge.get_interface("window").set("_lastReadResult", result)
-	)
-	var select_cb = JavaScriptBridge.create_callback(
-		func(args):
-			var idx = int(args[0])
-			var result = _currentObject.select_node(idx)
-			JavaScriptBridge.get_interface("window").set("_lastSelectResult", result)
-	)
-	JavaScriptBridge.get_interface("window").set("_gdReadCallback", read_cb)
-	JavaScriptBridge.get_interface("window").set("_gdSelectCallback", select_cb)
+# Called by interactable for silent background run
+func runScript(code: String, interactable):
+	_currentObject = interactable
+	_executeCode(code, true)
 
-func run():
-	
-	outputRCT.clear()
-	outputRCT.append_text("running : \n")
-	
+func _executeCode(code: String, silent: bool):
+	if not silent:
+		outputRCT.clear()
+		outputRCT.append_text("Running...\n")
+
 	var nodesStr = "["
 	for n in _currentObject.dataNodes:
 		nodesStr += '{"name": "%s", "value": %d},' % [n["name"], n["value"]]
 	nodesStr += "]"
-	
-	var code = inputCE.get_text()
-	
+
 	var wrapped = """
 import sys, io
 
@@ -97,7 +91,6 @@ sys.stderr = GodotOutput()
 
 dataNodes = """ + nodesStr + """
 
-# Custom functions
 def read(index):
 	if index < 0 or index >= len(dataNodes):
 		talk("Error: index " + str(index) + " out of range")
@@ -115,7 +108,7 @@ def select(index):
 	node = dataNodes[index]
 	talk("Selected: " + node["name"] + " (value: " + str(node["value"]) + ")")
 	return node["value"]
-	
+
 def swap(i, j):
 	talk("__swap__:" + str(i) + ":" + str(j))
 	dataNodes[i], dataNodes[j] = dataNodes[j], dataNodes[i]
@@ -125,16 +118,13 @@ def commitSort():
 
 """ + code
 
+	JavaScriptBridge.eval("window._pendingCode = %s;" % JSON.stringify(wrapped))
 	JavaScriptBridge.eval("""
-			(async () => {
-				try {
-					await runPythonFromGodot(`""" + wrapped.replace("`", "\\`") + """`);
-				} catch(e) {
-					if (window.godotTalk) window.godotTalk("Error: " + e.message);
-				}
-			})();
-		""")
-	
-
-func close() -> void:
-	panel.visible = false
+		(async () => {
+			try {
+				await runPythonFromGodot();
+			} catch(e) {
+				if (window.godotTalk) window.godotTalk("Error: " + e.message);
+			}
+		})();
+	""")

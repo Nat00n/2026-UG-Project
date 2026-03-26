@@ -2,8 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://bm85j7tdoavkf" path="res://scenes/IDE.tscn" id="1_o5qli"]
 [ext_resource type="Script" uid="uid://bpbwj01h0u4k5" path="res://scripts/main.gd" id="1_sugp2"]
-[ext_resource type="PackedScene" uid="uid://c2khoy27nacsl" path="res://scenes/room.tscn" id="2_0wfyh"]
+[ext_resource type="PackedScene" uid="uid://c2khoy27nacsl" path="res://scenes/sortRoom.tscn" id="2_0wfyh"]
 [ext_resource type="Script" uid="uid://0aj1e5d62pul" path="res://scripts/roomManager.gd" id="2_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://q3f3s8w0a8db" path="res://scenes/searchRoom.tscn" id="4_tbgi4"]
 
 [node name="Main" type="Node2D" unique_id=2102868353]
 script = ExtResource("1_sugp2")
@@ -11,16 +12,24 @@ script = ExtResource("1_sugp2")
 [node name="RoomManager" type="Node2D" parent="." unique_id=1047869164]
 script = ExtResource("2_jyhfs")
 
-[node name="Room" parent="RoomManager" unique_id=470420785 instance=ExtResource("2_0wfyh")]
+[node name="sortRoom" parent="RoomManager" unique_id=470420785 instance=ExtResource("2_0wfyh")]
+
+[node name="searchRoom" parent="RoomManager" unique_id=454512095 instance=ExtResource("4_tbgi4")]
 
 [node name="RoomUI" type="Node2D" parent="." unique_id=307088215]
 
 [node name="LeftButton" type="Button" parent="RoomUI" unique_id=79039829]
-offset_right = 8.0
-offset_bottom = 8.0
+offset_left = 34.0
+offset_top = 508.0
+offset_right = 94.0
+offset_bottom = 568.0
+text = "<-"
 
 [node name="RightButton" type="Button" parent="RoomUI" unique_id=1322071557]
-offset_right = 8.0
-offset_bottom = 8.0
+offset_left = 1840.0
+offset_top = 487.0
+offset_right = 1900.0
+offset_bottom = 547.0
+text = "->"
 
 [node name="IDE" parent="." unique_id=2056445691 instance=ExtResource("1_o5qli")]

@@ -6,3 +6,7 @@ func getInteractables() -> Array:
 		if child is Area2D:
 			result.append(child)
 	return result
+
+func onShow():
+	for interactable in getInteractables():
+		interactable._loadScript()
