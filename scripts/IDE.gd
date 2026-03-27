@@ -6,9 +6,14 @@ extends CanvasLayer
 @onready var outputRCT: RichTextLabel = $Panel/VSplitContainer/OutputBox
 @onready var runButton: Button = $Panel/VSplitContainer/HSplitContainer/RunButton
 @onready var closeButton: Button = $Panel/VSplitContainer/HSplitContainer/CloseButton
+@onready var aiButton: Button = $Panel/VSplitContainer/HSplitContainer/AIButton
 
 var _talkCallback
+var _aiCallback
 var _currentObject
+var _llmReady := false
+var _llmReadyCallback
+var _llmProgressCallback
 
 func _ready():
 	
@@ -16,10 +21,20 @@ func _ready():
 	
 	closeButton.pressed.connect(onClose)
 	runButton.pressed.connect(onRun)
+	aiButton.pressed.connect(onAITips)
 	
 	if OS.has_feature("web"):
 		_talkCallback = JavaScriptBridge.create_callback(talk)
 		JavaScriptBridge.get_interface("window").godotTalk = _talkCallback
+		
+		_aiCallback = JavaScriptBridge.create_callback(onAIResponse)
+		JavaScriptBridge.get_interface("window").godotAIResponse = _aiCallback
+		
+		_llmReadyCallback = JavaScriptBridge.create_callback(onLLMReady)
+		JavaScriptBridge.get_interface("window").godotLLMReady = _llmReadyCallback
+
+		_llmProgressCallback = JavaScriptBridge.create_callback(onLLMProgress)
+		JavaScriptBridge.get_interface("window").godotLoadProgress = _llmProgressCallback
 
 func talk(args): # test function to see that the python -> JavaScript -> Godot bridge works
 	var msg = str(args[0])
@@ -27,7 +42,6 @@ func talk(args): # test function to see that the python -> JavaScript -> Godot b
 		var index = int(msg.split(":")[1])
 		_currentObject.selectNode(index)
 	elif msg.begins_with("__swap__:"):
-		# format: __swap__:i:j
 		var parts = msg.split(":")
 		_currentObject.queueSwap(int(parts[1]), int(parts[2]))
 	elif msg.begins_with("__commit__"):
@@ -56,6 +70,72 @@ func open(objectName: String, interactable):
 	
 	panel.visible = true
 	
+
+func onLLMReady(args):
+	talk(["readyu"])
+	_llmReady = true
+	aiButton.disabled = false
+	aiButton.text = "AI Tips"
+
+func onLLMProgress(args):
+	aiButton.text = "AI Loading"
+
+func onAITips():
+	
+	talk(["burger"])
+	
+	if _currentObject == null or not _llmReady:
+		return
+
+	aiButton.disabled = true
+	aiButton.text = "AI Thinking..."
+
+	var playerCode = inputCE.text
+	var task = _currentObject.taskDesc
+	var nodeCount = _currentObject.dataNodes.size()
+
+	# Build a prompt describing the context
+	var prompt = """
+You are a Python tutor inside an educational game. 
+The player is working on the following task: %s
+The data they are working with has %d nodes, each with a name and a value from 1-10.
+They have access to these custom functions: read(index), select(index), swap(i, j), commitSort().
+
+Here is the player's current code:
+%s
+
+Give a short, encouraging summary of what is working well, then suggest one specific improvement.
+Keep the response under 100 words. Do not rewrite the full code, just give guidance.
+""" % [task, nodeCount, playerCode if playerCode.strip_edges() != "" else "(empty)"]
+
+	JavaScriptBridge.eval("window._pendingAIPrompt = %s;" % JSON.stringify(prompt))
+	JavaScriptBridge.eval("""
+		(async () => {
+			try {
+				await runAITips();
+			} catch(e) {
+				window.godotAIResponse("Error: " + e.message);
+			}
+		})();
+	""")
+	
+	talk(["Ai thinking"])
+
+func onAIResponse(args):
+	
+	talk(["Cheese"])
+	
+	var msg = str(args[0])
+	aiButton.disabled = false
+	aiButton.text = "AI Tips"
+
+	# Show AI response in output box with distinct colour
+	outputRCT.push_color(Color.html("#DCDCAA"))
+	outputRCT.append_text("\n AI Tips:\n")
+	outputRCT.pop()
+	outputRCT.push_color(Color.html("#9CDCFE"))
+	outputRCT.append_text(msg + "\n")
+	outputRCT.pop()
 
 func onRun():
 	if _currentObject:

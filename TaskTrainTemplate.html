@@ -253,8 +253,68 @@ const engine = new Engine(GODOT_CONFIG);
 			return await pyodide.runPythonAsync(code);
 		}
 
-		</script>
+		let llmEngine = null;
 
+		async function initWebLLM() {
+			// Dynamically import so we can use it outside a module context
+			const webllm = await import("https://esm.run/@mlc-ai/web-llm");
+
+			llmEngine = await webllm.CreateMLCEngine(
+				"Qwen2.5-Coder-1.5B-Instruct-q4f16_1-MLC",
+				{
+					initProgressCallback: (progress) => {
+						console.log("LLM progress:", progress.text);
+						if (window.godotLoadProgress) {
+							window.godotLoadProgress(progress.text);
+						}
+					}
+				}
+			);
+
+			console.log("WebLLM ready");
+			if (window.godotLLMReady) {
+				window.godotLLMReady("ready");
+			}
+		}
+
+		window.runAITips = async function() {
+			console.log("runAITips called");
+			
+			const prompt = window._pendingAIPrompt;
+			console.log("prompt:", prompt ? "set" : "null");
+			if (!prompt) throw new Error("No prompt set");
+
+			console.log("engine state:", llmEngine ? "exists" : "null");
+			if (!llmEngine) {
+				throw new Error("LLM not ready yet");
+			}
+
+			console.log("sending to LLM...");
+			const reply = await llmEngine.chat.completions.create({
+				messages: [
+					{ role: "user", content: prompt }
+				],
+				max_tokens: 300,
+				temperature: 0.7
+			});
+
+			console.log("got reply:", reply);
+			const text = reply.choices[0].message.content;
+			console.log("AI text:", text);
+
+			if (window.godotAIResponse) {
+				window.godotAIResponse(text);
+			} else {
+				console.error("godotAIResponse not set on window");
+			}
+		}
+
+		// Delay init slightly so Godot callbacks are registered first
+		window.addEventListener("load", () => {
+			setTimeout(initWebLLM, 2000);
+		});
+
+		</script>
 
 	</body>
 </html>

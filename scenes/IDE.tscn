@@ -52,7 +52,7 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 text = "AI Tips"
 
-[node name="RunButton2" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=346033384]
+[node name="RunButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=346033384]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
@@ -91,5 +91,3 @@ theme_override_font_sizes/italics_font_size = 24
 theme_override_font_sizes/mono_font_size = 24
 bbcode_enabled = true
 selection_enabled = true
-
-[connection signal="pressed" from="Panel/VSplitContainer/HSplitContainer/CloseButton" to="." method="_on_close_button_pressed"]
