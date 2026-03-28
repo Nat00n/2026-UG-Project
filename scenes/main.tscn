@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://c2khoy27nacsl" path="res://scenes/sortRoom.tscn" id="2_0wfyh"]
 [ext_resource type="Script" uid="uid://0aj1e5d62pul" path="res://scripts/roomManager.gd" id="2_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://q3f3s8w0a8db" path="res://scenes/searchRoom.tscn" id="4_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="6_tefeu"]
 
 [node name="Main" type="Node2D" unique_id=2102868353]
 script = ExtResource("1_sugp2")
@@ -33,3 +34,5 @@ offset_bottom = 547.0
 text = "->"
 
 [node name="IDE" parent="." unique_id=2056445691 instance=ExtResource("1_o5qli")]
+
+[node name="PauseMenu" parent="." unique_id=30784119 instance=ExtResource("6_tefeu")]

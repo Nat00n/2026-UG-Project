@@ -16,6 +16,10 @@ func _ready():
 	rightButton.pressed.connect(goRight)
 
 	_showRoom(0)
+	
+func init(popupRef: CanvasLayer):
+	IDE = popupRef
+	_showRoom(0)
 
 func _showRoom(index: int):
 	for i in range(rooms.size()):
