@@ -1,9 +1,10 @@
 [gd_scene format=3 uid="uid://q3f3s8w0a8db"]
 
 [ext_resource type="Script" uid="uid://e0y3asayi4ga" path="res://scripts/room.gd" id="1_c5whf"]
-[ext_resource type="PackedScene" uid="uid://cuastweaprt2q" path="res://scenes/Interactable.tscn" id="1_qiavs"]
+[ext_resource type="PackedScene" uid="uid://cuastweaprt2q" path="res://scenes/SearchObject.tscn" id="1_qiavs"]
+[ext_resource type="PackedScene" uid="uid://vuvlclyj1tpw" path="res://scenes/SortObject.tscn" id="2_l6gr7"]
 
-[node name="searchRoom" type="Node2D" unique_id=454512095]
+[node name="Level2" type="Node2D" unique_id=454512095]
 script = ExtResource("1_c5whf")
 
 [node name="Background" type="ColorRect" parent="." unique_id=796185774]
@@ -18,13 +19,12 @@ offset_right = 1746.0
 offset_bottom = 969.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
-[node name="Interactable" parent="." unique_id=1779530000 instance=ExtResource("1_qiavs")]
-z_index = 1
-position = Vector2(605, 774)
+[node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_l6gr7")]
+position = Vector2(682, 762)
 objectName = "Kevin"
 objectID = "object_002"
 
-[node name="Interactable2" parent="." unique_id=1707350476 instance=ExtResource("1_qiavs")]
-position = Vector2(1351, 404)
-objectName = "John"
+[node name="SearchObject" parent="." unique_id=568204940 instance=ExtResource("1_qiavs")]
+position = Vector2(1085, 429)
+objectName = "James"
 objectID = "object_003"

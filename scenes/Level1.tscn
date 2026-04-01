@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://c2khoy27nacsl"]
 
 [ext_resource type="Script" uid="uid://e0y3asayi4ga" path="res://scripts/room.gd" id="1_ffxv4"]
-[ext_resource type="PackedScene" uid="uid://cuastweaprt2q" path="res://scenes/Interactable.tscn" id="2_85yof"]
+[ext_resource type="PackedScene" uid="uid://vuvlclyj1tpw" path="res://scenes/SortObject.tscn" id="2_bwv4p"]
 
-[node name="sortRoom" type="Node2D" unique_id=470420785]
+[node name="Level1" type="Node2D" unique_id=470420785]
 script = ExtResource("1_ffxv4")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1634516390]
@@ -18,8 +18,8 @@ offset_right = 1605.0
 offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
-[node name="Interactable" parent="." unique_id=1779530000 instance=ExtResource("2_85yof")]
-z_index = 1
-position = Vector2(802, 500)
+[node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_bwv4p")]
+position = Vector2(716, 547)
+objectName = "Bob"
 objectID = "object_001"
-taskDesc = "To successfully sort the dataNodes provided"
+taskDescription = "To sort an array using bubble sort"

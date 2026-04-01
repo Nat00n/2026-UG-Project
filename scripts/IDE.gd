@@ -11,6 +11,7 @@ extends CanvasLayer
 var _talkCallback
 var _aiCallback
 var _currentObject
+var _executingObject
 var _llmReady := false
 var _llmReadyCallback
 var _llmProgressCallback
@@ -36,16 +37,21 @@ func _ready():
 		_llmProgressCallback = JavaScriptBridge.create_callback(onLLMProgress)
 		JavaScriptBridge.get_interface("window").godotLoadProgress = _llmProgressCallback
 
-func talk(args): # test function to see that the python -> JavaScript -> Godot bridge works
+func talk(args):
 	var msg = str(args[0])
+	var target = _executingObject if _executingObject else _currentObject
+	if target == null:
+		return
+
 	if msg.begins_with("__select__:"):
-		var index = int(msg.split(":")[1])
-		_currentObject.selectNode(index)
+		target.selectNode(int(msg.split(":")[1]))
 	elif msg.begins_with("__swap__:"):
 		var parts = msg.split(":")
-		_currentObject.queueSwap(int(parts[1]), int(parts[2]))
+		target.queueSwap(int(parts[1]), int(parts[2]))
 	elif msg.begins_with("__commit__"):
-		_currentObject.commitSort()
+		target.commitSort()
+	elif msg.begins_with("__commitSelect__:"):
+		target.commitSelect(int(msg.split(":")[1]))
 	else:
 		outputRCT.append_text(msg + "\n")
 
@@ -72,7 +78,6 @@ func open(objectName: String, interactable):
 	
 
 func onLLMReady(args):
-	talk(["readyu"])
 	_llmReady = true
 	aiButton.disabled = false
 	aiButton.text = "AI Tips"
@@ -81,8 +86,6 @@ func onLLMProgress(args):
 	aiButton.text = "AI Loading"
 
 func onAITips():
-	
-	talk(["burger"])
 	
 	if _currentObject == null or not _llmReady:
 		return
@@ -123,8 +126,6 @@ Keep the response under 100 words. Do not rewrite the full code, just give guida
 
 func onAIResponse(args):
 	
-	talk(["Cheese"])
-	
 	var msg = str(args[0])
 	aiButton.disabled = false
 	aiButton.text = "AI Tips"
@@ -140,24 +141,14 @@ func onAIResponse(args):
 func onRun():
 	if _currentObject:
 		_currentObject.saveScript(inputCE.text)
-	_executeCode(inputCE.text, false)
+	_executeCode(inputCE.text, _currentObject, false)
 
 # Called by interactable for silent background run
 func runScript(code: String, interactable):
-	_currentObject = interactable
-	_executeCode(code, true)
+	_executeCode(code, interactable, true)
 
-func _executeCode(code: String, silent: bool):
-	if not silent:
-		outputRCT.clear()
-		outputRCT.append_text("Running...\n")
-
-	var nodesStr = "["
-	for n in _currentObject.dataNodes:
-		nodesStr += '{"name": "%s", "value": %d},' % [n["name"], n["value"]]
-	nodesStr += "]"
-
-	var wrapped = """
+func _buildPreamble() -> String:
+	return """
 import sys, io
 
 class GodotOutput(io.TextIOBase):
@@ -169,34 +160,26 @@ class GodotOutput(io.TextIOBase):
 sys.stdout = GodotOutput()
 sys.stderr = GodotOutput()
 
-dataNodes = """ + nodesStr + """
-
-def read(index):
-	if index < 0 or index >= len(dataNodes):
-		talk("Error: index " + str(index) + " out of range")
-		return None
-	node = dataNodes[index]
-	result = node["name"] + " = " + str(node["value"])
-	talk(result)
-	return node["value"]
+array = """ + _currentObject.getArrayString() + """
 
 def select(index):
-	if index < 0 or index >= len(dataNodes):
+	if index < 0 or index >= len(array):
 		talk("Error: index " + str(index) + " out of range")
 		return None
 	talk("__select__:" + str(index))
-	node = dataNodes[index]
-	talk("Selected: " + node["name"] + " (value: " + str(node["value"]) + ")")
-	return node["value"]
+	talk("Selected index " + str(index) + " (value: " + str(array[index]) + ")")
+	return array["index"]
 
-def swap(i, j):
-	talk("__swap__:" + str(i) + ":" + str(j))
-	dataNodes[i], dataNodes[j] = dataNodes[j], dataNodes[i]
+""" + _currentObject.getPreambleFunctions()
 
-def commitSort():
-	talk("__commit__")
+func _executeCode(code: String, target, silent: bool):
+	_executingObject = target
+	
+	if not silent:
+		outputRCT.clear()
+		outputRCT.append_text("Running...\n")
 
-""" + code
+	var wrapped = _buildPreamble() + "\n" + code
 
 	JavaScriptBridge.eval("window._pendingCode = %s;" % JSON.stringify(wrapped))
 	JavaScriptBridge.eval("""
@@ -208,3 +191,5 @@ def commitSort():
 			}
 		})();
 	""")
+	await get_tree().create_timer(0.1).timeout
+	_executingObject = null

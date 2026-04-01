@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://vuvlclyj1tpw"]
+
+[ext_resource type="Script" uid="uid://e71xn68q4kv2" path="res://scripts/sortObject.gd" id="1_xq37s"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c6f01"]
+size = Vector2(37.4875, 38.855)
+
+[node name="SortObject" type="Area2D" unique_id=1779530000]
+script = ExtResource("1_xq37s")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=577107706]
+position = Vector2(19.25625, 20.5725)
+shape = SubResource("RectangleShape2D_c6f01")
+
+[node name="visual" type="ColorRect" parent="." unique_id=615142832]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.84606624, 0.5981369, 0.8300326, 1)
+
+[node name="hoverLabel" type="Label" parent="." unique_id=793281200]
+offset_left = -44.0
+offset_top = -27.0
+offset_right = 98.0
+offset_bottom = -4.0
+text = "[LMB] Open Editor"
+
+[node name="nodeDisplay" type="Control" parent="." unique_id=1863098277]
+layout_mode = 3
+anchors_preset = 0
+offset_top = -160.0
+offset_right = 40.000023
+offset_bottom = -120.0
