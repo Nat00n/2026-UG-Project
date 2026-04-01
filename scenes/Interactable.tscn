@@ -28,6 +28,6 @@ text = "[LMB] Open Editor"
 [node name="nodeDisplay" type="Control" parent="." unique_id=1863098277]
 layout_mode = 3
 anchors_preset = 0
-offset_top = -100.0
+offset_top = -160.0
 offset_right = 40.000023
-offset_bottom = -60.0
+offset_bottom = -120.0

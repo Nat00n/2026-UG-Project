@@ -63,9 +63,12 @@ func _buildDisplay():
 	
 	for i in range(dataNodes.size()):
 		var node = dataNodes[i]
+		
+		var scaledHeight = (1.0 + node["value"] / 10.0 ) * cardHeight
+		
 		var card = PanelContainer.new()
-		card.size = Vector2(cardWidth, cardHeight)
-		card.position = Vector2(startX + i * (cardWidth + cardGap), 0)
+		card.size = Vector2(cardWidth, scaledHeight)
+		card.position = Vector2(startX + i * (cardWidth + cardGap), 2.0 * cardHeight - scaledHeight)
 		
 		var label = Label.new()
 		label.text = "%s\n%d" % [node["name"], node["value"]]
@@ -76,10 +79,7 @@ func _buildDisplay():
 		nodeDisplay.add_child(card)
 		cardNodes.append(card)
 		
-	nodeDisplay.size = Vector2(
-		totalWidth,
-		cardHeight
-	)
+	nodeDisplay.size = Vector2(totalWidth, 2.0 * cardHeight)
 
 func _process(_delta):
 	var mouse = get_global_mouse_position()
@@ -145,9 +145,11 @@ func _animateSwap(i: int, j: int):
 	var totalWidth = dataNodes.size() * (cardWidth + cardGap) - cardGap
 	var startX = -totalWidth / 2.0
 
-	# Target positions are just the slot positions — no world coords needed
-	var posA = Vector2(startX + i * (cardWidth + cardGap), 0)
-	var posB = Vector2(startX + j * (cardWidth + cardGap), 0)
+	var scaledHeightA = (1.0 + dataNodes[i]["value"] / 10.0) * cardHeight
+	var scaledHeightB = (1.0 + dataNodes[j]["value"] / 10.0) * cardHeight
+
+	var posA = Vector2(startX + i * (cardWidth + cardGap), 2.0 * cardHeight - scaledHeightA)
+	var posB = Vector2(startX + j * (cardWidth + cardGap), 2.0 * cardHeight - scaledHeightB)
 
 	# Lift swapping cards above others visually
 	cardA.z_index = 1
