@@ -30,3 +30,6 @@ anchors_preset = 0
 offset_top = -160.0
 offset_right = 40.000023
 offset_bottom = -120.0
+
+[node name="selectionBeam" type="Line2D" parent="." unique_id=401556129]
+points = PackedVector2Array(0, 1)

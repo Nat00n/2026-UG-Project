@@ -104,11 +104,3 @@ func saveScript(code: String):
 	JavaScriptBridge.eval("""
         localStorage.setItem('script_%s', %s);
 	""" % [objectID, JSON.stringify(code)])
-
-func runSavedScript():
-	if savedScript.strip_edges() == "":
-		return
-	if not get_parent().visible:
-		return
-	if _popup:
-		_popup.runScript(savedScript, self)

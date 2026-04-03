@@ -21,6 +21,7 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_l6gr7")]
 position = Vector2(682, 762)
+searchTarget = NodePath("../SearchObject")
 objectName = "Kevin"
 objectID = "object_002"
 

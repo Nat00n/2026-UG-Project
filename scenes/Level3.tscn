@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://db7300cbxno5a"]
+
+[ext_resource type="Script" uid="uid://e0y3asayi4ga" path="res://scripts/room.gd" id="1_xsxxn"]
+[ext_resource type="PackedScene" uid="uid://cuastweaprt2q" path="res://scenes/SearchObject.tscn" id="2_uocrp"]
+
+[node name="Level3" type="Node2D" unique_id=454512095]
+script = ExtResource("1_xsxxn")
+
+[node name="Background" type="ColorRect" parent="." unique_id=796185774]
+offset_right = 1929.0
+offset_bottom = 1090.0
+color = Color(0.27387273, 0.27387273, 0.27387273, 1)
+
+[node name="Floor" type="ColorRect" parent="." unique_id=1013166347]
+offset_left = 146.0
+offset_top = 152.0
+offset_right = 1746.0
+offset_bottom = 969.0
+color = Color(0.004679383, 0.13212621, 0.13827685, 1)
+
+[node name="SearchObject" parent="." unique_id=568204940 instance=ExtResource("2_uocrp")]
+position = Vector2(907, 659)
+targetValue = 2
+objectName = "John"
+objectID = "object_004"
+taskDescription = "Search for the value 2"

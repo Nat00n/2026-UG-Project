@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://c2khoy27nacsl" path="res://scenes/Level1.tscn" id="3_jlsqs"]
 [ext_resource type="PackedScene" uid="uid://q3f3s8w0a8db" path="res://scenes/Level2.tscn" id="4_q8u5g"]
 [ext_resource type="PackedScene" uid="uid://bm85j7tdoavkf" path="res://scenes/IDE.tscn" id="5_lhr70"]
+[ext_resource type="PackedScene" uid="uid://db7300cbxno5a" path="res://scenes/Level3.tscn" id="5_nxtc6"]
 [ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="6_wp0k4"]
 
 [node name="Main" type="Node2D" unique_id=2102868353]
@@ -16,6 +17,8 @@ script = ExtResource("2_nxtc6")
 [node name="Level1" parent="RoomManager" unique_id=470420785 instance=ExtResource("3_jlsqs")]
 
 [node name="Level2" parent="RoomManager" unique_id=454512095 instance=ExtResource("4_q8u5g")]
+
+[node name="Level3" parent="RoomManager" unique_id=1369823568 instance=ExtResource("5_nxtc6")]
 
 [node name="RoomUI" type="Node2D" parent="." unique_id=307088215]
 
@@ -32,6 +35,15 @@ offset_top = 487.0
 offset_right = 1900.0
 offset_bottom = 547.0
 text = "->"
+
+[node name="PauseButton" type="Button" parent="RoomUI" unique_id=1826896044]
+offset_left = 1899.0
+offset_top = 18.0
+offset_right = 1955.5
+offset_bottom = 93.0
+rotation = 1.5707964
+theme_override_font_sizes/font_size = 48
+text = "="
 
 [node name="IDE" parent="." unique_id=2056445691 instance=ExtResource("5_lhr70")]
 

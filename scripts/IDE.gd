@@ -59,8 +59,6 @@ func talk(args):
 func onClose() -> void:
 	if _currentObject:
 		_currentObject.saveScript(inputCE.text)
-		# Run silently on close
-		_currentObject.runSavedScript()
 
 	panel.visible = false
 	_currentObject = null
@@ -94,7 +92,7 @@ func onAITips():
 	aiButton.text = "AI Thinking..."
 
 	var playerCode = inputCE.text
-	var task = _currentObject.taskDesc
+	var task = _currentObject.taskDescription
 	var nodeCount = _currentObject.dataNodes.size()
 
 	# Build a prompt describing the context
