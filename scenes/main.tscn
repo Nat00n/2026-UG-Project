@@ -1,24 +1,27 @@
 [gd_scene format=3 uid="uid://htb1yerdmyaq"]
 
-[ext_resource type="Script" uid="uid://bpbwj01h0u4k5" path="res://scripts/main.gd" id="1_c01mt"]
-[ext_resource type="Script" uid="uid://0aj1e5d62pul" path="res://scripts/roomManager.gd" id="2_nxtc6"]
-[ext_resource type="PackedScene" uid="uid://c2khoy27nacsl" path="res://scenes/Level1.tscn" id="3_jlsqs"]
-[ext_resource type="PackedScene" uid="uid://q3f3s8w0a8db" path="res://scenes/Level2.tscn" id="4_q8u5g"]
-[ext_resource type="PackedScene" uid="uid://bm85j7tdoavkf" path="res://scenes/IDE.tscn" id="5_lhr70"]
-[ext_resource type="PackedScene" uid="uid://db7300cbxno5a" path="res://scenes/Level3.tscn" id="5_nxtc6"]
-[ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="6_wp0k4"]
+[ext_resource type="Script" uid="uid://bpbwj01h0u4k5" path="res://scripts/main.gd" id="1_nxtc6"]
+[ext_resource type="Script" uid="uid://0aj1e5d62pul" path="res://scripts/roomManager.gd" id="2_jlsqs"]
+[ext_resource type="PackedScene" uid="uid://c2khoy27nacsl" path="res://scenes/Level1.tscn" id="3_q8u5g"]
+[ext_resource type="PackedScene" uid="uid://q3f3s8w0a8db" path="res://scenes/Level2.tscn" id="4_lhr70"]
+[ext_resource type="PackedScene" uid="uid://db7300cbxno5a" path="res://scenes/Level3.tscn" id="5_wp0k4"]
+[ext_resource type="PackedScene" uid="uid://bm85j7tdoavkf" path="res://scenes/IDE.tscn" id="6_bjd11"]
+[ext_resource type="PackedScene" uid="uid://bul744ri4bh6v" path="res://scenes/Level4.tscn" id="6_jlsqs"]
+[ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="7_qmy6f"]
 
 [node name="Main" type="Node2D" unique_id=2102868353]
-script = ExtResource("1_c01mt")
+script = ExtResource("1_nxtc6")
 
 [node name="RoomManager" type="Node2D" parent="." unique_id=1047869164]
-script = ExtResource("2_nxtc6")
+script = ExtResource("2_jlsqs")
 
-[node name="Level1" parent="RoomManager" unique_id=470420785 instance=ExtResource("3_jlsqs")]
+[node name="Level1" parent="RoomManager" unique_id=470420785 instance=ExtResource("3_q8u5g")]
 
-[node name="Level2" parent="RoomManager" unique_id=454512095 instance=ExtResource("4_q8u5g")]
+[node name="Level2" parent="RoomManager" unique_id=454512095 instance=ExtResource("4_lhr70")]
 
-[node name="Level3" parent="RoomManager" unique_id=1369823568 instance=ExtResource("5_nxtc6")]
+[node name="Level3" parent="RoomManager" unique_id=1369823568 instance=ExtResource("5_wp0k4")]
+
+[node name="Level4" parent="RoomManager" unique_id=419315921 instance=ExtResource("6_jlsqs")]
 
 [node name="RoomUI" type="Node2D" parent="." unique_id=307088215]
 
@@ -45,6 +48,6 @@ rotation = 1.5707964
 theme_override_font_sizes/font_size = 48
 text = "="
 
-[node name="IDE" parent="." unique_id=2056445691 instance=ExtResource("5_lhr70")]
+[node name="IDE" parent="." unique_id=2056445691 instance=ExtResource("6_bjd11")]
 
-[node name="PauseMenu" parent="." unique_id=30784119 instance=ExtResource("6_wp0k4")]
+[node name="PauseMenu" parent="." unique_id=30784119 instance=ExtResource("7_qmy6f")]

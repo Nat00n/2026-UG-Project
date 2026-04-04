@@ -3,6 +3,10 @@ extends InteractableObject
 
 @onready var selectionBeam: Line2D = $selectionBeam
 @export var targetValue: int = 5
+@export var sortedReq: bool = false
+
+var checkQueue: Array = []  # holds steps: {type: "check"/"select", index: int}
+var isAnimating: bool = false
 
 func _ready():
 	super._ready()
@@ -12,11 +16,18 @@ func _ready():
 			hasSortObject = true
 			break
 	if not hasSortObject:
-		for i in range(10):
-			dataNodes.append({
-				"name": "node%d" % i,
-				"value": randi_range(1, 10)
-			})
+		if sortedReq:
+			for i in range(10):
+				dataNodes.append({
+					"name": "node%d" % i,
+					"value": i+1
+				})
+		else:
+			for i in range(10):
+				dataNodes.append({
+					"name": "node%d" % i,
+					"value": randi_range(1, 10)
+				})
 		_buildDisplay()
 
 func _init_object():
@@ -28,63 +39,99 @@ func getPreambleFunctions() -> String:
 	return """
 targetValue = %d
 
+def check(index):
+	talk("__check__:" + str(index))
+
 def commitSelect(index):
 	talk("__commitSelect__:" + str(index))
 """ % targetValue
 
 func receiveArray(sortedNodes: Array):
-	print("receiveArray called with ", sortedNodes.size(), " nodes")
 	dataNodes = sortedNodes.duplicate(true)
-
-	var totalWidth = dataNodes.size() * (cardWidth + cardGap) - cardGap
-	var startX = -totalWidth / 2.0
-
-	# Build cards but start them all at the object centre, then fly to position
-	for child in nodeDisplay.get_children():
-		child.queue_free()
-
-	var tween = create_tween()
-	tween.set_parallel(true)
-
-	for i in range(dataNodes.size()):
-		var node = dataNodes[i]
-		var scaledHeight = (1.0 + node["value"] / 10.0) * cardHeight
-
-		var card = PanelContainer.new()
-		card.size = Vector2(cardWidth, scaledHeight)
-		# Start at centre
-		card.position = Vector2(0, 2.0 * cardHeight - scaledHeight)
-
-		var label = Label.new()
-		label.text = "%s\n%d" % [node["name"], node["value"]]
-		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-
-		card.add_child(label)
-		nodeDisplay.add_child(card)
-		node["card"] = card
-
-		# Fly to final position
-		var finalX = startX + i * (cardWidth + cardGap)
-		tween.tween_property(card, "position",
-			Vector2(finalX, 2.0 * cardHeight - scaledHeight), 0.5)\
-			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)\
-			.set_delay(i * 0.05)
-
-	nodeDisplay.size = Vector2(totalWidth, 2.0 * cardHeight)
 	selectionBeam.visible = false
+	checkQueue.clear()
+	_buildDisplay()
 
-func commitSelect(index: int):
-	if index < 0 or index >= dataNodes.size():
+func queueCheck(index: int):
+	checkQueue.append({"type": "check", "index": index})
+
+func queueSelect(index: int):
+	checkQueue.append({"type": "select", "index": index})
+
+func commitSearch():
+	if not isAnimating:
+		isAnimating = true
+		_playNextStep()
+
+func _playNextStep():
+	if checkQueue.is_empty():
+		isAnimating = false
 		return
 
-	selectNode(index)
+	var step = checkQueue.pop_front()
 
-	var cardCentre = cardNodes[index].global_position + Vector2(cardWidth / 2.0, 0)
+	if step["type"] == "check":
+		_animateCheck(step["index"])
+	elif step["type"] == "select":
+		_animateSelect(step["index"])
+
+func _animateCheck(index: int):
+	if index < 0 or index >= cardNodes.size():
+		_playNextStep()
+		return
+
+	# Flash the card cyan to show it's being examined
+	var card = cardNodes[index]
+	var label = card.get_child(0)
+
+	label.add_theme_color_override("font_color", Color.CYAN)
+	card.add_theme_stylebox_override("panel", _makeStyleBox(Color(0.2, 0.6, 0.8, 0.4)))
+
+	await get_tree().create_timer(0.3).timeout
+
+	# Fade back unless it will be selected next
+	var nextIsSelect = not checkQueue.is_empty() and \
+		checkQueue[0]["type"] == "select" and \
+		checkQueue[0]["index"] == index
+
+	if not nextIsSelect:
+		label.remove_theme_color_override("font_color")
+		card.remove_theme_stylebox_override("panel")
+
+	await get_tree().create_timer(0.1).timeout
+	_playNextStep()
+
+func _animateSelect(index: int):
+	if index < 0 or index >= cardNodes.size():
+		_playNextStep()
+		return
+
+	# Clear all highlights first
+	for i in range(cardNodes.size()):
+		cardNodes[i].get_child(0).remove_theme_color_override("font_color")
+		cardNodes[i].remove_theme_stylebox_override("panel")
+
+	# Highlight selected card yellow
+	var card = cardNodes[index]
+	card.get_child(0).add_theme_color_override("font_color", Color.YELLOW)
+	card.add_theme_stylebox_override("panel", _makeStyleBox(Color(0.8, 0.7, 0.0, 0.4)))
+
+	# Draw beam to selected card
+	var cardCentre = card.global_position + Vector2(cardWidth / 2.0, 0)
 	var objectCentre = visual.global_position + visual.size / 2.0
-
 	selectionBeam.clear_points()
 	selectionBeam.add_point(to_local(objectCentre))
 	selectionBeam.add_point(to_local(cardCentre))
 	selectionBeam.visible = true
+
+	await get_tree().create_timer(0.15).timeout
+	_playNextStep()
+
+func _makeStyleBox(color: Color) -> StyleBoxFlat:
+	var style = StyleBoxFlat.new()
+	style.bg_color = color
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	return style

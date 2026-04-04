@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://bul744ri4bh6v"]
+
+[ext_resource type="Script" uid="uid://e0y3asayi4ga" path="res://scripts/room.gd" id="1_1ank6"]
+[ext_resource type="PackedScene" uid="uid://dwoug4klogb4e" path="res://scenes/GraphObject.tscn" id="2_edif7"]
+
+[node name="Level4" type="Node2D" unique_id=454512095]
+script = ExtResource("1_1ank6")
+
+[node name="Background" type="ColorRect" parent="." unique_id=796185774]
+offset_right = 1929.0
+offset_bottom = 1090.0
+color = Color(0.27387273, 0.27387273, 0.27387273, 1)
+
+[node name="Floor" type="ColorRect" parent="." unique_id=1013166347]
+offset_left = 146.0
+offset_top = 152.0
+offset_right = 1746.0
+offset_bottom = 969.0
+color = Color(0.004679383, 0.13212621, 0.13827685, 1)
+
+[node name="GraphObject" parent="." unique_id=1779530000 instance=ExtResource("2_edif7")]
+position = Vector2(274, 277)

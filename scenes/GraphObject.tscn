@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://dwoug4klogb4e"]
+
+[ext_resource type="Script" uid="uid://bc64uoxfuu7bu" path="res://scripts/graphObject.gd" id="1_6jx3y"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c6f01"]
+size = Vector2(37.4875, 38.855)
+
+[node name="GraphObject" type="Area2D" unique_id=1779530000]
+script = ExtResource("1_6jx3y")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=577107706]
+position = Vector2(19.25625, 20.5725)
+shape = SubResource("RectangleShape2D_c6f01")
+
+[node name="visual" type="ColorRect" parent="." unique_id=615142832]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.22827706, 0.7746986, 0.8703903, 1)
+
+[node name="hoverLabel" type="Label" parent="." unique_id=793281200]
+offset_left = -44.0
+offset_top = -27.0
+offset_right = 98.0
+offset_bottom = -4.0
+text = "[LMB] Open Editor"
+
+[node name="nodeDisplay" type="Control" parent="." unique_id=1863098277]
+layout_mode = 3
+anchors_preset = 0
+offset_top = -160.0
+offset_right = 40.000023
+offset_bottom = -120.0

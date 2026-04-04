@@ -50,8 +50,21 @@ func talk(args):
 		target.queueSwap(int(parts[1]), int(parts[2]))
 	elif msg.begins_with("__commit__"):
 		target.commitSort()
+	elif msg.begins_with("__check__:"):
+		_currentObject.queueCheck(int(msg.split(":")[1]))
 	elif msg.begins_with("__commitSelect__:"):
-		target.commitSelect(int(msg.split(":")[1]))
+		_currentObject.queueSelect(int(msg.split(":")[1]))
+		_currentObject.commitSearch()
+	elif msg.begins_with("__visit__:"):
+		_currentObject.queueVisit(int(msg.split(":")[1]))
+	elif msg.begins_with("__path__:"):
+		var parts = msg.split(":")[1].split(",")
+		var pathIds = []
+		for p in parts:
+			if p != "":
+				pathIds.append(int(p))
+		_currentObject.queuePath(pathIds)
+		_currentObject.startPathAnimation()
 	else:
 		outputRCT.append_text(msg + "\n")
 
