@@ -33,7 +33,6 @@ func commitSort():
 	if not isAnimating:
 		isAnimating = true
 		_playNextSwap()
-		_sendToSearch()
 
 func _sendToSearch():
 	var searchNode: SearchObject = null

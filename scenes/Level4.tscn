@@ -20,3 +20,5 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="GraphObject" parent="." unique_id=1779530000 instance=ExtResource("2_edif7")]
 position = Vector2(274, 277)
+objectName = "Emmi"
+objectID = "object_006"

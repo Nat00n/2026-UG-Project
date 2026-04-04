@@ -14,6 +14,8 @@ var weightLabels: Dictionary = {}
 var visitQueue: Array = []
 var pendingPath: Array = []
 var isAnimating: bool = false
+var currentNodeId: int = -1
+var pathCommitted: bool = false
 
 const NODE_RADIUS = 22
 const GRAPH_WIDTH = 1260
@@ -108,6 +110,13 @@ func _hasEdge(fromId: int, toId: int) -> bool:
 	return false
 
 func _buildGraphDisplay():
+	
+	currentNodeId = -1
+	pathCommitted = false
+	visitQueue.clear()
+	pendingPath.clear()
+	isAnimating = false
+
 	for child in nodeDisplay.get_children():
 		child.queue_free()
 	nodeCircles.clear()
@@ -214,6 +223,8 @@ def commitPath(path):
 # --- Animation ---
 
 func queueVisit(nodeId: int):
+	if pathCommitted:
+		return  # ignore any visits queued after commitPath
 	visitQueue.append(nodeId)
 	if not isAnimating:
 		isAnimating = true
@@ -221,11 +232,13 @@ func queueVisit(nodeId: int):
 
 func queuePath(pathIds: Array):
 	pendingPath = pathIds
+	pathCommitted = true  # stop accepting new visits
 
 func startPathAnimation():
-	# Wait for all visit steps to finish, then animate path
+	# Wait for remaining queued visits to finish first
 	var delay = visitQueue.size() * 0.35 + 0.3
 	await get_tree().create_timer(delay).timeout
+	pathCommitted = false  # reset for next run
 	_animatePath(pendingPath)
 
 func _playNextVisit():
@@ -234,7 +247,16 @@ func _playNextVisit():
 		return
 
 	var nodeId = visitQueue.pop_front()
-	_setNodeColor(nodeId, Color(0.15, 0.55, 0.85))  # cyan-blue visited
+
+	# Colour the previous current node as visited before moving on
+	if currentNodeId != -1 and currentNodeId != startNodeId and currentNodeId != goalNodeId:
+		_setNodeColor(currentNodeId, Color(0.15, 0.55, 0.85))
+
+	currentNodeId = nodeId
+
+	# Current node gets a distinct highlight
+	if nodeId != startNodeId and nodeId != goalNodeId:
+		_setNodeColor(nodeId, Color(0.95, 0.55, 0.1))  # orange = currently exploring
 
 	await get_tree().create_timer(0.35).timeout
 	_playNextVisit()
