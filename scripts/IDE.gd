@@ -70,6 +70,19 @@ func talk(args):
 				pathIds.append(int(p))
 		_currentObject.queuePath(pathIds)
 		_currentObject.startPathAnimation()
+	elif msg.begins_with("__cell__:"):
+		var parts = msg.split(":")
+		_currentObject.setCell(int(parts[1]), int(parts[2]), int(parts[3]))
+	elif msg.begins_with("__highlight__:"):
+		var parts = msg.split(":")
+		_currentObject.highlightCell(int(parts[1]), int(parts[2]))
+	elif msg.begins_with("__knapsack__:"):
+		var parts = msg.split(":")[1].split(",")
+		var indices = []
+		for p in parts:
+			if p != "":
+				indices.append(int(p))
+		_currentObject.commitKnapsack(indices)
 	else:
 		outputRCT.append_text(msg + "\n")
 
