@@ -48,6 +48,11 @@ func talk(args):
 	elif msg.begins_with("__swap__:"):
 		var parts = msg.split(":")
 		target.queueSwap(int(parts[1]), int(parts[2]))
+	elif msg.begins_with("__move__:"):
+		var parts = msg.split(":")
+		_currentObject.queueMove(int(parts[1]), int(parts[2]))
+	elif msg.begins_with("__pivot__:"):
+		_currentObject.queuePivot(int(msg.split(":")[1]))
 	elif msg.begins_with("__commit__"):
 		target.commitSort()
 	elif msg.begins_with("__check__:"):

@@ -5,6 +5,7 @@ extends InteractableObject
 
 var swapQueue: Array = []
 var isAnimating: bool = false
+var pivotIndex: int = -1
 
 func _init_object():
 	for i in range(10):
@@ -17,17 +18,22 @@ func _init_object():
 func getPreambleFunctions() -> String:
 	return """
 def swap(i, j):
-	print(f"swapping {array[i]} and {array[j]}")
 	talk("__swap__:" + str(i) + ":" + str(j))
 	array[i], array[j] = array[j], array[i]
-	print(f"array now: {array}")
+
+def move(fromIndex, toIndex):
+	# Used by merge sort to place elements into correct position
+	talk("__move__:" + str(fromIndex) + ":" + str(toIndex))
+	val = array.pop(fromIndex)
+	array.insert(toIndex, val)
+
+def setPivot(index):
+	# Highlights the pivot element for quick sort
+	talk("__pivot__:" + str(index))
 
 def commitSort():
 	talk("__commit__")
 """
-
-func queueSwap(i: int, j: int):
-	swapQueue.append([i, j])
 
 func commitSort():
 	if not isAnimating:
@@ -62,21 +68,44 @@ func _sendToSearch():
 		searchNode.receiveArray(dataNodes.duplicate(true))
 	)
 
+func queueSwap(i: int, j: int):
+	swapQueue.append({"type": "swap", "i": i, "j": j})
+
+func queueMove(fromIndex: int, toIndex: int):
+	swapQueue.append({"type": "move", "from": fromIndex, "to": toIndex})
+
+func queuePivot(index: int):
+	swapQueue.append({"type": "pivot", "index": index})
+
 func _playNextSwap():
 	if swapQueue.is_empty():
 		isAnimating = false
+		_applyPivot(-1)
 		_sendToSearch()
 		return
 
 	var step = swapQueue.pop_front()
-	var i = step[0]
-	var j = step[1]
 
-	var temp = dataNodes[i]
-	dataNodes[i] = dataNodes[j]
-	dataNodes[j] = temp
+	if step["type"] == "swap":
+		var i = step["i"]
+		var j = step["j"]
+		var temp = dataNodes[i]
+		dataNodes[i] = dataNodes[j]
+		dataNodes[j] = temp
+		_animateSwap(i, j)
+	elif step["type"] == "pivot":
+		_applyPivot(step["index"])
+		await get_tree().create_timer(0.15).timeout
+		_playNextSwap()
+	elif step["type"] == "move":
+		_animateMove(step["from"], step["to"])
 
-	_animateSwap(i, j)
+func _applyPivot(index: int):
+	if pivotIndex >= 0 and pivotIndex < cardNodes.size():
+		cardNodes[pivotIndex].get_child(0).remove_theme_color_override("font_color")
+	pivotIndex = index
+	if index >= 0 and index < cardNodes.size():
+		cardNodes[index].get_child(0).add_theme_color_override("font_color", Color.ORANGE)
 
 func _animateSwap(i: int, j: int):
 	var totalWidth = dataNodes.size() * (cardWidth + cardGap) - cardGap
@@ -85,27 +114,69 @@ func _animateSwap(i: int, j: int):
 	var cardA = cardNodes[i]
 	var cardB = cardNodes[j]
 
-	# Only swap x — each card keeps its own y the whole time
 	var posA = Vector2(startX + i * (cardWidth + cardGap), cardA.position.y)
 	var posB = Vector2(startX + j * (cardWidth + cardGap), cardB.position.y)
+
+	cardA.get_child(0).add_theme_color_override("font_color", Color.CYAN)
+	cardB.get_child(0).add_theme_color_override("font_color", Color.CYAN)
 
 	cardA.z_index = 1
 	cardB.z_index = 1
 
 	var tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(cardA, "position", Vector2(posB.x, posA.y), 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property(cardB, "position", Vector2(posA.x, posB.y), 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(cardA, "position", Vector2(posB.x, cardA.position.y), 0.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(cardB, "position", Vector2(posA.x, cardB.position.y), 0.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.set_parallel(false)
 
 	tween.tween_callback(func():
 		var temp = cardNodes[i]
 		cardNodes[i] = cardNodes[j]
 		cardNodes[j] = temp
+
 		cardNodes[i].get_child(0).text = "%s\n%d" % [dataNodes[i]["name"], dataNodes[i]["value"]]
 		cardNodes[j].get_child(0).text = "%s\n%d" % [dataNodes[j]["name"], dataNodes[j]["value"]]
 		cardNodes[i].z_index = 0
 		cardNodes[j].z_index = 0
-		await get_tree().create_timer(0.15).timeout
+
+		if i != pivotIndex:
+			cardNodes[i].get_child(0).remove_theme_color_override("font_color")
+		if j != pivotIndex:
+			cardNodes[j].get_child(0).remove_theme_color_override("font_color")
+
+		await get_tree().create_timer(0.05).timeout
+		_playNextSwap()
+	)
+	
+func _animateMove(fromIndex: int, toIndex: int):
+	var totalWidth = dataNodes.size() * (cardWidth + cardGap) - cardGap
+	var startX = -totalWidth / 2.0
+
+	var card = cardNodes[fromIndex]
+	var targetX = startX + toIndex * (cardWidth + cardGap)
+
+	card.z_index = 1
+	card.get_child(0).add_theme_color_override("font_color", Color.CYAN)
+
+	var tween = create_tween()
+	tween.tween_property(card, "position", Vector2(targetX, card.position.y), 0.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+	tween.tween_callback(func():
+		var movedNode = dataNodes[fromIndex]
+		var movedCard = cardNodes[fromIndex]
+
+		dataNodes.remove_at(fromIndex)
+		dataNodes.insert(toIndex, movedNode)
+		cardNodes.remove_at(fromIndex)
+		cardNodes.insert(toIndex, movedCard)
+
+		for i in range(cardNodes.size()):
+			cardNodes[i].position.x = startX + i * (cardWidth + cardGap)
+			cardNodes[i].z_index = 0
+			if i != pivotIndex:
+				cardNodes[i].get_child(0).remove_theme_color_override("font_color")
+			cardNodes[i].get_child(0).text = "%s\n%d" % [dataNodes[i]["name"], dataNodes[i]["value"]]
+
+		await get_tree().create_timer(0.05).timeout
 		_playNextSwap()
 	)
