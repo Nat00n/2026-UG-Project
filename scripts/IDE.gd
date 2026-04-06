@@ -87,9 +87,7 @@ func talk(args):
 		for p in parts:
 			if p.strip_edges() != "":
 				coinList.append(int(p))
-		target.clearAllStacks()
-		for coin in coinList:
-			target.addCoinToStack(coin)
+		target.commitChange(coinList)
 
 	# Knapsack
 	elif msg.begins_with("__cell__:"):
@@ -139,10 +137,10 @@ func open(objectName: String, interactable):
 func onLLMReady(args):
 	_llmReady = true
 	aiButton.disabled = false
-	aiButton.text = "AI Tips"
+	aiButton.text = "= AI Tips ="
 
 func onLLMProgress(args):
-	aiButton.text = "AI Loading"
+	aiButton.text = "= AI Loading ="
 
 func onAITips():
 	
@@ -150,7 +148,7 @@ func onAITips():
 		return
 
 	aiButton.disabled = true
-	aiButton.text = "AI Thinking..."
+	aiButton.text = "= AI Thinking... ="
 
 	var playerCode = inputCE.text
 	var task = _currentObject.taskDescription
@@ -187,7 +185,7 @@ func onAIResponse(args):
 	
 	var msg = str(args[0])
 	aiButton.disabled = false
-	aiButton.text = "AI Tips"
+	aiButton.text = "= AI Tips ="
 
 	# Show AI response in output box with distinct colour
 	outputRCT.push_color(Color.html("#DCDCAA"))

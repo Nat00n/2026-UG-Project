@@ -11,7 +11,7 @@ var targetAmount: int = 0
 var coinStacks: Dictionary = {}
 
 func _init_object():
-	targetAmount = randi_range(15, 1000)
+	targetAmount = randi_range(15, 500)
 	_buildCoinDisplay()
 
 func resetDisplay():
@@ -20,7 +20,7 @@ func resetDisplay():
 			t.kill()
 	activeTweens.clear()
 	# Regenerate a new target amount on each reset
-	targetAmount = randi_range(15, 1000)
+	targetAmount = randi_range(15, 500)
 	_buildCoinDisplay()
 
 func _buildDisplay():
@@ -75,12 +75,12 @@ func _formatCoin(value: int) -> String:
 
 func _getCoinColor(value: int) -> Color:
 	match value:
-		1:   return Color(0.7, 0.5, 0.3)
+		1:   return Color(0.6, 0.45, 0.25)
 		2:   return Color(0.6, 0.45, 0.25)
-		5:   return Color(0.75, 0.75, 0.75)
+		5:   return Color(0.8, 0.8, 0.8)
 		10:  return Color(0.8, 0.8, 0.8)
-		20:  return Color(0.85, 0.75, 0.3)
-		50:  return Color(0.85, 0.75, 0.3)
+		20:  return Color(0.8, 0.8, 0.8)
+		50:  return Color(0.9, 0.8, 0.35)
 		100: return Color(0.9, 0.8, 0.35)
 	return Color.GRAY
 
@@ -112,7 +112,7 @@ func _makeCoinCircle(value: int) -> PanelContainer:
 
 	return panel
 
-func addCoinToStack(coinValue: int):
+func addCoinToStack(coinValue: int, delay: float = 0.0):
 	if not COIN_VALUES.has(coinValue):
 		return
 
@@ -123,18 +123,18 @@ func addCoinToStack(coinValue: int):
 	var coinY = COL_HEIGHT - COIN_RADIUS - stack.size() * (COIN_RADIUS * 2 + COIN_GAP)
 
 	var coin = _makeCoinCircle(coinValue)
-	coin.position = Vector2(colX - COIN_RADIUS, coinY - COIN_RADIUS)
+	coin.position = Vector2(colX - COIN_RADIUS, coinY - COIN_RADIUS - 60)
+	coin.modulate.a = 0.0
 	nodeDisplay.add_child(coin)
 	stack.append(coin)
 
-	# Animate coin dropping in from above
-	var startY = coin.position.y - 60
-	var endY = coin.position.y
-	coin.position.y = startY
-
 	var tween = createTrackedTween()
-	tween.tween_property(coin, "position:y", endY, 0.25)\
-		.set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(true)
+	tween.tween_property(coin, "position:y", coinY - COIN_RADIUS, 0.25)\
+		.set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)\
+		.set_delay(delay)
+	tween.tween_property(coin, "modulate:a", 1.0, 0.1)\
+		.set_delay(delay)
 
 func removeCoinFromStack(coinValue: int):
 	if not COIN_VALUES.has(coinValue):
@@ -150,6 +150,13 @@ func clearAllStacks():
 			if is_instance_valid(coin):
 				coin.queue_free()
 		coinStacks[coinVal].clear()
+		
+func commitChange(coinList: Array):
+	clearAllStacks()
+	var delay = 0.0
+	for coin in coinList:
+		addCoinToStack(coin, delay)
+		delay += 0.2
 
 func getPreambleFunctions() -> String:
 	return """

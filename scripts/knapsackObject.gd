@@ -11,8 +11,8 @@ var isFilling: bool = false
 
 const CELL_W = 52
 const CELL_H = 44
-const GRID_OFFSET_X = 220
-const GRID_OFFSET_Y = 60
+const GRID_OFFSET_X = 260
+const GRID_OFFSET_Y = 40
 const ITEM_COLORS = [
 	Color(0.85, 0.35, 0.35),
 	Color(0.35, 0.65, 0.85),
@@ -170,11 +170,13 @@ func _makeRoundedStyle(bg: Color, border: Color, radius: int, borderWidth: int) 
 # KnapsackObject.gd
 var animGeneration := 0
 var slotNodes: Array = []  # store slot references directly
+var slotOffsetMap: Dictionary = {}
 
 func resetDisplay():
 	fillQueue.clear()
 	isFilling = false
 	animGeneration += 1
+	slotOffsetMap.clear()
 	items = initialDataNodes.duplicate(true)
 	super.resetDisplay()
 
@@ -237,10 +239,56 @@ func _playNextFill():
 	elif step["type"] == "taken":
 		cell.add_theme_stylebox_override("panel", _makeRoundedStyle(
 			Color(0.2, 0.7, 0.3), Color(0.4, 0.9, 0.5), 6, 3))
-		if step["row"] >= 0 and step["row"] < itemShapes.size():
-			itemShapes[step["row"]].add_theme_stylebox_override("panel",
-				_makeRoundedStyle(ITEM_COLORS[step["row"] % ITEM_COLORS.size()], Color.WHITE, 8, 3))
-		await get_tree().create_timer(0.25).timeout
+		var idx = step["row"]
+		if idx >= 0 and idx < itemShapes.size() and idx in slotOffsetMap:
+			var item = items[idx]
+			var color = ITEM_COLORS[idx % ITEM_COLORS.size()]
+			var slotOffset = slotOffsetMap[idx]
+			var capturedOffset = slotOffset
+			var capturedGen = gen
+			itemShapes[idx].add_theme_stylebox_override("panel",
+				_makeRoundedStyle(color, Color.WHITE, 8, 3))
+			var sourcePos = itemShapes[idx].global_position
+			var rows = items.size()
+			var barY = GRID_OFFSET_Y + rows * CELL_H + 16
+			var targetX = nodeDisplay.global_position.x + GRID_OFFSET_X + capturedOffset * CELL_W + 1
+			var targetY = nodeDisplay.global_position.y + barY
+			var copy = PanelContainer.new()
+			copy.size = Vector2(item["weight"] * (CELL_W - 4), 52)
+			copy.global_position = sourcePos
+			copy.add_theme_stylebox_override("panel", _makeRoundedStyle(color.darkened(0.2), color, 8, 2))
+			var copyLabel = Label.new()
+			copyLabel.text = "w:%d v:%d" % [item["weight"], item["value"]]
+			copyLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			copyLabel.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			copyLabel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			copyLabel.add_theme_font_size_override("font_size", 10)
+			copyLabel.add_theme_color_override("font_color", Color.WHITE)
+			copy.add_child(copyLabel)
+			get_tree().current_scene.add_child(copy)
+			var tween = create_tween()
+			tween.tween_property(copy, "global_position",
+				Vector2(targetX, targetY), 0.5)\
+				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			tween.tween_callback(func():
+				copy.queue_free()
+				if capturedGen != animGeneration:
+					return
+				for w in range(item["weight"]):
+					var slotIdx = capturedOffset + w
+					if slotIdx < slotNodes.size():
+						slotNodes[slotIdx].add_theme_stylebox_override("panel",
+							_makeRoundedStyle(color.darkened(0.1), color, 8, 2))
+						var slotLabel = Label.new()
+						slotLabel.text = item["name"] if w == 0 else ""
+						slotLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+						slotLabel.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+						slotLabel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+						slotLabel.add_theme_font_size_override("font_size", 9)
+						slotLabel.add_theme_color_override("font_color", Color.WHITE)
+						slotNodes[slotIdx].add_child(slotLabel)
+			)
+		await get_tree().create_timer(0.5).timeout
 	elif step["type"] == "skipped":
 		cell.add_theme_stylebox_override("panel", _makeRoundedStyle(
 			Color(0.5, 0.2, 0.2), Color(0.7, 0.3, 0.3), 6, 2))
@@ -276,69 +324,12 @@ func queueSkipped(row: int, col: int):
 		_playNextFill()
 
 func commitKnapsack(selectedIndices: Array):
-	var gen = animGeneration
-	var slotOffset = 0
-
+	slotOffsetMap.clear()
+	var offset = 0
 	for idx in selectedIndices:
-		if idx >= items.size():
-			continue
-
-		var item = items[idx]
-		var color = ITEM_COLORS[idx % ITEM_COLORS.size()]
-
-		itemShapes[idx].add_theme_stylebox_override("panel",
-			_makeRoundedStyle(color, Color.WHITE, 8, 3))
-
-		var sourcePos = itemShapes[idx].global_position
-		var targetX = nodeDisplay.global_position.x + GRID_OFFSET_X + slotOffset * CELL_W + 1
-		var rows = items.size()
-		var barY = GRID_OFFSET_Y + rows * CELL_H + 16
-		var targetY = nodeDisplay.global_position.y + barY
-
-		var copy = PanelContainer.new()
-		var shapeW = item["weight"] * (CELL_W - 4)
-		copy.size = Vector2(shapeW, 52)
-		copy.global_position = sourcePos
-		copy.add_theme_stylebox_override("panel", _makeRoundedStyle(color.darkened(0.2), color, 8, 2))
-
-		var copyLabel = Label.new()
-		copyLabel.text = "w:%d v:%d" % [item["weight"], item["value"]]
-		copyLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		copyLabel.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		copyLabel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		copyLabel.add_theme_font_size_override("font_size", 10)
-		copyLabel.add_theme_color_override("font_color", Color.WHITE)
-		copy.add_child(copyLabel)
-		get_tree().current_scene.add_child(copy)
-
-		var capturedOffset = slotOffset
-		var tween = create_tween()
-		tween.tween_property(copy, "global_position",
-			Vector2(targetX, targetY), 0.5)\
-			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)\
-			.set_delay(selectedIndices.find(idx) * 0.2)
-
-		tween.tween_callback(func():
-			copy.queue_free()
-			if gen != animGeneration:
-				return
-			# Use slotNodes array directly instead of find_child
-			for w in range(item["weight"]):
-				var slotIdx = capturedOffset + w
-				if slotIdx < slotNodes.size():
-					slotNodes[slotIdx].add_theme_stylebox_override("panel",
-						_makeRoundedStyle(color.darkened(0.1), color, 8, 2))
-					var slotLabel = Label.new()
-					slotLabel.text = item["name"] if w == 0 else ""
-					slotLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-					slotLabel.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-					slotLabel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-					slotLabel.add_theme_font_size_override("font_size", 9)
-					slotLabel.add_theme_color_override("font_color", Color.WHITE)
-					slotNodes[slotIdx].add_child(slotLabel)
-		)
-
-		slotOffset += item["weight"]
+		if idx < items.size():
+			slotOffsetMap[idx] = offset
+			offset += items[idx]["weight"]
 
 func getPreambleFunctions() -> String:
 	var itemsStr = "["

@@ -48,21 +48,18 @@ text = "Code Editor"
 
 [node name="AIButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=1489610588]
 layout_mode = 2
-size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "AI Tips"
+text = "= AI Tips ="
 
 [node name="RunButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=346033384]
 layout_mode = 2
-size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "Run"
+text = "= Run ="
 
 [node name="CloseButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=2005574071]
 layout_mode = 2
-size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "Close"
+text = "= Close ="
 
 [node name="CodeEditor" type="CodeEdit" parent="Panel/VSplitContainer" unique_id=1855355128]
 layout_mode = 2
