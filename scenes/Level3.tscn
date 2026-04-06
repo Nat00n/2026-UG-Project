@@ -21,13 +21,13 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 [node name="SearchObject" parent="." unique_id=568204940 instance=ExtResource("2_uocrp")]
 position = Vector2(907, 659)
 targetValue = 2
-sortedReq = true
 objectName = "John"
 objectID = "object_004"
 taskDescription = "Search for the value 2"
 
 [node name="SearchObject2" parent="." unique_id=1779530000 instance=ExtResource("2_uocrp")]
 position = Vector2(571, 378)
+sortReq = true
 objectName = "Connor"
 objectID = "object_005"
 taskDescription = "TO SEARCH"

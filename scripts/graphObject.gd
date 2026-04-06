@@ -3,27 +3,58 @@ extends InteractableObject
 
 @export var nodeCount: int = 30
 @export var startNodeId: int = 0
-@export var goalNodeId: int = randi_range(22,30)
+@export var goalNodeId: int = randi_range(24,30)
 
 var graphNodes: Array = []
-# Each: {id, pos, neighbours: [{id, weight}]}
-
 var nodeCircles: Array = []
 var edgeLines: Dictionary = {}
 var weightLabels: Dictionary = {}
+
 var visitQueue: Array = []
 var pendingPath: Array = []
-var isAnimating: bool = false
-var currentNodeId: int = -1
 var pathCommitted: bool = false
+var totalVisitCount: int = 0
+var currentNodeId: int = -1
+
+# _process driven animation — no chained timers
+var visitTimer: float = 0.0
+var visitDelay: float = 0.35
+var isVisiting: bool = false
+
+var pathTimer: float = 0.0
+var pathDelay: float = 0.45
+var pathIndex: int = -1
+var isPathAnimating: bool = false
+
+var waitingForPath: bool = false
+var waitTimer: float = 0.0
+var waitDuration: float = 0.0
 
 const NODE_RADIUS = 22
-const GRAPH_WIDTH = 1260
-const GRAPH_HEIGHT = 840
+const GRAPH_WIDTH = 900
+const GRAPH_HEIGHT = 600
 const MAX_NEIGHBOURS = 4
 
 func _init_object():
 	_generateGraph()
+	_buildGraphDisplay()
+
+func resetDisplay():
+	visitQueue.clear()
+	pendingPath.clear()
+	isVisiting = false
+	isPathAnimating = false
+	waitingForPath = false
+	pathCommitted = false
+	pathIndex = -1
+	currentNodeId = -1
+	visitTimer = 0.0
+	pathTimer = 0.0
+	waitTimer = 0.0
+	totalVisitCount = 0
+	super.resetDisplay()
+
+func _buildDisplay():
 	_buildGraphDisplay()
 
 func _generateGraph():
@@ -54,18 +85,16 @@ func _generateGraph():
 			"neighbours": []
 		})
 
-	# Spanning tree first to guarantee full connectivity
+	# Spanning tree — always connect to nearest unconnected node
 	var connected = [0]
 	var unconnected = []
 	for i in range(1, nodeCount):
 		unconnected.append(i)
 
 	while not unconnected.is_empty():
-		# Find the closest connected node to any unconnected node
 		var bestFrom = -1
 		var bestTo = -1
 		var bestDist = INF
-
 		for toId in unconnected:
 			for fromId in connected:
 				var d = graphNodes[fromId]["pos"].distance_to(graphNodes[toId]["pos"])
@@ -73,13 +102,11 @@ func _generateGraph():
 					bestDist = d
 					bestFrom = fromId
 					bestTo = toId
-
 		_addEdge(bestFrom, bestTo)
 		connected.append(bestTo)
 		unconnected.erase(bestTo)
 
-	# Add extra nearby edges up to MAX_NEIGHBOURS per node
-	# Sort all possible pairs by distance
+	# Extra nearby edges sorted by distance up to MAX_NEIGHBOURS
 	var pairs = []
 	for i in range(nodeCount):
 		for j in range(i + 1, nodeCount):
@@ -92,7 +119,6 @@ func _generateGraph():
 	for pair in pairs:
 		var i = pair["i"]
 		var j = pair["j"]
-		# Only add if both nodes are under the neighbour cap
 		if graphNodes[i]["neighbours"].size() < MAX_NEIGHBOURS and \
 		   graphNodes[j]["neighbours"].size() < MAX_NEIGHBOURS:
 			_addEdge(i, j)
@@ -110,13 +136,6 @@ func _hasEdge(fromId: int, toId: int) -> bool:
 	return false
 
 func _buildGraphDisplay():
-	
-	currentNodeId = -1
-	pathCommitted = false
-	visitQueue.clear()
-	pendingPath.clear()
-	isAnimating = false
-
 	for child in nodeDisplay.get_children():
 		child.queue_free()
 	nodeCircles.clear()
@@ -125,13 +144,11 @@ func _buildGraphDisplay():
 
 	nodeDisplay.size = Vector2(GRAPH_WIDTH, GRAPH_HEIGHT)
 
-	# Draw edges first so nodes appear on top
 	for i in range(graphNodes.size()):
 		for neighbour in graphNodes[i]["neighbours"]:
 			var j = neighbour["id"]
 			if i < j:
 				var key = "%d_%d" % [i, j]
-
 				var line = Line2D.new()
 				line.width = clamp(neighbour["weight"] / 6.0, 1.5, 6.0)
 				line.default_color = Color(0.45, 0.45, 0.45)
@@ -140,7 +157,6 @@ func _buildGraphDisplay():
 				nodeDisplay.add_child(line)
 				edgeLines[key] = line
 
-				# Weight label at edge midpoint
 				var mid = (graphNodes[i]["pos"] + graphNodes[j]["pos"]) / 2.0
 				var wLabel = Label.new()
 				wLabel.text = str(neighbour["weight"])
@@ -150,7 +166,6 @@ func _buildGraphDisplay():
 				nodeDisplay.add_child(wLabel)
 				weightLabels[key] = wLabel
 
-	# Draw nodes on top
 	for i in range(graphNodes.size()):
 		var circle = _makeNodeCircle(i)
 		circle.position = graphNodes[i]["pos"] - Vector2(NODE_RADIUS, NODE_RADIUS)
@@ -173,13 +188,11 @@ func _makeNodeCircle(id: int) -> PanelContainer:
 	for corner in ["corner_radius_top_left", "corner_radius_top_right",
 				   "corner_radius_bottom_left", "corner_radius_bottom_right"]:
 		style.set(corner, NODE_RADIUS)
-
 	style.border_width_left = 2
 	style.border_width_right = 2
 	style.border_width_top = 2
 	style.border_width_bottom = 2
 	style.border_color = Color(0.8, 0.8, 0.8, 0.3)
-
 	panel.add_theme_stylebox_override("panel", style)
 
 	var label = Label.new()
@@ -192,7 +205,113 @@ func _makeNodeCircle(id: int) -> PanelContainer:
 
 	return panel
 
+func _setNodeColor(nodeId: int, color: Color):
+	if nodeId < 0 or nodeId >= nodeCircles.size():
+		return
+	if not is_instance_valid(nodeCircles[nodeId]):
+		return
+	var style = StyleBoxFlat.new()
+	style.bg_color = color
+	for corner in ["corner_radius_top_left", "corner_radius_top_right",
+				   "corner_radius_bottom_left", "corner_radius_bottom_right"]:
+		style.set(corner, NODE_RADIUS)
+	style.border_width_left = 2
+	style.border_width_right = 2
+	style.border_width_top = 2
+	style.border_width_bottom = 2
+	style.border_color = Color(0.8, 0.8, 0.8, 0.3)
+	nodeCircles[nodeId].add_theme_stylebox_override("panel", style)
+
+# --- _process driven animation ---
+
+func _process(delta):
+	# Mouse hover
+	var mouse = get_global_mouse_position()
+	var rect = Rect2(visual.global_position, visual.size)
+	var wasHovered = _hovered
+	_hovered = rect.has_point(mouse)
+	if _hovered != wasHovered:
+		hoverLabel.visible = _hovered
+
+	# Visit animation
+	if isVisiting and not visitQueue.is_empty():
+		visitTimer += delta
+		if visitTimer >= visitDelay:
+			visitTimer = 0.0
+			_stepVisit()
+	elif isVisiting and visitQueue.is_empty():
+		isVisiting = false
+
+	# Wait before path animation
+	if waitingForPath:
+		waitTimer += delta
+		if waitTimer >= waitDuration:
+			waitingForPath = false
+			isPathAnimating = true
+			pathIndex = 0
+			_resetPathColors()
+
+	# Path animation
+	if isPathAnimating:
+		pathTimer += delta
+		if pathTimer >= pathDelay:
+			pathTimer = 0.0
+			_stepPath()
+
+func _stepVisit():
+	if visitQueue.is_empty():
+		isVisiting = false
+		return
+	var nodeId = visitQueue.pop_front()
+	if currentNodeId != -1 and currentNodeId != startNodeId and currentNodeId != goalNodeId:
+		_setNodeColor(currentNodeId, Color(0.15, 0.55, 0.85))
+	currentNodeId = nodeId
+	if nodeId != startNodeId and nodeId != goalNodeId:
+		_setNodeColor(nodeId, Color(0.95, 0.55, 0.1))
+
+func _resetPathColors():
+	for i in range(nodeCircles.size()):
+		if i != startNodeId and i != goalNodeId:
+			_setNodeColor(i, Color(0.25, 0.25, 0.55))
+	for key in edgeLines:
+		if is_instance_valid(edgeLines[key]):
+			edgeLines[key].default_color = Color(0.45, 0.45, 0.45)
+
+func _stepPath():
+	if pathIndex >= pendingPath.size():
+		isPathAnimating = false
+		return
+
+	var nodeId = pendingPath[pathIndex]
+	_setNodeColor(nodeId, Color.YELLOW)
+
+	if pathIndex > 0:
+		var prevId = pendingPath[pathIndex - 1]
+		var key = "%d_%d" % [min(prevId, nodeId), max(prevId, nodeId)]
+		if edgeLines.has(key) and is_instance_valid(edgeLines[key]):
+			edgeLines[key].default_color = Color.YELLOW
+			edgeLines[key].width += 2.0
+
+	pathIndex += 1
+
 # --- Python bridge ---
+
+func queueVisit(nodeId: int):
+	if pathCommitted:
+		return
+	visitQueue.append(nodeId)
+	isVisiting = true
+
+func queuePath(pathIds: Array):
+	pendingPath = pathIds
+	pathCommitted = true
+	totalVisitCount = visitQueue.size()
+
+func startPathAnimation():
+	waitDuration = totalVisitCount * visitDelay + 0.5
+	waitTimer = 0.0
+	waitingForPath = true
+	pathCommitted = false
 
 func getPreambleFunctions() -> String:
 	var graphStr = "{"
@@ -209,95 +328,11 @@ startNode = %d
 goalNode = %d
 
 def getNeighbours(nodeId):
-	# Returns list of [neighbourId, weight]
 	return graph.get(nodeId, [])
 
 def visitNode(nodeId):
 	talk("__visit__:" + str(nodeId))
 
 def commitPath(path):
-	# path is a list of node ids from start to goal
 	talk("__path__:" + ",".join(str(n) for n in path))
 """ % [graphStr, startNodeId, goalNodeId]
-
-# --- Animation ---
-
-func queueVisit(nodeId: int):
-	if pathCommitted:
-		return  # ignore any visits queued after commitPath
-	visitQueue.append(nodeId)
-	if not isAnimating:
-		isAnimating = true
-		_playNextVisit()
-
-func queuePath(pathIds: Array):
-	pendingPath = pathIds
-	pathCommitted = true  # stop accepting new visits
-
-func startPathAnimation():
-	# Wait for remaining queued visits to finish first
-	var delay = visitQueue.size() * 0.35 + 0.3
-	await get_tree().create_timer(delay).timeout
-	pathCommitted = false  # reset for next run
-	_animatePath(pendingPath)
-
-func _playNextVisit():
-	if visitQueue.is_empty():
-		isAnimating = false
-		return
-
-	var nodeId = visitQueue.pop_front()
-
-	# Colour the previous current node as visited before moving on
-	if currentNodeId != -1 and currentNodeId != startNodeId and currentNodeId != goalNodeId:
-		_setNodeColor(currentNodeId, Color(0.15, 0.55, 0.85))
-
-	currentNodeId = nodeId
-
-	# Current node gets a distinct highlight
-	if nodeId != startNodeId and nodeId != goalNodeId:
-		_setNodeColor(nodeId, Color(0.95, 0.55, 0.1))  # orange = currently exploring
-
-	await get_tree().create_timer(0.35).timeout
-	_playNextVisit()
-
-func _animatePath(pathIds: Array):
-	if pathIds.is_empty():
-		return
-
-	# Reset non-start/goal nodes to neutral first
-	for i in range(nodeCircles.size()):
-		if i != startNodeId and i != goalNodeId:
-			_setNodeColor(i, Color(0.25, 0.25, 0.55))
-	for key in edgeLines:
-		edgeLines[key].default_color = Color(0.45, 0.45, 0.45)
-
-	# Animate path nodes and edges one step at a time
-	for i in range(pathIds.size()):
-		var nodeId = pathIds[i]
-		_setNodeColor(nodeId, Color.YELLOW)
-
-		if i > 0:
-			var prevId = pathIds[i - 1]
-			var key = "%d_%d" % [min(prevId, nodeId), max(prevId, nodeId)]
-			if edgeLines.has(key):
-				var line = edgeLines[key]
-				line.default_color = Color.YELLOW
-				line.width += 2.0
-
-		await get_tree().create_timer(0.45).timeout
-
-func _setNodeColor(nodeId: int, color: Color):
-	if nodeId < 0 or nodeId >= nodeCircles.size():
-		return
-	var style = StyleBoxFlat.new()
-	style.bg_color = color
-	for corner in ["corner_radius_top_left", "corner_radius_top_right",
-				   "corner_radius_bottom_left", "corner_radius_bottom_right"]:
-		style.set(corner, NODE_RADIUS)
-	style.border_width_left = 2
-	style.border_width_right = 2
-	style.border_width_top = 2
-	style.border_width_bottom = 2
-	style.border_color = Color(0.8, 0.8, 0.8, 0.3)
-	nodeCircles[nodeId].add_theme_stylebox_override("panel", style)

@@ -43,52 +43,76 @@ func talk(args):
 	if target == null:
 		return
 
-	if msg.begins_with("__select__:"):
-		target.selectNode(int(msg.split(":")[1]))
-	elif msg.begins_with("__swap__:"):
+	# Sort
+	if msg.begins_with("__swap__:"):
 		var parts = msg.split(":")
 		target.queueSwap(int(parts[1]), int(parts[2]))
-	elif msg.begins_with("__move__:"):
-		var parts = msg.split(":")
-		_currentObject.queueMove(int(parts[1]), int(parts[2]))
 	elif msg.begins_with("__pivot__:"):
-		_currentObject.queuePivot(int(msg.split(":")[1]))
+		target.queuePivot(int(msg.split(":")[1]))
 	elif msg.begins_with("__commit__"):
 		target.commitSort()
+	elif msg.begins_with("__move__:"):
+		var parts = msg.split(":")
+		target.queueMove(int(parts[1]), int(parts[2]))
+
+	# Search
 	elif msg.begins_with("__check__:"):
-		_currentObject.queueCheck(int(msg.split(":")[1]))
+		target.queueCheck(int(msg.split(":")[1]))
 	elif msg.begins_with("__commitSelect__:"):
-		_currentObject.queueSelect(int(msg.split(":")[1]))
-		_currentObject.commitSearch()
+		target.queueSelect(int(msg.split(":")[1]))
+		target.commitSearch()
+	elif msg.begins_with("__select__:"):
+		target.selectNode(int(msg.split(":")[1]))
+
+	# Graph
 	elif msg.begins_with("__visit__:"):
-		_currentObject.queueVisit(int(msg.split(":")[1]))
+		target.queueVisit(int(msg.split(":")[1]))
 	elif msg.begins_with("__path__:"):
 		var parts = msg.split(":")[1].split(",")
 		var pathIds = []
 		for p in parts:
-			if p != "":
+			if p.strip_edges() != "":
 				pathIds.append(int(p))
-		_currentObject.queuePath(pathIds)
-		_currentObject.startPathAnimation()
+		target.queuePath(pathIds)
+		target.startPathAnimation()
+
+	# Coin change
+	elif msg.begins_with("__addcoin__:"):
+		target.addCoinToStack(int(msg.split(":")[1]))
+	elif msg.begins_with("__removecoin__:"):
+		target.removeCoinFromStack(int(msg.split(":")[1]))
+	elif msg.begins_with("__commitchange__:"):
+		var parts = msg.split(":")[1].split(",")
+		var coinList = []
+		for p in parts:
+			if p.strip_edges() != "":
+				coinList.append(int(p))
+		target.clearAllStacks()
+		for coin in coinList:
+			target.addCoinToStack(coin)
+
+	# Knapsack
 	elif msg.begins_with("__cell__:"):
 		var parts = msg.split(":")
-		_currentObject.queueCellFill(int(parts[1]), int(parts[2]), int(parts[3]))
+		target.queueCellFill(int(parts[1]), int(parts[2]), int(parts[3]))
+	elif msg.begins_with("__backtrack__:"):
+		var parts = msg.split(":")
+		target.queueBacktrack(int(parts[1]), int(parts[2]))
+	elif msg.begins_with("__taken__:"):
+		var parts = msg.split(":")
+		target.queueTaken(int(parts[1]), int(parts[2]))
+	elif msg.begins_with("__skipped__:"):
+		var parts = msg.split(":")
+		target.queueSkipped(int(parts[1]), int(parts[2]))
 	elif msg.begins_with("__knapsack__:"):
 		var parts = msg.split(":")[1].split(",")
 		var indices = []
 		for p in parts:
-			if p != "":
+			if p.strip_edges() != "":
 				indices.append(int(p))
-		_currentObject.commitKnapsack(indices)
-	elif msg.begins_with("__backtrack__:"):
-		var parts = msg.split(":")
-		_currentObject.queueBacktrack(int(parts[1]), int(parts[2]))
-	elif msg.begins_with("__taken__:"):
-		var parts = msg.split(":")
-		_currentObject.queueTaken(int(parts[1]), int(parts[2]))
-	elif msg.begins_with("__skipped__:"):
-		var parts = msg.split(":")
-		_currentObject.queueSkipped(int(parts[1]), int(parts[2]))
+		target.commitKnapsack(indices)
+
+	# Default output
 	else:
 		outputRCT.append_text(msg + "\n")
 
@@ -213,6 +237,9 @@ func _executeCode(code: String, target, silent: bool):
 	if not silent:
 		outputRCT.clear()
 		outputRCT.append_text("Running...\n")
+		
+	if target.has_method("resetDisplay"):
+		target.resetDisplay()
 
 	var wrapped = _buildPreamble() + "\n" + code
 

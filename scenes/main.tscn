@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://divpf6uw37yqa"]
+[gd_scene format=3 uid="uid://b3memlw6ok0rs"]
 
 [ext_resource type="Script" uid="uid://bpbwj01h0u4k5" path="res://scripts/main.gd" id="1_nxtc6"]
 [ext_resource type="Script" uid="uid://0aj1e5d62pul" path="res://scripts/roomManager.gd" id="2_jlsqs"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bul744ri4bh6v" path="res://scenes/Level4.tscn" id="6_jlsqs"]
 [ext_resource type="PackedScene" uid="uid://dryfocxftdcbs" path="res://scenes/Level5.tscn" id="7_q8u5g"]
 [ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="7_qmy6f"]
+[ext_resource type="PackedScene" uid="uid://dkl4hktywvl4b" path="res://scenes/Level6.tscn" id="8_lhr70"]
 
 [node name="Main" type="Node2D" unique_id=2102868353]
 script = ExtResource("1_nxtc6")
@@ -25,6 +26,8 @@ script = ExtResource("2_jlsqs")
 [node name="Level4" parent="RoomManager" unique_id=419315921 instance=ExtResource("6_jlsqs")]
 
 [node name="Level5" parent="RoomManager" unique_id=1357960288 instance=ExtResource("7_q8u5g")]
+
+[node name="Level6" parent="RoomManager" unique_id=2037297976 instance=ExtResource("8_lhr70")]
 
 [node name="RoomUI" type="Node2D" parent="." unique_id=307088215]
 

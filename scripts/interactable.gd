@@ -4,6 +4,7 @@ extends Area2D
 @onready var hoverLabel: Label = $hoverLabel
 @onready var visual: ColorRect = $visual
 @onready var nodeDisplay: Control = $nodeDisplay
+
 @export var objectName: String = "Object"
 @export var objectID: String = "object_000"
 @export var taskDescription: String = "None"
@@ -11,8 +12,10 @@ extends Area2D
 var _hovered := false
 var _popup: CanvasLayer
 var dataNodes: Array = []
+var initialDataNodes: Array = []
 var cardNodes: Array = []
 var savedScript: String = ""
+var activeTweens: Array = []
 
 const cardWidth = 60
 const cardHeight = 60
@@ -20,6 +23,7 @@ const cardGap = 15
 
 func _ready():
 	hoverLabel.visible = false
+	add_to_group("interactable")
 	_loadScript()
 	_init_object()
 
@@ -51,12 +55,24 @@ func _buildDisplay():
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-
 		card.add_child(label)
 		nodeDisplay.add_child(card)
 		cardNodes.append(card)
 
 	nodeDisplay.size = Vector2(totalWidth, 2.0 * cardHeight)
+
+func createTrackedTween() -> Tween:
+	var t = create_tween()
+	activeTweens.append(t)
+	return t
+
+func resetDisplay():
+	for t in activeTweens:
+		if is_instance_valid(t):
+			t.kill()
+	activeTweens.clear()
+	dataNodes = initialDataNodes.duplicate(true)
+	_buildDisplay()
 
 func _process(_delta):
 	var mouse = get_global_mouse_position()
@@ -75,7 +91,7 @@ func _input(event):
 # Override in child to provide Python preamble functions
 func getPreambleFunctions() -> String:
 	return ""
-	
+
 func getArrayString() -> String:
 	var values = []
 	for n in dataNodes:
@@ -83,7 +99,7 @@ func getArrayString() -> String:
 	return "[" + ", ".join(values) + "]"
 
 func selectNode(index: int):
-	if index < 0 or index >= dataNodes.size():
+	if index < 0 or index >= cardNodes.size():
 		return
 	for i in range(cardNodes.size()):
 		var label = cardNodes[i].get_child(0)
@@ -94,7 +110,7 @@ func selectNode(index: int):
 
 func _loadScript():
 	var result = JavaScriptBridge.eval("""
-        localStorage.getItem('script_%s') || ''
+		localStorage.getItem('script_%s') || ''
 	""" % objectID)
 	if result != null:
 		savedScript = str(result)
@@ -102,5 +118,13 @@ func _loadScript():
 func saveScript(code: String):
 	savedScript = code
 	JavaScriptBridge.eval("""
-        localStorage.setItem('script_%s', %s);
+		localStorage.setItem('script_%s', %s);
 	""" % [objectID, JSON.stringify(code)])
+
+func runSavedScript():
+	if savedScript.strip_edges() == "":
+		return
+	if not get_parent().visible:
+		return
+	if _popup:
+		_popup.runScript(savedScript, self)

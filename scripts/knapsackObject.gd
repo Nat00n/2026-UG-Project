@@ -30,6 +30,7 @@ func _init_object():
 			"weight": randi_range(1, 4),
 			"value": randi_range(1, 10)
 		})
+	initialDataNodes = items.duplicate(true)
 	_buildDisplay()
 
 func _buildDisplay():
@@ -152,29 +153,6 @@ func _buildGrid(rows: int, cols: int):
 			row.append(cell)
 		cellNodes.append(row)
 
-func _buildKnapsackBar():
-	var rows = items.size() + 1
-	var barY = GRID_OFFSET_Y + rows * CELL_H + 16
-
-	var barLabel = Label.new()
-	barLabel.text = "Knapsack (cap: %d)" % capacity
-	barLabel.position = Vector2(GRID_OFFSET_X, barY - 20)
-	barLabel.size = Vector2(capacity * CELL_W, 18)
-	barLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	barLabel.add_theme_font_size_override("font_size", 11)
-	barLabel.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-	nodeDisplay.add_child(barLabel)
-
-	# Empty slot cells for the knapsack bar
-	for c in range(capacity):
-		var slot = PanelContainer.new()
-		slot.name = "slot_%d" % c
-		slot.size = Vector2(CELL_W - 3, CELL_H + 8)
-		slot.position = Vector2(GRID_OFFSET_X + c * CELL_W + 1, barY)
-		var style = _makeRoundedStyle(Color(0.78, 0.78, 0.78), Color(0.6, 0.6, 0.6), 8, 1)
-		slot.add_theme_stylebox_override("panel", style)
-		nodeDisplay.add_child(slot)
-
 func _makeRoundedStyle(bg: Color, border: Color, radius: int, borderWidth: int) -> StyleBoxFlat:
 	var style = StyleBoxFlat.new()
 	style.bg_color = bg
@@ -189,29 +167,39 @@ func _makeRoundedStyle(bg: Color, border: Color, radius: int, borderWidth: int) 
 	style.border_color = border
 	return style
 
-func queueCellFill(row: int, col: int, value: int):
-	fillQueue.append({"type": "fill", "row": row, "col": col, "value": value})
-	if not isFilling:
-		isFilling = true
-		_playNextFill()
+# KnapsackObject.gd
+var animGeneration := 0
+var slotNodes: Array = []  # store slot references directly
 
-func queueBacktrack(row: int, col: int):
-	fillQueue.append({"type": "backtrack", "row": row, "col": col})
-	if not isFilling:
-		isFilling = true
-		_playNextFill()
+func resetDisplay():
+	fillQueue.clear()
+	isFilling = false
+	animGeneration += 1
+	items = initialDataNodes.duplicate(true)
+	super.resetDisplay()
 
-func queueTaken(row: int, col: int):
-	fillQueue.append({"type": "taken", "row": row, "col": col})
-	if not isFilling:
-		isFilling = true
-		_playNextFill()
+func _buildKnapsackBar():
+	slotNodes.clear()  # rebuild slot references
+	var rows = items.size()
+	var barY = GRID_OFFSET_Y + rows * CELL_H + 16
 
-func queueSkipped(row: int, col: int):
-	fillQueue.append({"type": "skipped", "row": row, "col": col})
-	if not isFilling:
-		isFilling = true
-		_playNextFill()
+	var barLabel = Label.new()
+	barLabel.text = "Knapsack (cap: %d)" % capacity
+	barLabel.position = Vector2(GRID_OFFSET_X, barY - 20)
+	barLabel.size = Vector2(capacity * CELL_W, 18)
+	barLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	barLabel.add_theme_font_size_override("font_size", 11)
+	barLabel.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+	nodeDisplay.add_child(barLabel)
+
+	for c in range(capacity):
+		var slot = PanelContainer.new()
+		slot.size = Vector2(CELL_W - 3, CELL_H + 8)
+		slot.position = Vector2(GRID_OFFSET_X + c * CELL_W + 1, barY)
+		var style = _makeRoundedStyle(Color(0.78, 0.78, 0.78), Color(0.6, 0.6, 0.6), 8, 1)
+		slot.add_theme_stylebox_override("panel", style)
+		nodeDisplay.add_child(slot)
+		slotNodes.append(slot)
 
 func _playNextFill():
 	if fillQueue.is_empty():
@@ -219,50 +207,76 @@ func _playNextFill():
 		return
 
 	var step = fillQueue.pop_front()
+	var gen = step.get("gen", 0)
+	if gen != animGeneration:
+		_playNextFill()  # skip stale steps
+		return
+
 	var cell = cellNodes[step["row"]][step["col"]]
-	var rowColor = ITEM_COLORS[(step["row"] - 1) % ITEM_COLORS.size()] if step["row"] > 0 else Color(0.5, 0.75, 0.9)
+	var rowColor = ITEM_COLORS[(step["row"]) % ITEM_COLORS.size()]
 
 	if step["type"] == "fill":
 		cell.add_theme_stylebox_override("panel", _makeRoundedStyle(
 			rowColor.lightened(0.5), rowColor, 6, 2))
 		cell.get_child(0).text = str(step["value"])
 		await get_tree().create_timer(0.05).timeout
+		if animGeneration != gen:
+			return
 		cell.add_theme_stylebox_override("panel", _makeRoundedStyle(
 			rowColor.lightened(0.35), rowColor, 6, 2))
 		await get_tree().create_timer(0.04).timeout
-
 	elif step["type"] == "backtrack":
-		# White pulsing cursor showing where we are in the traceback
 		cell.add_theme_stylebox_override("panel", _makeRoundedStyle(
 			Color(0.95, 0.95, 0.95), Color.WHITE, 6, 3))
 		await get_tree().create_timer(0.18).timeout
-		# Restore to filled colour
+		if animGeneration != gen:
+			return
 		cell.add_theme_stylebox_override("panel", _makeRoundedStyle(
 			rowColor.lightened(0.35), rowColor, 6, 2))
 		await get_tree().create_timer(0.05).timeout
-
 	elif step["type"] == "taken":
-		# Green — this item was selected
 		cell.add_theme_stylebox_override("panel", _makeRoundedStyle(
 			Color(0.2, 0.7, 0.3), Color(0.4, 0.9, 0.5), 6, 3))
-		# Also highlight the item shape on the left
-		if step["row"] > 0:
-			var idx = step["row"] - 1
-			itemShapes[idx].add_theme_stylebox_override("panel",
-				_makeRoundedStyle(ITEM_COLORS[idx % ITEM_COLORS.size()], Color.WHITE, 8, 3))
+		if step["row"] >= 0 and step["row"] < itemShapes.size():
+			itemShapes[step["row"]].add_theme_stylebox_override("panel",
+				_makeRoundedStyle(ITEM_COLORS[step["row"] % ITEM_COLORS.size()], Color.WHITE, 8, 3))
 		await get_tree().create_timer(0.25).timeout
-
 	elif step["type"] == "skipped":
-		# Dim red — this item was not selected
 		cell.add_theme_stylebox_override("panel", _makeRoundedStyle(
 			Color(0.5, 0.2, 0.2), Color(0.7, 0.3, 0.3), 6, 2))
 		await get_tree().create_timer(0.18).timeout
 
+	if animGeneration != gen:
+		return
 	_playNextFill()
 
+# Pass gen into each queued step
+func queueCellFill(row: int, col: int, value: int):
+	fillQueue.append({"type": "fill", "row": row, "col": col, "value": value, "gen": animGeneration})
+	if not isFilling:
+		isFilling = true
+		_playNextFill()
+
+func queueBacktrack(row: int, col: int):
+	fillQueue.append({"type": "backtrack", "row": row, "col": col, "gen": animGeneration})
+	if not isFilling:
+		isFilling = true
+		_playNextFill()
+
+func queueTaken(row: int, col: int):
+	fillQueue.append({"type": "taken", "row": row, "col": col, "gen": animGeneration})
+	if not isFilling:
+		isFilling = true
+		_playNextFill()
+
+func queueSkipped(row: int, col: int):
+	fillQueue.append({"type": "skipped", "row": row, "col": col, "gen": animGeneration})
+	if not isFilling:
+		isFilling = true
+		_playNextFill()
+
 func commitKnapsack(selectedIndices: Array):
-	var rows = items.size() + 1
-	var barY = GRID_OFFSET_Y + rows * CELL_H + 16
+	var gen = animGeneration
 	var slotOffset = 0
 
 	for idx in selectedIndices:
@@ -272,16 +286,15 @@ func commitKnapsack(selectedIndices: Array):
 		var item = items[idx]
 		var color = ITEM_COLORS[idx % ITEM_COLORS.size()]
 
-		# Highlight item shape
 		itemShapes[idx].add_theme_stylebox_override("panel",
 			_makeRoundedStyle(color, Color.WHITE, 8, 3))
 
-		# Animate item shape flying into knapsack bar
 		var sourcePos = itemShapes[idx].global_position
-		var targetX = GRID_OFFSET_X + slotOffset * CELL_W + 1
+		var targetX = nodeDisplay.global_position.x + GRID_OFFSET_X + slotOffset * CELL_W + 1
+		var rows = items.size()
+		var barY = GRID_OFFSET_Y + rows * CELL_H + 16
 		var targetY = nodeDisplay.global_position.y + barY
 
-		# Create a flying copy
 		var copy = PanelContainer.new()
 		var shapeW = item["weight"] * (CELL_W - 4)
 		copy.size = Vector2(shapeW, 52)
@@ -298,20 +311,22 @@ func commitKnapsack(selectedIndices: Array):
 		copy.add_child(copyLabel)
 		get_tree().current_scene.add_child(copy)
 
+		var capturedOffset = slotOffset
 		var tween = create_tween()
 		tween.tween_property(copy, "global_position",
-			Vector2(nodeDisplay.global_position.x + targetX, targetY), 0.5)\
+			Vector2(targetX, targetY), 0.5)\
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)\
 			.set_delay(selectedIndices.find(idx) * 0.2)
 
 		tween.tween_callback(func():
 			copy.queue_free()
-			# Fill the bar slots with item colour
+			if gen != animGeneration:
+				return
+			# Use slotNodes array directly instead of find_child
 			for w in range(item["weight"]):
-				var slotName = "slot_%d" % (slotOffset + w)
-				var slot = nodeDisplay.find_child(slotName, false, false)
-				if slot:
-					slot.add_theme_stylebox_override("panel",
+				var slotIdx = capturedOffset + w
+				if slotIdx < slotNodes.size():
+					slotNodes[slotIdx].add_theme_stylebox_override("panel",
 						_makeRoundedStyle(color.darkened(0.1), color, 8, 2))
 					var slotLabel = Label.new()
 					slotLabel.text = item["name"] if w == 0 else ""
@@ -320,7 +335,7 @@ func commitKnapsack(selectedIndices: Array):
 					slotLabel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 					slotLabel.add_theme_font_size_override("font_size", 9)
 					slotLabel.add_theme_color_override("font_color", Color.WHITE)
-					slot.add_child(slotLabel)
+					slotNodes[slotIdx].add_child(slotLabel)
 		)
 
 		slotOffset += item["weight"]

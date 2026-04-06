@@ -1,0 +1,167 @@
+class_name CoinChangeObject
+extends InteractableObject
+
+const COIN_VALUES = [1, 2, 5, 10, 20, 50, 100]
+const COIN_RADIUS = 20
+const COIN_GAP = 4
+const COL_WIDTH = 80
+const COL_HEIGHT = 300
+
+var targetAmount: int = 0
+var coinStacks: Dictionary = {}
+
+func _init_object():
+	targetAmount = randi_range(15, 1000)
+	_buildCoinDisplay()
+
+func resetDisplay():
+	for t in activeTweens:
+		if is_instance_valid(t):
+			t.kill()
+	activeTweens.clear()
+	# Regenerate a new target amount on each reset
+	targetAmount = randi_range(15, 1000)
+	_buildCoinDisplay()
+
+func _buildDisplay():
+	_buildCoinDisplay()
+
+func _buildCoinDisplay():
+	for child in nodeDisplay.get_children():
+		child.queue_free()
+	coinStacks.clear()
+
+	var totalWidth = COIN_VALUES.size() * COL_WIDTH
+	nodeDisplay.size = Vector2(totalWidth, COL_HEIGHT + 80)
+
+	# Target amount label
+	var targetLabel = Label.new()
+	targetLabel.text = "Make: %s" % _formatCoin(targetAmount)
+	targetLabel.position = Vector2(totalWidth / 2.0 - 70, -40)
+	targetLabel.size = Vector2(140, 30)
+	targetLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	targetLabel.add_theme_font_size_override("font_size", 16)
+	targetLabel.add_theme_color_override("font_color", Color.YELLOW)
+	nodeDisplay.add_child(targetLabel)
+
+	for i in range(COIN_VALUES.size()):
+		var coinVal = COIN_VALUES[i]
+		var colX = i * COL_WIDTH + COL_WIDTH / 2.0
+
+		# Coin value label below baseline
+		var valLabel = Label.new()
+		valLabel.text = _formatCoin(coinVal)
+		valLabel.position = Vector2(colX - 30, COL_HEIGHT + 10)
+		valLabel.size = Vector2(60, 30)
+		valLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		valLabel.add_theme_font_size_override("font_size", 13)
+		valLabel.add_theme_color_override("font_color", Color.WHITE)
+		nodeDisplay.add_child(valLabel)
+
+		# Baseline
+		var line = Line2D.new()
+		line.add_point(Vector2(colX - COIN_RADIUS - 4, COL_HEIGHT))
+		line.add_point(Vector2(colX + COIN_RADIUS + 4, COL_HEIGHT))
+		line.default_color = Color(0.4, 0.4, 0.4)
+		line.width = 2
+		nodeDisplay.add_child(line)
+
+		coinStacks[coinVal] = []
+
+func _formatCoin(value: int) -> String:
+	if value < 100:
+		return "%dp" % value
+	return "£%.2f" % (value / 100.0)
+
+func _getCoinColor(value: int) -> Color:
+	match value:
+		1:   return Color(0.7, 0.5, 0.3)
+		2:   return Color(0.6, 0.45, 0.25)
+		5:   return Color(0.75, 0.75, 0.75)
+		10:  return Color(0.8, 0.8, 0.8)
+		20:  return Color(0.85, 0.75, 0.3)
+		50:  return Color(0.85, 0.75, 0.3)
+		100: return Color(0.9, 0.8, 0.35)
+	return Color.GRAY
+
+func _makeCoinCircle(value: int) -> PanelContainer:
+	var panel = PanelContainer.new()
+	panel.size = Vector2(COIN_RADIUS * 2, COIN_RADIUS * 2)
+	panel.custom_minimum_size = Vector2(COIN_RADIUS * 2, COIN_RADIUS * 2)
+
+	var style = StyleBoxFlat.new()
+	style.bg_color = _getCoinColor(value)
+	for corner in ["corner_radius_top_left", "corner_radius_top_right",
+				   "corner_radius_bottom_left", "corner_radius_bottom_right"]:
+		style.set(corner, COIN_RADIUS)
+	style.border_width_left = 2
+	style.border_width_right = 2
+	style.border_width_top = 2
+	style.border_width_bottom = 2
+	style.border_color = Color(1, 1, 1, 0.2)
+	panel.add_theme_stylebox_override("panel", style)
+
+	var label = Label.new()
+	label.text = _formatCoin(value)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	label.add_theme_font_size_override("font_size", 9)
+	label.add_theme_color_override("font_color", Color(0.15, 0.1, 0.05))
+	panel.add_child(label)
+
+	return panel
+
+func addCoinToStack(coinValue: int):
+	if not COIN_VALUES.has(coinValue):
+		return
+
+	var colIndex = COIN_VALUES.find(coinValue)
+	var colX = colIndex * COL_WIDTH + COL_WIDTH / 2.0
+	var stack = coinStacks[coinValue]
+
+	var coinY = COL_HEIGHT - COIN_RADIUS - stack.size() * (COIN_RADIUS * 2 + COIN_GAP)
+
+	var coin = _makeCoinCircle(coinValue)
+	coin.position = Vector2(colX - COIN_RADIUS, coinY - COIN_RADIUS)
+	nodeDisplay.add_child(coin)
+	stack.append(coin)
+
+	# Animate coin dropping in from above
+	var startY = coin.position.y - 60
+	var endY = coin.position.y
+	coin.position.y = startY
+
+	var tween = createTrackedTween()
+	tween.tween_property(coin, "position:y", endY, 0.25)\
+		.set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+
+func removeCoinFromStack(coinValue: int):
+	if not COIN_VALUES.has(coinValue):
+		return
+	var stack = coinStacks[coinValue]
+	if stack.is_empty():
+		return
+	stack.pop_back().queue_free()
+
+func clearAllStacks():
+	for coinVal in COIN_VALUES:
+		for coin in coinStacks[coinVal]:
+			if is_instance_valid(coin):
+				coin.queue_free()
+		coinStacks[coinVal].clear()
+
+func getPreambleFunctions() -> String:
+	return """
+coins = [1, 2, 5, 10, 20, 50, 100]
+targetAmount = %d
+
+def useCoin(value):
+	talk("__addcoin__:" + str(value))
+
+def removeCoin(value):
+	talk("__removecoin__:" + str(value))
+
+def commitChange(coinList):
+	talk("__commitchange__:" + ",".join(str(c) for c in coinList))
+""" % targetAmount

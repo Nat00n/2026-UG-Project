@@ -1,39 +1,126 @@
 class_name SearchObject
 extends InteractableObject
 
-@onready var selectionBeam: Line2D = $selectionBeam
-@export var targetValue: int = 5
-@export var sortedReq: bool = false
+@onready var selectionBeam: Line2D = $displayRoot/selectionBeam
 
-var checkQueue: Array = []  # holds steps: {type: "check"/"select", index: int}
+@export var targetValue: int = 5
+@export var sortReq: bool = false
+
+var checkQueue: Array = []
 var isAnimating: bool = false
+var checkTimer: float = 0.0
+var checkDelay: float = 0.3
+
+func _init_object():
+	if is_instance_valid(selectionBeam):
+		selectionBeam.visible = false
+		selectionBeam.width = 3
+		selectionBeam.default_color = Color.YELLOW
 
 func _ready():
 	super._ready()
+	# Generate own data only if no sort object in the same room
 	var hasSortObject = false
 	for node in get_parent().get_children():
 		if node is SortObject:
 			hasSortObject = true
 			break
 	if not hasSortObject:
-		if sortedReq:
-			for i in range(10):
-				dataNodes.append({
-					"name": "node%d" % i,
-					"value": i+1
-				})
-		else:
-			for i in range(10):
-				dataNodes.append({
-					"name": "node%d" % i,
-					"value": randi_range(1, 10)
-				})
+		for i in range(10):
+			dataNodes.append({
+				"name": "node%d" % i,
+				"value": i + 1 if sortReq else randi_range(1, 10)
+			})
+		initialDataNodes = dataNodes.duplicate(true)
+		targetValue = dataNodes[randi() % dataNodes.size()]["value"]
 		_buildDisplay()
 
-func _init_object():
-	selectionBeam.visible = false
-	selectionBeam.width = 3
-	selectionBeam.default_color = Color.YELLOW
+func resetDisplay():
+	checkQueue.clear()
+	isAnimating = false
+	checkTimer = 0.0
+	if is_instance_valid(selectionBeam):
+		selectionBeam.visible = false
+	if initialDataNodes.is_empty():
+		return
+	super.resetDisplay()
+
+func receiveArray(sortedNodes: Array):
+	dataNodes = sortedNodes.duplicate(true)
+	initialDataNodes = dataNodes.duplicate(true)
+	checkQueue.clear()
+	isAnimating = false
+	checkTimer = 0.0
+	if is_instance_valid(selectionBeam):
+		selectionBeam.visible = false
+	targetValue = dataNodes[randi() % dataNodes.size()]["value"]
+	_buildDisplay()
+
+func _process(delta):
+	# Mouse hover handled by base class
+	var mouse = get_global_mouse_position()
+	var rect = Rect2(visual.global_position, visual.size)
+	var wasHovered = _hovered
+	_hovered = rect.has_point(mouse)
+	if _hovered != wasHovered:
+		hoverLabel.visible = _hovered
+
+	if isAnimating and not checkQueue.is_empty():
+		checkTimer += delta
+		if checkTimer >= checkDelay:
+			checkTimer = 0.0
+			_stepCheck()
+	elif isAnimating and checkQueue.is_empty():
+		isAnimating = false
+
+func _stepCheck():
+	if checkQueue.is_empty():
+		isAnimating = false
+		return
+
+	var step = checkQueue.pop_front()
+
+	# Clear all card highlights first
+	for i in range(cardNodes.size()):
+		cardNodes[i].get_child(0).remove_theme_color_override("font_color")
+		cardNodes[i].remove_theme_stylebox_override("panel")
+
+	if step["type"] == "check":
+		var card = cardNodes[step["index"]]
+		card.get_child(0).add_theme_color_override("font_color", Color.CYAN)
+		card.add_theme_stylebox_override("panel", _makeStyleBox(Color(0.2, 0.6, 0.8, 0.4)))
+
+	elif step["type"] == "select":
+		var card = cardNodes[step["index"]]
+		card.get_child(0).add_theme_color_override("font_color", Color.YELLOW)
+		card.add_theme_stylebox_override("panel", _makeStyleBox(Color(0.8, 0.7, 0.0, 0.4)))
+
+		var cardCentre = card.global_position + Vector2(cardWidth / 2.0, 0)
+		var objectCentre = visual.global_position + visual.size / 2.0
+		selectionBeam.clear_points()
+		selectionBeam.add_point(to_local(objectCentre))
+		selectionBeam.add_point(to_local(cardCentre))
+		selectionBeam.visible = true
+
+func _makeStyleBox(color: Color) -> StyleBoxFlat:
+	var style = StyleBoxFlat.new()
+	style.bg_color = color
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	return style
+
+func queueCheck(index: int):
+	checkQueue.append({"type": "check", "index": index})
+	isAnimating = true
+
+func queueSelect(index: int):
+	checkQueue.append({"type": "select", "index": index})
+	isAnimating = true
+
+func commitSearch():
+	isAnimating = true
 
 func getPreambleFunctions() -> String:
 	return """
@@ -45,93 +132,3 @@ def check(index):
 def commitSelect(index):
 	talk("__commitSelect__:" + str(index))
 """ % targetValue
-
-func receiveArray(sortedNodes: Array):
-	dataNodes = sortedNodes.duplicate(true)
-	selectionBeam.visible = false
-	checkQueue.clear()
-	_buildDisplay()
-
-func queueCheck(index: int):
-	checkQueue.append({"type": "check", "index": index})
-
-func queueSelect(index: int):
-	checkQueue.append({"type": "select", "index": index})
-
-func commitSearch():
-	if not isAnimating:
-		isAnimating = true
-		_playNextStep()
-
-func _playNextStep():
-	if checkQueue.is_empty():
-		isAnimating = false
-		return
-
-	var step = checkQueue.pop_front()
-
-	if step["type"] == "check":
-		_animateCheck(step["index"])
-	elif step["type"] == "select":
-		_animateSelect(step["index"])
-
-func _animateCheck(index: int):
-	if index < 0 or index >= cardNodes.size():
-		_playNextStep()
-		return
-
-	# Flash the card cyan to show it's being examined
-	var card = cardNodes[index]
-	var label = card.get_child(0)
-
-	label.add_theme_color_override("font_color", Color.CYAN)
-	card.add_theme_stylebox_override("panel", _makeStyleBox(Color(0.2, 0.6, 0.8, 0.4)))
-
-	await get_tree().create_timer(0.3).timeout
-
-	# Fade back unless it will be selected next
-	var nextIsSelect = not checkQueue.is_empty() and \
-		checkQueue[0]["type"] == "select" and \
-		checkQueue[0]["index"] == index
-
-	if not nextIsSelect:
-		label.remove_theme_color_override("font_color")
-		card.remove_theme_stylebox_override("panel")
-
-	await get_tree().create_timer(0.1).timeout
-	_playNextStep()
-
-func _animateSelect(index: int):
-	if index < 0 or index >= cardNodes.size():
-		_playNextStep()
-		return
-
-	# Clear all highlights first
-	for i in range(cardNodes.size()):
-		cardNodes[i].get_child(0).remove_theme_color_override("font_color")
-		cardNodes[i].remove_theme_stylebox_override("panel")
-
-	# Highlight selected card yellow
-	var card = cardNodes[index]
-	card.get_child(0).add_theme_color_override("font_color", Color.YELLOW)
-	card.add_theme_stylebox_override("panel", _makeStyleBox(Color(0.8, 0.7, 0.0, 0.4)))
-
-	# Draw beam to selected card
-	var cardCentre = card.global_position + Vector2(cardWidth / 2.0, 0)
-	var objectCentre = visual.global_position + visual.size / 2.0
-	selectionBeam.clear_points()
-	selectionBeam.add_point(to_local(objectCentre))
-	selectionBeam.add_point(to_local(cardCentre))
-	selectionBeam.visible = true
-
-	await get_tree().create_timer(0.15).timeout
-	_playNextStep()
-
-func _makeStyleBox(color: Color) -> StyleBoxFlat:
-	var style = StyleBoxFlat.new()
-	style.bg_color = color
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 4
-	style.corner_radius_bottom_right = 4
-	return style

@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://dkl4hktywvl4b"]
+
+[ext_resource type="Script" uid="uid://e0y3asayi4ga" path="res://scripts/room.gd" id="1_tfsyw"]
+[ext_resource type="PackedScene" uid="uid://c4ga25vdopg7g" path="res://scenes/CoinObject.tscn" id="2_c55bh"]
+
+[node name="Level6" type="Node2D" unique_id=454512095]
+script = ExtResource("1_tfsyw")
+
+[node name="Background" type="ColorRect" parent="." unique_id=796185774]
+offset_right = 1929.0
+offset_bottom = 1090.0
+color = Color(0.27387273, 0.27387273, 0.27387273, 1)
+
+[node name="Floor" type="ColorRect" parent="." unique_id=1013166347]
+offset_left = 146.0
+offset_top = 152.0
+offset_right = 1746.0
+offset_bottom = 969.0
+color = Color(0.004679383, 0.13212621, 0.13827685, 1)
+
+[node name="CoinObject" parent="." unique_id=1779530000 instance=ExtResource("2_c55bh")]
+position = Vector2(696, 633)
+objectName = "Spaghetti"
+objectID = "object_009"
+taskDescription = "exact coin change algorithm"

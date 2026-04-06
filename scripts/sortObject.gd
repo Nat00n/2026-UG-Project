@@ -6,6 +6,7 @@ extends InteractableObject
 var swapQueue: Array = []
 var isAnimating: bool = false
 var pivotIndex: int = -1
+var hasSentToSearch: bool = false
 
 func _init_object():
 	for i in range(10):
@@ -13,7 +14,22 @@ func _init_object():
 			"name": "node%d" % i,
 			"value": randi_range(1, 10)
 		})
+	initialDataNodes = dataNodes.duplicate(true)
 	_buildDisplay()
+	
+func _buildDisplay():
+	if hasSentToSearch:
+		return
+	super._buildDisplay()
+
+func resetDisplay():
+	if hasSentToSearch:
+		return
+	swapQueue.clear()
+	isAnimating = false
+	pivotIndex = -1
+	hasSentToSearch = false
+	super.resetDisplay()
 
 func getPreambleFunctions() -> String:
 	return """
@@ -21,67 +37,34 @@ def swap(i, j):
 	talk("__swap__:" + str(i) + ":" + str(j))
 	array[i], array[j] = array[j], array[i]
 
-def move(fromIndex, toIndex):
-	# Used by merge sort to place elements into correct position
-	talk("__move__:" + str(fromIndex) + ":" + str(toIndex))
-	val = array.pop(fromIndex)
-	array.insert(toIndex, val)
-
 def setPivot(index):
-	# Highlights the pivot element for quick sort
 	talk("__pivot__:" + str(index))
 
 def commitSort():
 	talk("__commit__")
 """
 
+func queueSwap(i: int, j: int):
+	swapQueue.append({"type": "swap", "i": i, "j": j})
+
+func queuePivot(index: int):
+	swapQueue.append({"type": "pivot", "index": index})
+
+func queueMove(fromIndex: int, toIndex: int):
+	swapQueue.append({"type": "move", "from": fromIndex, "to": toIndex})
+
 func commitSort():
 	if not isAnimating:
 		isAnimating = true
 		_playNextSwap()
 
-func _sendToSearch():
-	var searchNode: SearchObject = null
-	for node in get_parent().get_children():
-		if node is SearchObject:
-			searchNode = node
-			break
-	if searchNode == null:
-		return
-
-	var targetPos = searchNode.visual.global_position + searchNode.visual.size / 2.0
-
-	var tween = create_tween()
-	tween.set_parallel(true)
-
-	for i in range(cardNodes.size()):
-		tween.tween_property(cardNodes[i], "global_position", targetPos, 0.6)\
-			.set_trans(Tween.TRANS_SINE)\
-			.set_ease(Tween.EASE_IN)\
-			.set_delay(i * 0.05)
-
-	tween.set_parallel(false)
-	tween.tween_callback(func():
-		for child in nodeDisplay.get_children():
-			child.queue_free()
-		cardNodes.clear()
-		searchNode.receiveArray(dataNodes.duplicate(true))
-	)
-
-func queueSwap(i: int, j: int):
-	swapQueue.append({"type": "swap", "i": i, "j": j})
-
-func queueMove(fromIndex: int, toIndex: int):
-	swapQueue.append({"type": "move", "from": fromIndex, "to": toIndex})
-
-func queuePivot(index: int):
-	swapQueue.append({"type": "pivot", "index": index})
-
 func _playNextSwap():
 	if swapQueue.is_empty():
 		isAnimating = false
 		_applyPivot(-1)
-		_sendToSearch()
+		if not hasSentToSearch:
+			hasSentToSearch = true
+			_sendToSearch()
 		return
 
 	var step = swapQueue.pop_front()
@@ -119,35 +102,33 @@ func _animateSwap(i: int, j: int):
 
 	cardA.get_child(0).add_theme_color_override("font_color", Color.CYAN)
 	cardB.get_child(0).add_theme_color_override("font_color", Color.CYAN)
-
 	cardA.z_index = 1
 	cardB.z_index = 1
 
-	var tween = create_tween()
+	var tween = createTrackedTween()
 	tween.set_parallel(true)
 	tween.tween_property(cardA, "position", Vector2(posB.x, cardA.position.y), 0.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(cardB, "position", Vector2(posA.x, cardB.position.y), 0.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.set_parallel(false)
 
 	tween.tween_callback(func():
+		if not is_instance_valid(cardA) or not is_instance_valid(cardB):
+			return
 		var temp = cardNodes[i]
 		cardNodes[i] = cardNodes[j]
 		cardNodes[j] = temp
-
 		cardNodes[i].get_child(0).text = "%s\n%d" % [dataNodes[i]["name"], dataNodes[i]["value"]]
 		cardNodes[j].get_child(0).text = "%s\n%d" % [dataNodes[j]["name"], dataNodes[j]["value"]]
 		cardNodes[i].z_index = 0
 		cardNodes[j].z_index = 0
-
 		if i != pivotIndex:
 			cardNodes[i].get_child(0).remove_theme_color_override("font_color")
 		if j != pivotIndex:
 			cardNodes[j].get_child(0).remove_theme_color_override("font_color")
-
 		await get_tree().create_timer(0.05).timeout
 		_playNextSwap()
 	)
-	
+
 func _animateMove(fromIndex: int, toIndex: int):
 	var totalWidth = dataNodes.size() * (cardWidth + cardGap) - cardGap
 	var startX = -totalWidth / 2.0
@@ -158,25 +139,52 @@ func _animateMove(fromIndex: int, toIndex: int):
 	card.z_index = 1
 	card.get_child(0).add_theme_color_override("font_color", Color.CYAN)
 
-	var tween = create_tween()
+	var tween = createTrackedTween()
 	tween.tween_property(card, "position", Vector2(targetX, card.position.y), 0.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 	tween.tween_callback(func():
+		if not is_instance_valid(card):
+			return
 		var movedNode = dataNodes[fromIndex]
 		var movedCard = cardNodes[fromIndex]
-
 		dataNodes.remove_at(fromIndex)
 		dataNodes.insert(toIndex, movedNode)
 		cardNodes.remove_at(fromIndex)
 		cardNodes.insert(toIndex, movedCard)
-
 		for i in range(cardNodes.size()):
 			cardNodes[i].position.x = startX + i * (cardWidth + cardGap)
 			cardNodes[i].z_index = 0
 			if i != pivotIndex:
 				cardNodes[i].get_child(0).remove_theme_color_override("font_color")
 			cardNodes[i].get_child(0).text = "%s\n%d" % [dataNodes[i]["name"], dataNodes[i]["value"]]
-
 		await get_tree().create_timer(0.05).timeout
 		_playNextSwap()
+	)
+
+func _sendToSearch():
+	var searchNode: SearchObject = null
+	for node in get_parent().get_children():
+		if node is SearchObject:
+			searchNode = node
+			break
+	if searchNode == null:
+		return
+
+	var targetPos = searchNode.visual.global_position + searchNode.visual.size / 2.0
+
+	var tween = createTrackedTween()
+	tween.set_parallel(true)
+
+	for i in range(cardNodes.size()):
+		tween.tween_property(cardNodes[i], "global_position", targetPos, 0.6)\
+			.set_trans(Tween.TRANS_SINE)\
+			.set_ease(Tween.EASE_IN)\
+			.set_delay(i * 0.05)
+
+	tween.set_parallel(false)
+	tween.tween_callback(func():
+		for child in nodeDisplay.get_children():
+			child.queue_free()
+		cardNodes.clear()
+		searchNode.receiveArray(dataNodes.duplicate(true))
 	)
