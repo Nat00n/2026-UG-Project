@@ -19,8 +19,8 @@ offset_bottom = 969.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="KnapsackObject" parent="." unique_id=1779530000 instance=ExtResource("2_msw3u")]
-position = Vector2(271, 354)
-capacity = 20
+position = Vector2(285, 533)
+capacity = 5
 objectName = "Jukebox"
 objectID = "object_008"
 taskDescription = "Knapsack gridfill"

@@ -72,10 +72,7 @@ func talk(args):
 		_currentObject.startPathAnimation()
 	elif msg.begins_with("__cell__:"):
 		var parts = msg.split(":")
-		_currentObject.setCell(int(parts[1]), int(parts[2]), int(parts[3]))
-	elif msg.begins_with("__highlight__:"):
-		var parts = msg.split(":")
-		_currentObject.highlightCell(int(parts[1]), int(parts[2]))
+		_currentObject.queueCellFill(int(parts[1]), int(parts[2]), int(parts[3]))
 	elif msg.begins_with("__knapsack__:"):
 		var parts = msg.split(":")[1].split(",")
 		var indices = []
@@ -83,6 +80,15 @@ func talk(args):
 			if p != "":
 				indices.append(int(p))
 		_currentObject.commitKnapsack(indices)
+	elif msg.begins_with("__backtrack__:"):
+		var parts = msg.split(":")
+		_currentObject.queueBacktrack(int(parts[1]), int(parts[2]))
+	elif msg.begins_with("__taken__:"):
+		var parts = msg.split(":")
+		_currentObject.queueTaken(int(parts[1]), int(parts[2]))
+	elif msg.begins_with("__skipped__:"):
+		var parts = msg.split(":")
+		_currentObject.queueSkipped(int(parts[1]), int(parts[2]))
 	else:
 		outputRCT.append_text(msg + "\n")
 
