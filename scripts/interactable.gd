@@ -7,7 +7,9 @@ extends Area2D
 
 @export var objectName: String = "Object"
 @export var objectID: String = "object_000"
-@export var taskDescription: String = "None"
+@export_multiline var taskDescription: String = "None"
+@export var taskName: String = "None"
+@export_multiline var taskGuide: String = "None"
 
 var _hovered := false
 var _popup: CanvasLayer
@@ -16,6 +18,7 @@ var initialDataNodes: Array = []
 var cardNodes: Array = []
 var savedScript: String = ""
 var activeTweens: Array = []
+
 
 const cardWidth = 60
 const cardHeight = 60
@@ -60,6 +63,9 @@ func _buildDisplay():
 		cardNodes.append(card)
 
 	nodeDisplay.size = Vector2(totalWidth, 2.0 * cardHeight)
+	
+func _getBaseGuide() -> String:
+	return ""
 
 func createTrackedTween() -> Tween:
 	var t = create_tween()

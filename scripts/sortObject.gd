@@ -1,8 +1,6 @@
 class_name SortObject
 extends InteractableObject
 
-@export var searchTarget: NodePath
-
 var swapQueue: Array = []
 var isAnimating: bool = false
 var pivotIndex: int = -1
@@ -16,7 +14,7 @@ func _init_object():
 		})
 	initialDataNodes = dataNodes.duplicate(true)
 	_buildDisplay()
-	
+
 func _buildDisplay():
 	if hasSentToSearch:
 		return
@@ -36,6 +34,11 @@ func getPreambleFunctions() -> String:
 def swap(i, j):
 	talk("__swap__:" + str(i) + ":" + str(j))
 	array[i], array[j] = array[j], array[i]
+
+def move(fromIndex, toIndex):
+	talk("__move__:" + str(fromIndex) + ":" + str(toIndex))
+	val = array.pop(fromIndex)
+	array.insert(toIndex, val)
 
 def setPivot(index):
 	talk("__pivot__:" + str(index))
@@ -63,7 +66,6 @@ func _playNextSwap():
 		isAnimating = false
 		_applyPivot(-1)
 		if not hasSentToSearch:
-			hasSentToSearch = true
 			_sendToSearch()
 		return
 
@@ -188,3 +190,5 @@ func _sendToSearch():
 		cardNodes.clear()
 		searchNode.receiveArray(dataNodes.duplicate(true))
 	)
+	
+	hasSentToSearch = true

@@ -33,31 +33,41 @@ anchor_bottom = 1.0
 offset_bottom = -1.0
 grow_horizontal = 2
 grow_vertical = 2
-split_offsets = PackedInt32Array(0, 0)
+split_offsets = PackedInt32Array(42, 7)
+split_offset = 42
 
 [node name="HSplitContainer" type="HSplitContainer" parent="Panel/VSplitContainer" unique_id=316253582]
 layout_mode = 2
-split_offsets = PackedInt32Array(-120, -15, 111)
-split_offset = -120
+split_offsets = PackedInt32Array(183, 1748, 1884, 1994)
+split_offset = 183
 
-[node name="Label" type="Label" parent="Panel/VSplitContainer/HSplitContainer" unique_id=575328589]
+[node name="EditorTabButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=1380147305]
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 24
-text = "Code Editor"
+text = "~ Code Editor ~"
+
+[node name="GuideTabButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=2015699709]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 24
+text = "~ Task Guide ~"
 
 [node name="AIButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=1489610588]
 layout_mode = 2
+size_flags_horizontal = 8
 theme_override_font_sizes/font_size = 24
 text = "= AI Tips ="
 
 [node name="RunButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=346033384]
 layout_mode = 2
+size_flags_horizontal = 8
 theme_override_font_sizes/font_size = 24
 text = "= Run ="
 
 [node name="CloseButton" type="Button" parent="Panel/VSplitContainer/HSplitContainer" unique_id=2005574071]
 layout_mode = 2
+size_flags_horizontal = 8
 theme_override_font_sizes/font_size = 24
 text = "= Close ="
 
@@ -88,3 +98,8 @@ theme_override_font_sizes/italics_font_size = 24
 theme_override_font_sizes/mono_font_size = 24
 bbcode_enabled = true
 selection_enabled = true
+
+[node name="GuideBox" type="RichTextLabel" parent="Panel/VSplitContainer" unique_id=1925186903]
+visible = false
+layout_mode = 2
+bbcode_enabled = true

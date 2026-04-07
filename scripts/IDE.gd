@@ -4,9 +4,12 @@ extends CanvasLayer
 @onready var panel: Panel = $Panel
 @onready var inputCE: CodeEdit = $Panel/VSplitContainer/CodeEditor
 @onready var outputRCT: RichTextLabel = $Panel/VSplitContainer/OutputBox
+@onready var guideBox: RichTextLabel = $Panel/VSplitContainer/GuideBox
 @onready var runButton: Button = $Panel/VSplitContainer/HSplitContainer/RunButton
 @onready var closeButton: Button = $Panel/VSplitContainer/HSplitContainer/CloseButton
 @onready var aiButton: Button = $Panel/VSplitContainer/HSplitContainer/AIButton
+@onready var editorTabButton: Button = $Panel/VSplitContainer/HSplitContainer/EditorTabButton
+@onready var guideTabButton: Button = $Panel/VSplitContainer/HSplitContainer/GuideTabButton
 
 var _talkCallback
 var _aiCallback
@@ -15,27 +18,33 @@ var _executingObject
 var _llmReady := false
 var _llmReadyCallback
 var _llmProgressCallback
+var _onEditorTab := true
 
 func _ready():
-	
 	panel.visible = false
-	
+
 	closeButton.pressed.connect(onClose)
 	runButton.pressed.connect(onRun)
 	aiButton.pressed.connect(onAITips)
-	
+	editorTabButton.pressed.connect(_showEditorTab)
+	guideTabButton.pressed.connect(_showGuideTab)
+
+	_setupSyntaxHighlighting()
+	_showEditorTab()
+
 	if OS.has_feature("web"):
 		_talkCallback = JavaScriptBridge.create_callback(talk)
 		JavaScriptBridge.get_interface("window").godotTalk = _talkCallback
-		
+
 		_aiCallback = JavaScriptBridge.create_callback(onAIResponse)
 		JavaScriptBridge.get_interface("window").godotAIResponse = _aiCallback
-		
+
 		_llmReadyCallback = JavaScriptBridge.create_callback(onLLMReady)
 		JavaScriptBridge.get_interface("window").godotLLMReady = _llmReadyCallback
 
 		_llmProgressCallback = JavaScriptBridge.create_callback(onLLMProgress)
 		JavaScriptBridge.get_interface("window").godotLoadProgress = _llmProgressCallback
+
 
 func talk(args):
 	var msg = str(args[0])
@@ -125,14 +134,81 @@ func onClose() -> void:
 
 func open(objectName: String, interactable):
 	_currentObject = interactable
-	
 	outputRCT.clear()
 	outputRCT.append_text("--- %s ---\n" % objectName)
-	
 	inputCE.text = interactable.savedScript
-	
+	_showEditorTab()
 	panel.visible = true
+
+func _setupSyntaxHighlighting():
+	var highlighter = CodeHighlighter.new()
+
+	# Keywords
+	var keywords = ["False", "None", "True", "and", "as", "assert", "async", "await",
+		"break", "class", "continue", "def", "del", "elif", "else", "except",
+		"finally", "for", "from", "global", "if", "import", "in", "is",
+		"lambda", "not", "or", "pass", "raise", "return", "try", "while", "with", "yield"]
+	for kw in keywords:
+		highlighter.add_keyword_color(kw, Color.html("#569CD6"))
+
+	# Built-ins
+	var builtins = ["print", "len", "range", "int", "str", "float", "list",
+		"dict", "set", "tuple", "type", "enumerate", "zip", "map",
+		"filter", "sorted", "reversed", "min", "max", "sum", "abs"]
+	for b in builtins:
+		highlighter.add_keyword_color(b, Color.html("#DCDCAA"))
+
+	# Colors
+	highlighter.number_color = Color.html("#B5CEA8")
+	highlighter.symbol_color = Color.html("#D4D4D4")
+	highlighter.function_color = Color.html("#DCDCAA")
+	highlighter.member_variable_color = Color.html("#9CDCFE")
+
+	# Strings
+	highlighter.add_color_region('"', '"', Color.html("#CE9178"))
+	highlighter.add_color_region("'", "'", Color.html("#CE9178"))
+
+	# Comments
+	highlighter.add_color_region("#", "", Color.html("#6A9955"), true)
+
+	inputCE.syntax_highlighter = highlighter
+
+func _showEditorTab():
+	_onEditorTab = true
+	inputCE.visible = true
+	outputRCT.visible = true
+	guideBox.visible = false
+	editorTabButton.add_theme_color_override("font_color", Color.WHITE)
+	guideTabButton.remove_theme_color_override("font_color")
+	runButton.visible = true
+	aiButton.visible = true
+
+func _showGuideTab():
+	_onEditorTab = false
+	inputCE.visible = false
+	outputRCT.visible = false
+	guideBox.visible = true
+	guideTabButton.add_theme_color_override("font_color", Color.WHITE)
+	editorTabButton.remove_theme_color_override("font_color")
+	runButton.visible = false
+	aiButton.visible = false
+	_populateGuide()
+
+func _populateGuide():
+	guideBox.clear()
+	if _currentObject == null:
+		return
 	
+	if _currentObject.taskName.strip_edges() != "":
+		guideBox.append_text("[b]%s[/b]\n\n" % _currentObject.taskName)
+	
+	var base = _currentObject._getBaseGuide()
+	if base.strip_edges() != "":
+		guideBox.append_text(base + "\n\n")
+	
+	if _currentObject.taskGuide.strip_edges() != "":
+		guideBox.append_text("[b]Your Task:[/b]\n" + _currentObject.taskGuide)
+
 
 func onLLMReady(args):
 	_llmReady = true
