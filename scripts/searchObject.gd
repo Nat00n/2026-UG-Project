@@ -1,7 +1,8 @@
 class_name SearchObject
 extends InteractableObject
 
-@onready var selectionBeam: Line2D = $displayRoot/selectionBeam
+
+@onready var selectionBeam: Line2D = $selectionBeam
 
 @export var targetValue: int = 5
 @export var sortReq: bool = false

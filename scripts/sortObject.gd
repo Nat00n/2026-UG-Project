@@ -42,6 +42,15 @@ def move(fromIndex, toIndex):
 
 def setPivot(index):
 	talk("__pivot__:" + str(index))
+	
+def divideRange(start, end):
+	talk("__highlight__:" + str(start) + ":" + str(end) + ":0.2,0.6,0.9")
+
+def mergeRange(start, end):
+	talk("__highlight__:" + str(start) + ":" + str(end) + ":0.9,0.75,0.1")
+	
+def showSplit(start, mid, end):
+	talk("__split__:" + str(start) + ":" + str(mid) + ":" + str(end))
 
 def commitSort():
 	talk("__commit__")
@@ -55,6 +64,9 @@ func queuePivot(index: int):
 
 func queueMove(fromIndex: int, toIndex: int):
 	swapQueue.append({"type": "move", "from": fromIndex, "to": toIndex})
+	
+func queueHighlightSplit(start: int, mid: int, end: int):
+	swapQueue.append({"type": "split", "start": start, "mid": mid, "end": end})
 
 func commitSort():
 	if not isAnimating:
@@ -65,8 +77,20 @@ func _playNextSwap():
 	if swapQueue.is_empty():
 		isAnimating = false
 		_applyPivot(-1)
-		if not hasSentToSearch:
-			_sendToSearch()
+		for i in range(cardNodes.size()):
+			cardNodes[i].get_child(0).remove_theme_color_override("font_color")
+
+		var tween = createTrackedTween()
+		tween.set_parallel(true)
+		for i in range(cardNodes.size()):
+			var baseY = 2.0 * cardHeight - cardNodes[i].size.y
+			tween.tween_property(cardNodes[i], "position:y", baseY, 0.2)\
+				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		tween.set_parallel(false)
+		tween.tween_callback(func():
+			if not hasSentToSearch:
+				_sendToSearch()
+		)
 		return
 
 	var step = swapQueue.pop_front()
@@ -84,6 +108,27 @@ func _playNextSwap():
 		_playNextSwap()
 	elif step["type"] == "move":
 		_animateMove(step["from"], step["to"])
+	elif step["type"] == "split":
+		var tween = createTrackedTween()
+		tween.set_parallel(true)
+		for i in range(cardNodes.size()):
+			var baseY = 2.0 * cardHeight - cardNodes[i].size.y
+			if i >= step["start"] and i < step["mid"]:
+				cardNodes[i].get_child(0).add_theme_color_override("font_color", Color.CYAN)
+				tween.tween_property(cardNodes[i], "position:y", baseY - 30.0, 0.2)\
+					.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			elif i >= step["mid"] and i < step["end"]:
+				cardNodes[i].get_child(0).add_theme_color_override("font_color", Color.ORANGE)
+				tween.tween_property(cardNodes[i], "position:y", baseY - 30.0, 0.2)\
+					.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			else:
+				cardNodes[i].get_child(0).add_theme_color_override("font_color", Color(0.35, 0.35, 0.35))
+				tween.tween_property(cardNodes[i], "position:y", baseY, 0.2)\
+					.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		tween.set_parallel(false)
+		tween.tween_callback(func():
+			_playNextSwap()
+		)
 
 func _applyPivot(index: int):
 	if pivotIndex >= 0 and pivotIndex < cardNodes.size():
@@ -135,29 +180,30 @@ func _animateMove(fromIndex: int, toIndex: int):
 	var totalWidth = dataNodes.size() * (cardWidth + cardGap) - cardGap
 	var startX = -totalWidth / 2.0
 
-	var card = cardNodes[fromIndex]
-	var targetX = startX + toIndex * (cardWidth + cardGap)
+	var movedNode = dataNodes[fromIndex]
+	var movedCard = cardNodes[fromIndex]
+	dataNodes.remove_at(fromIndex)
+	dataNodes.insert(toIndex, movedNode)
+	cardNodes.remove_at(fromIndex)
+	cardNodes.insert(toIndex, movedCard)
 
-	card.z_index = 1
-	card.get_child(0).add_theme_color_override("font_color", Color.CYAN)
+	movedCard.z_index = 1
+	movedCard.get_child(0).add_theme_color_override("font_color", Color.CYAN)
 
 	var tween = createTrackedTween()
-	tween.tween_property(card, "position", Vector2(targetX, card.position.y), 0.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.set_parallel(true)
+	for i in range(cardNodes.size()):
+		var destX = startX + i * (cardWidth + cardGap)
+		tween.tween_property(cardNodes[i], "position:x", destX, 0.25)\
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.set_parallel(false)
 
 	tween.tween_callback(func():
-		if not is_instance_valid(card):
+		if not is_instance_valid(movedCard):
 			return
-		var movedNode = dataNodes[fromIndex]
-		var movedCard = cardNodes[fromIndex]
-		dataNodes.remove_at(fromIndex)
-		dataNodes.insert(toIndex, movedNode)
-		cardNodes.remove_at(fromIndex)
-		cardNodes.insert(toIndex, movedCard)
+		movedCard.z_index = 0
+		movedCard.get_child(0).remove_theme_color_override("font_color")
 		for i in range(cardNodes.size()):
-			cardNodes[i].position.x = startX + i * (cardWidth + cardGap)
-			cardNodes[i].z_index = 0
-			if i != pivotIndex:
-				cardNodes[i].get_child(0).remove_theme_color_override("font_color")
 			cardNodes[i].get_child(0).text = "%s\n%d" % [dataNodes[i]["name"], dataNodes[i]["value"]]
 		await get_tree().create_timer(0.05).timeout
 		_playNextSwap()

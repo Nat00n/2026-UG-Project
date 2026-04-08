@@ -63,6 +63,9 @@ func talk(args):
 	elif msg.begins_with("__move__:"):
 		var parts = msg.split(":")
 		target.queueMove(int(parts[1]), int(parts[2]))
+	elif msg.begins_with("__split__:"):
+		var parts = msg.split(":")
+		target.queueHighlightSplit(int(parts[1]), int(parts[2]), int(parts[3]))
 
 	# Search
 	elif msg.begins_with("__check__:"):
@@ -70,8 +73,6 @@ func talk(args):
 	elif msg.begins_with("__commitSelect__:"):
 		target.queueSelect(int(msg.split(":")[1]))
 		target.commitSearch()
-	elif msg.begins_with("__select__:"):
-		target.selectNode(int(msg.split(":")[1]))
 
 	# Graph
 	elif msg.begins_with("__visit__:"):
@@ -293,17 +294,7 @@ class GodotOutput(io.TextIOBase):
 sys.stdout = GodotOutput()
 sys.stderr = GodotOutput()
 
-array = """ + _currentObject.getArrayString() + """
-
-def select(index):
-	if index < 0 or index >= len(array):
-		talk("Error: index " + str(index) + " out of range")
-		return None
-	talk("__select__:" + str(index))
-	talk("Selected index " + str(index) + " (value: " + str(array[index]) + ")")
-	return array["index"]
-
-""" + _currentObject.getPreambleFunctions()
+array = """ + _currentObject.getArrayString() + _currentObject.getPreambleFunctions()
 
 func _executeCode(code: String, target, silent: bool):
 	_executingObject = target
