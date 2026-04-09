@@ -5,7 +5,7 @@ extends CanvasLayer
 @onready var usernameInput: LineEdit = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/UsernameInput
 @onready var leaderboardLabel: RichTextLabel = $Control/HBoxContainer/RightHalf/CenterContainer/VBoxContainer/LeaderboardLabel
 
-@export var mainScene: PackedScene
+@export var levelSelection: PackedScene
 
 func _ready():
 	errorLabel.visible = false
@@ -25,7 +25,7 @@ func onPlay():
 		return
 	Global.username = name
 	Global.startTimer()
-	get_tree().change_scene_to_packed(mainScene)
+	get_tree().change_scene_to_packed(levelSelection)
 
 func _fetchLeaderboard():
 	await Global.populateLeaderboard(leaderboardLabel)

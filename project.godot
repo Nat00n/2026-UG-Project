@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 SilentWolf="*uid://db5764g3lpopi"
 Global="*uid://jyt0bn3u4rlt"
+LevelProgressionManager="*uid://btlo0gv8tbypo"
 
 [display]
 
