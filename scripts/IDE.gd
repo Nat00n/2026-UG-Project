@@ -179,31 +179,44 @@ func _showEditorTab():
 	inputCE.visible = true
 	outputRCT.visible = true
 	guideBox.visible = false
-	editorTabButton.add_theme_color_override("font_color", Color.WHITE)
-	guideTabButton.remove_theme_color_override("font_color")
-	runButton.visible = true
 	aiButton.visible = true
+	runButton.visible = true
+	_setActiveTab(editorTabButton, guideTabButton)
 
 func _showGuideTab():
 	_onEditorTab = false
 	inputCE.visible = false
 	outputRCT.visible = false
 	guideBox.visible = true
-	guideTabButton.add_theme_color_override("font_color", Color.WHITE)
-	editorTabButton.remove_theme_color_override("font_color")
-	runButton.visible = false
 	aiButton.visible = false
+	runButton.visible = false
+	_setActiveTab(guideTabButton, editorTabButton)
 	_populateGuide()
+	
+func _setActiveTab(activeButton: Button, inactiveButton: Button):
+	var activeStyle = StyleBoxFlat.new()
+	activeStyle.bg_color = Color(0.25, 0.25, 0.25)
+	activeStyle.corner_radius_top_left = 4
+	activeStyle.corner_radius_top_right = 4
+	activeStyle.corner_radius_bottom_left = 4
+	activeStyle.corner_radius_bottom_right = 4
+	activeButton.add_theme_stylebox_override("normal", activeStyle)
+	activeButton.add_theme_stylebox_override("hover", activeStyle)
+
+	var inactiveStyle = StyleBoxEmpty.new()
+	inactiveButton.add_theme_stylebox_override("normal", inactiveStyle)
+	inactiveButton.add_theme_stylebox_override("hover", inactiveStyle)
 
 func _populateGuide():
 	guideBox.clear()
+	guideBox.add_theme_font_size_override("normal_font_size",24)
 	if _currentObject == null:
 		return
 	
 	if _currentObject.taskName.strip_edges() != "":
 		guideBox.append_text("[b]%s[/b]\n\n" % _currentObject.taskName)
 	
-	var base = _currentObject._getBaseGuide()
+	var base = _currentObject.getBaseGuide()
 	if base.strip_edges() != "":
 		guideBox.append_text(base + "\n\n")
 	
@@ -220,7 +233,6 @@ func onLLMProgress(args):
 	aiButton.text = "= AI Loading ="
 
 func onAITips():
-	
 	if _currentObject == null or not _llmReady:
 		return
 
@@ -229,21 +241,25 @@ func onAITips():
 
 	var playerCode = inputCE.text
 	var task = _currentObject.taskDescription
-	var nodeCount = _currentObject.dataNodes.size()
+	var preamble = _currentObject.getBaseGuide()
 
-	# Build a prompt describing the context
-	var prompt = """
-You are a Python tutor inside an educational game. 
-The player is working on the following task: %s
-The data they are working with has %d nodes, each with a name and a value from 1-10.
-They have access to these custom functions: read(index), select(index), swap(i, j), commitSort().
+	var prompt = """You are a coding tutor in an educational game. 
+You must NEVER write code or pseudocode. Only ask questions and give hints.
 
-Here is the player's current code:
+Task: %s
+
+Available functions and data:
 %s
 
-Give a short, encouraging summary of what is working well, then suggest one specific improvement.
-Keep the response under 100 words. Do not rewrite the full code, just give guidance.
-""" % [task, nodeCount, playerCode if playerCode.strip_edges() != "" else "(empty)"]
+Player's code:
+%s
+
+Give one short hint or ask one guiding question to help the player improve their code.  
+Keep your response under 50 words.""" % [
+		task if task.strip_edges() != "" else "No task provided.",
+		preamble.strip_edges(),
+		playerCode.strip_edges() if playerCode.strip_edges() != "" else "(empty)"
+	]
 
 	JavaScriptBridge.eval("window._pendingAIPrompt = %s;" % JSON.stringify(prompt))
 	JavaScriptBridge.eval("""
@@ -255,8 +271,8 @@ Keep the response under 100 words. Do not rewrite the full code, just give guida
 			}
 		})();
 	""")
-	
-	talk(["Ai thinking"])
+
+	talk(["AI Thinking..."])
 
 func onAIResponse(args):
 	

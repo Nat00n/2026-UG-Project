@@ -1,28 +1,92 @@
 [gd_scene format=3 uid="uid://d3sc30ebo1ggn"]
 
 [ext_resource type="Script" uid="uid://r847uq6hbpel" path="res://scripts/startMenu.gd" id="1_fb70i"]
-[ext_resource type="PackedScene" uid="uid://b3memlw6ok0rs" path="res://scenes/Main.tscn" id="2_kmax6"]
+[ext_resource type="PackedScene" uid="uid://cf4k66j5wyyv8" path="res://scenes/Main.tscn" id="2_kmax6"]
 
 [node name="CanvasLayer" type="CanvasLayer" unique_id=215037783]
 script = ExtResource("1_fb70i")
 mainScene = ExtResource("2_kmax6")
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=688803657]
+[node name="Control" type="Control" parent="." unique_id=1955588539]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=532728757]
+[node name="HBoxContainer" type="HBoxContainer" parent="Control" unique_id=2143884947]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LeftHalf" type="Control" parent="Control/HBoxContainer" unique_id=1557093769]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="Control/HBoxContainer/LeftHalf" unique_id=688803657]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/HBoxContainer/LeftHalf/CenterContainer" unique_id=532728757]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="CenterContainer/VBoxContainer" unique_id=2122263375]
+[node name="Title" type="Label" parent="Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer" unique_id=2122263375]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "Task Train"
 
-[node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=254359427]
+[node name="UsernameInput" type="LineEdit" parent="Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer" unique_id=34968653]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+placeholder_text = "Username"
+alignment = 1
+
+[node name="ErrorLabel" type="Label" parent="Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer" unique_id=29764519]
+layout_mode = 2
+
+[node name="PlayButton" type="Button" parent="Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer" unique_id=254359427]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Play"
+
+[node name="RightHalf" type="Control" parent="Control/HBoxContainer" unique_id=1411130147]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="Control/HBoxContainer/RightHalf" unique_id=1691591203]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/HBoxContainer/RightHalf/CenterContainer" unique_id=1413959443]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/HBoxContainer/RightHalf/CenterContainer/VBoxContainer" unique_id=1410932752]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Top Scores"
+horizontal_alignment = 1
+
+[node name="LeaderboardLabel" type="RichTextLabel" parent="Control/HBoxContainer/RightHalf/CenterContainer/VBoxContainer" unique_id=971368225]
+custom_minimum_size = Vector2(800, 800)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_font_sizes/bold_font_size = 24
+theme_override_font_sizes/bold_italics_font_size = 24
+theme_override_font_sizes/italics_font_size = 24
+theme_override_font_sizes/mono_font_size = 24
+text = "Test
+"
+horizontal_alignment = 1

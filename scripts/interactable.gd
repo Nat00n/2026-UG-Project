@@ -64,7 +64,7 @@ func _buildDisplay():
 
 	nodeDisplay.size = Vector2(totalWidth, 2.0 * cardHeight)
 	
-func _getBaseGuide() -> String:
+func getBaseGuide() -> String:
 	return ""
 
 func createTrackedTween() -> Tween:

@@ -43,12 +43,6 @@ def move(fromIndex, toIndex):
 def setPivot(index):
 	talk("__pivot__:" + str(index))
 	
-def divideRange(start, end):
-	talk("__highlight__:" + str(start) + ":" + str(end) + ":0.2,0.6,0.9")
-
-def mergeRange(start, end):
-	talk("__highlight__:" + str(start) + ":" + str(end) + ":0.9,0.75,0.1")
-	
 def showSplit(start, mid, end):
 	talk("__split__:" + str(start) + ":" + str(mid) + ":" + str(end))
 
@@ -88,7 +82,8 @@ func _playNextSwap():
 				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 		tween.set_parallel(false)
 		tween.tween_callback(func():
-			if not hasSentToSearch:
+			if not hasSentToSearch and _isSorted():
+				Global.submitScore()
 				_sendToSearch()
 		)
 		return
@@ -129,6 +124,12 @@ func _playNextSwap():
 		tween.tween_callback(func():
 			_playNextSwap()
 		)
+		
+func _isSorted() -> bool:
+	for i in range(dataNodes.size() - 1):
+		if dataNodes[i]["value"] > dataNodes[i + 1]["value"]:
+			return false
+	return true
 
 func _applyPivot(index: int):
 	if pivotIndex >= 0 and pivotIndex < cardNodes.size():
@@ -238,3 +239,27 @@ func _sendToSearch():
 	)
 	
 	hasSentToSearch = true
+	
+func getBaseGuide() -> String:
+	return """[b]Available Data:[/b]
+
+[code]array[/code]
+A list of integers representing the current values to be sorted.
+Example: [3, 1, 4, 1, 5]
+
+[b]Available Functions:[/b]
+
+[code]swap(i, j)[/code]
+Swaps the elements at index i and j in the array and triggers the swap animation.
+
+[code]move(fromIndex, toIndex)[/code]
+Removes the element at fromIndex and inserts it at toIndex. Useful for insertion sort.
+
+[code]setPivot(index)[/code]
+Highlights the element at index as the current pivot (shown in orange).
+
+[code]showSplit(start, mid, end)[/code]
+Visually splits the array into two halves: [start, mid) in cyan and [mid, end) in orange.
+
+[code]commitSort()[/code]
+Call once the array is fully sorted. Confirms the final order and ends the animation."""

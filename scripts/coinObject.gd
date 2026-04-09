@@ -172,3 +172,28 @@ def removeCoin(value):
 def commitChange(coinList):
 	talk("__commitchange__:" + ",".join(str(c) for c in coinList))
 """ % targetAmount
+
+
+func getBaseGuide() -> String:
+	return """[b]Available Data:[/b]
+
+[code]coins[/code]
+A list of available coin denominations in pence: [1, 2, 5, 10, 20, 50, 100].
+
+[code]targetAmount[/code]
+The total amount in pence you must make using the available coins.
+
+[b]Available Functions:[/b]
+
+[code]useCoin(value)[/code]
+Adds one coin of the given denomination to its stack in the visualiser.
+Call this each time your algorithm selects a coin.
+
+[code]removeCoin(value)[/code]
+Removes the top coin of the given denomination from its stack.
+Useful if your algorithm backtracks.
+
+[code]commitChange(coinList)[/code]
+Accepts a flat list of coin values representing the complete final selection.
+Clears all stacks and animates the full solution at once.
+Example: commitChange([50, 20, 5, 2, 2])"""

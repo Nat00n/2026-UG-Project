@@ -357,3 +357,33 @@ def skippedCell(row, col):
 def commitKnapsack(selectedItems):
 	talk("__knapsack__:" + ",".join(str(i) for i in selectedItems))
 """ % [itemsStr, capacity]
+
+
+func getBaseGuide() -> String:
+	return """[b]Available Data:[/b]
+
+[code]items[/code]
+A list of dictionaries, each with keys: "name", "weight", and "value".
+Example: [{"name": "item0", "weight": 2, "value": 6}, ...]
+
+[code]capacity[/code]
+The maximum total weight the knapsack can hold.
+
+[b]Available Functions:[/b]
+
+[code]setCell(row, col, value)[/code]
+Fills a cell in the DP grid at (row, col) with the given integer value.
+Row corresponds to the item index (1-based), col to the weight available.
+
+[code]backtrackCell(row, col)[/code]
+Briefly highlights a cell during backtracking to show it is being re-examined.
+
+[code]takenCell(row, col)[/code]
+Marks a cell as one where the item was taken. Triggers the item flight animation into the knapsack bar.
+
+[code]skippedCell(row, col)[/code]
+Marks a cell as one where the item was skipped (not included at this capacity).
+
+[code]commitKnapsack(selectedItems)[/code]
+Accepts a list of item indices representing the final selection.
+Call this after filling the DP table to animate items into their knapsack slots."""

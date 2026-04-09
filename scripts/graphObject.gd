@@ -336,3 +336,29 @@ def visitNode(nodeId):
 def commitPath(path):
 	talk("__path__:" + ",".join(str(n) for n in path))
 """ % [graphStr, startNodeId, goalNodeId]
+
+func getBaseGuide() -> String:
+	return """[b]Available Data:[/b]
+
+[code]graph[/code]
+A dictionary mapping each node ID to a list of its neighbours.
+Each neighbour is a list: [neighbourId, edgeWeight].
+Example: {0: [[1, 5], [2, 3]], 1: [[0, 5]], ...}
+
+[code]startNode[/code]
+The ID of the node to begin traversal from (shown in green).
+
+[code]goalNode[/code]
+The ID of the target node to reach (shown in red).
+
+[b]Available Functions:[/b]
+
+[code]getNeighbours(nodeId)[/code]
+Returns the list of [neighbourId, weight] pairs for the given node.
+
+[code]visitNode(nodeId)[/code]
+Animates the traversal of a node during your search. Call this each time you explore a node.
+
+[code]commitPath(path)[/code]
+Accepts a list of node IDs representing the final path from startNode to goalNode.
+Triggers the path highlight animation once all visits have played."""

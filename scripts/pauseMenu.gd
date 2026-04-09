@@ -1,12 +1,13 @@
 extends CanvasLayer
 
-@onready var resumeButton: Button = $PanelContainer/VBoxContainer/ResumeButton
-@onready var settingsButton: Button = $PanelContainer/VBoxContainer/SettingsButton
-@onready var quitButton: Button = $PanelContainer/VBoxContainer/QuitButton
-@onready var settingsPanel: PanelContainer = $PanelContainer/VBoxContainer/SettingsPanel
-@onready var volumeSlider: HSlider = $PanelContainer/VBoxContainer/SettingsPanel/VBoxContainer/VolumeSlider
-@onready var settingsBackButton: Button = $PanelContainer/VBoxContainer/SettingsPanel/VBoxContainer/SettingsBackButton
-@onready var vBoxContainer: VBoxContainer = $PanelContainer/VBoxContainer
+@onready var resumeButton: Button = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/ResumeButton
+@onready var settingsButton: Button = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/SettingsButton
+@onready var quitButton: Button = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/QuitButton
+@onready var settingsPanel: PanelContainer = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/SettingsPanel
+@onready var volumeSlider: HSlider = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/SettingsPanel/VBoxContainer/VolumeSlider
+@onready var settingsBackButton: Button = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/SettingsPanel/VBoxContainer/SettingsBackButton
+@onready var leaderboardLabel: RichTextLabel = $Control/HBoxContainer/RightHalf/CenterContainer/VBoxContainer/leaderboardLabel
+
 
 func _ready():
 	
@@ -37,29 +38,34 @@ func _input(event):
 func openPause():
 	show()
 	get_tree().paused = true
+	_fetchLeaderboard()
 
 func onResume():
 	hide()
 	get_tree().paused = false
 
+func _setMainButtonsVisible(value: bool):
+	resumeButton.visible = value
+	settingsButton.visible = value
+	quitButton.visible = value
+
 func onSettings():
+	_setMainButtonsVisible(false)
 	settingsPanel.visible = true
-	# Hide the main buttons
-	resumeButton.visible = false
-	settingsButton.visible = false
-	quitButton.visible = false
-	
+
 func onSettingsBack():
 	settingsPanel.visible = false
-	# Show the main buttons again
-	resumeButton.visible = true
-	settingsButton.visible = true
-	quitButton.visible = true
+	_setMainButtonsVisible(true)
 
 func onQuit():
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://scenes/StartMenu.tscn")
 
 func onVolumeChanged(value: float):
-	# Convert linear 0-1 to decibels
 	AudioServer.set_bus_volume_db(0, linear_to_db(value))
+
+func _fetchLeaderboard():
+	await Global.populateLeaderboard(leaderboardLabel)
+
+func _onScoresReceived():
+	await Global.populateLeaderboard(leaderboardLabel)

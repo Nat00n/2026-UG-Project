@@ -133,3 +133,23 @@ def check(index):
 def commitSelect(index):
 	talk("__commitSelect__:" + str(index))
 """ % targetValue
+
+func getBaseGuide() -> String:
+	return """[b]Available Data:[/b]
+
+[code]array[/code]
+A list of integers representing the values to search through.
+Example: [2, 5, 7, 9, 12]
+The array might first need to be sourced from another system.
+
+[code]targetValue[/code]
+The integer value you are searching for within the array.
+
+[b]Available Functions:[/b]
+
+[code]check(index)[/code]
+Highlights the element at index as currently being inspected (shown in cyan).
+
+[code]commitSelect(index)[/code]
+Marks the element at index as the found result and ends the search animation.
+Call this once you have located the target value and ended the search."""
