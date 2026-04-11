@@ -1,10 +1,16 @@
 extends Control
 
-@onready var levelMap = $LevelSelectionMap
-@onready var levelInfoPanel = $LevelInfoPanel
-@onready var levelNameLabel = $LevelInfoPanel/VBoxContainer/LevelName
-@onready var startButton = $LevelInfoPanel/VBoxContainer/StartButton
-@onready var backButton = $BackButton
+@onready var levelMap: Control = $Map
+
+@onready var levelInfo: Panel = $LevelInfo
+
+@onready var levelName: Label = $LevelInfo/VBoxContainer/LevelName
+
+@onready var startButton: Button = $LevelInfo/VBoxContainer/StartButton
+
+@onready var pauseButton: Button = $PauseButton
+@onready var pauseMenu: CanvasLayer = $PauseMenu
+
 
 var progressionManager
 
@@ -14,16 +20,16 @@ func _ready():
 	# Connect signals
 	levelMap.levelSelected.connect(_onLevelSelected)
 	startButton.pressed.connect(_onStartButtonPressed)
-	backButton.pressed.connect(_onBackButtonPressed)
+	pauseButton.pressed.connect(_onPause)
 	
 	# Hide info panel initially
-	levelInfoPanel.visible = false
+	levelInfo.visible = false
 
 func _onLevelSelected(levelId: String):
 	var level = progressionManager.levels[levelId]
 	
 	# Update info panel
-	levelNameLabel.text = level.levelName
+	levelName.text = level.levelName
 	
 	if level.isCompleted:
 		startButton.text = "Replay"
@@ -31,7 +37,7 @@ func _onLevelSelected(levelId: String):
 		startButton.text = "Start"
 	
 	startButton.set_meta("levelId", levelId)
-	levelInfoPanel.visible = true
+	levelInfo.visible = true
 
 func _onStartButtonPressed():
 	var levelId = startButton.get_meta("levelId")
@@ -39,10 +45,9 @@ func _onStartButtonPressed():
 	
 	# Load the level scene
 	get_tree().change_scene_to_file(level.scenePath)
-
-func _onBackButtonPressed():
-	# Return to main menu or previous screen
-	get_tree().change_scene_to_file("res://main_menu.tscn")
+	
+func _onPause():
+	pauseMenu.openPause()
 
 # Call this when a level is completed
 func onLevelCompleted(levelId: String):

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ctqhtni7hsajb" path="res://scripts/LevelSelectionScreen.gd" id="1_4tn7f"]
 [ext_resource type="Script" uid="uid://6il3a10mhot1" path="res://scripts/LevelSelectionMap.gd" id="2_og16j"]
+[ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="3_b387n"]
 
 [node name="LevelSelectionScreen" type="Control" unique_id=1720488618]
 layout_mode = 3
@@ -54,7 +55,14 @@ size_flags_vertical = 3
 theme_override_font_sizes/font_size = 32
 text = "Start Level"
 
-[node name="BackButton" type="Button" parent="." unique_id=72604481]
+[node name="PauseButton" type="Button" parent="." unique_id=1929197231]
 layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
+offset_left = 1899.0
+offset_top = 18.0
+offset_right = 1955.5
+offset_bottom = 93.0
+rotation = 1.5707964
+theme_override_font_sizes/font_size = 48
+text = "="
+
+[node name="PauseMenu" parent="." unique_id=30784119 instance=ExtResource("3_b387n")]

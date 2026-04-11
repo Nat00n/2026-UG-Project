@@ -61,6 +61,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Settings"
 
+[node name="LevelSelectButton" type="Button" parent="Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer" unique_id=1347326101]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Level Select"
+
 [node name="QuitButton" type="Button" parent="Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer" unique_id=1967200226]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32

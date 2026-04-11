@@ -48,7 +48,7 @@ func setupLevels():
 		levelData.areaIndex = levelInfo["area"]
 		levelData.position = levelInfo["pos"]
 		levelData.requiredLevelId = levelInfo["required"]
-		levelData.scenePath = "res://levels/" + levelInfo["id"] + ".tscn"
+		levelData.scenePath = "res://scenes/levels/" + levelInfo["id"] + ".tscn"
 		
 		progressionManager.registerLevel(levelData)
 		levelNodes[levelData.levelId] = levelData

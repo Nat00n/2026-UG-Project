@@ -1,11 +1,9 @@
 [gd_scene format=3 uid="uid://d3sc30ebo1ggn"]
 
 [ext_resource type="Script" uid="uid://r847uq6hbpel" path="res://scripts/startMenu.gd" id="1_fb70i"]
-[ext_resource type="PackedScene" uid="uid://dmvs30b2b4afm" path="res://scenes/LevelSelectionScreen.tscn" id="2_kmax6"]
 
 [node name="CanvasLayer" type="CanvasLayer" unique_id=215037783]
 script = ExtResource("1_fb70i")
-levelSelection = ExtResource("2_kmax6")
 
 [node name="Control" type="Control" parent="." unique_id=1955588539]
 layout_mode = 3
