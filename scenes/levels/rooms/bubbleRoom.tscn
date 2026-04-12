@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://5txxikkv7a4h"]
+
+[ext_resource type="Script" uid="uid://e0y3asayi4ga" path="res://scripts/room.gd" id="1_3xrw2"]
+[ext_resource type="PackedScene" uid="uid://vuvlclyj1tpw" path="res://scenes/SortObject.tscn" id="2_itjfx"]
+
+[node name="BubbleRoom" type="Node2D" unique_id=470420785]
+script = ExtResource("1_3xrw2")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1634516390]
+offset_right = 1930.0
+offset_bottom = 1096.0
+color = Color(0.27387273, 0.27387273, 0.27387273, 1)
+
+[node name="Floor" type="ColorRect" parent="." unique_id=356980670]
+offset_left = 146.0
+offset_top = 152.0
+offset_right = 1605.0
+offset_bottom = 822.0
+color = Color(0.004679383, 0.13212621, 0.13827685, 1)
+
+[node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_itjfx")]
+position = Vector2(716, 547)
+objectName = "Bob"
+objectID = "object_001"
+taskDescription = "To sort an array using bubble sort"
+taskName = "Bubble Sort"
+taskGuide = "To implement a bubble sort algorithm to return a sorted array"
