@@ -10,8 +10,9 @@ var checkQueue: Array = []
 var isAnimating: bool = false
 var checkTimer: float = 0.0
 var checkDelay: float = 0.3
+var foundPosition: int = -1  # Track the position user selected
 
-# NEW: Track if array was received from sort
+# Track if array was received from sort
 var arrayReceivedFromSort: bool = false
 var expectedPosition: int = -1
 
@@ -45,13 +46,14 @@ func resetDisplay():
 	checkTimer = 0.0
 	arrayReceivedFromSort = false
 	expectedPosition = -1
+	foundPosition = -1  # Reset found position
 	if is_instance_valid(selectionBeam):
 		selectionBeam.visible = false
 	if initialDataNodes.is_empty():
 		return
 	super.resetDisplay()
 
-# NEW: Called by SortObject when it sends the sorted array
+# Called by SortObject when it sends the sorted array
 func receiveArray(sortedNodes: Array):
 	dataNodes = sortedNodes.duplicate(true)
 	initialDataNodes = dataNodes.duplicate(true)
@@ -136,10 +138,13 @@ func queueCheck(index: int):
 	isAnimating = true
 
 func queueSelect(index: int):
+	# CRITICAL: Save position NOW, not after animation
+	foundPosition = index
 	checkQueue.append({"type": "select", "index": index})
 	isAnimating = true
+	print("[", objectID, "] queueSelect: saved foundPosition = ", foundPosition)
 
-# NEW: Verify position is correct
+# Verify position is correct
 func commitSearch():
 	isAnimating = true
 	# Wait for animation to finish, then verify
@@ -147,11 +152,8 @@ func commitSearch():
 	verifySearchResult()
 
 func verifySearchResult():
-	# Find the last "select" in the queue to get the found position
-	var foundPosition = -1
-	for step in checkQueue:
-		if step["type"] == "select":
-			foundPosition = step["index"]
+	print("\n[", objectID, "] === VERIFYING SEARCH RESULT ===")
+	print("  Found position: ", foundPosition)
 	
 	# If we're in standalone mode (no sort object), we need to find expected position
 	if not arrayReceivedFromSort:
@@ -161,12 +163,28 @@ func verifySearchResult():
 				expectedPosition = i
 				break
 	
-	# Verify correctness
-	if foundPosition != expectedPosition:
-		print("[" + objectID + "] Incorrect position! Found: " + str(foundPosition) + ", Expected: " + str(expectedPosition))
+	print("  Expected position: ", expectedPosition)
+	print("  Target value: ", targetValue)
+	
+	# Check if commitSelect was called
+	if foundPosition == -1:
+		print("  ✗ ERROR: commitSelect() was never called!")
+		print("  User's Python code must call: commitSelect(index)")
 		return
 	
-	print("[" + objectID + "] Correct position found: " + str(foundPosition))
+	# Verify correctness
+	if foundPosition < 0 or foundPosition >= dataNodes.size():
+		print("  ✗ Found position out of bounds!")
+		return
+	
+	var valueAtFound = dataNodes[foundPosition]["value"]
+	print("  Value at found position: ", valueAtFound)
+	
+	if valueAtFound != targetValue:
+		print("  ✗ Incorrect! Found position ", foundPosition, " has value ", valueAtFound, ", not ", targetValue)
+		return
+	
+	print("  ✓ CORRECT! Found ", targetValue, " at position ", foundPosition)
 	Global.submitScore()
 	roomTaskCompleted.emit(objectID)  # Complete room
 

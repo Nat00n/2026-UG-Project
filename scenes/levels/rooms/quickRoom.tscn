@@ -21,7 +21,7 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_1qfdc")]
 position = Vector2(729, 406)
 objectName = "Billy"
-objectID = "object_004"
+objectID = "obj_4"
 taskDescription = "To sort an array using a quick sort algorithm"
 taskName = "Quick Sort"
 taskGuide = "To implement a quick sort algorithm to return a sorted array"

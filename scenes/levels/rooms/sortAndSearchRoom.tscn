@@ -22,7 +22,9 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_nvlyb")]
 position = Vector2(840, 669)
 objectName = "Seasalt"
+objectID = "obj_6"
 
 [node name="SearchObject" parent="." unique_id=1672652981 instance=ExtResource("3_rbc2q")]
 position = Vector2(840, 382)
 objectName = "Sammy"
+objectID = "obj_5"

@@ -21,7 +21,7 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_oy47q")]
 position = Vector2(1090, 433)
 objectName = "Em"
-objectID = "object_002"
+objectID = "obj_2"
 taskDescription = "To sort an array using a merge sort algorithm"
 taskName = "Merge Sort"
 taskGuide = "To implement a merge sort algorithm to return a sorted array"

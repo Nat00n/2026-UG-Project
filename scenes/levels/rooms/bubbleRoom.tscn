@@ -21,7 +21,7 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_itjfx")]
 position = Vector2(716, 547)
 objectName = "Bob"
-objectID = "object_001"
+objectID = "obj_1"
 taskDescription = "To sort an array using bubble sort"
 taskName = "Bubble Sort"
 taskGuide = "To implement a bubble sort algorithm to return a sorted array"

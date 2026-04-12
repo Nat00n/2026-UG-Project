@@ -10,6 +10,7 @@
 [node name="Level4-2" type="Node2D" unique_id=655865353]
 script = ExtResource("1_2jrij")
 levelId = "4-2"
+totalRooms = 1
 
 [node name="RoomManager" type="Node2D" parent="." unique_id=514760587]
 script = ExtResource("2_ucg12")

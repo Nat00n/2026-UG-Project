@@ -10,8 +10,7 @@ signal roomTaskCompleted(objectID: String)
 @onready var nodeDisplay: Control = $nodeDisplay
 
 @export var objectName: String = "Object"
-static var _nextObjectID := 1
-var objectID: String = ""
+@export var objectID: String = "obj_0"
 @export_multiline var taskDescription: String = "None"
 @export var taskName: String = "None"
 @export_multiline var taskGuide: String = "None"
@@ -29,9 +28,6 @@ const cardHeight = 60
 const cardGap = 15
 
 func _ready():
-	if objectID == "":
-		objectID = "obj_%d" % _nextObjectID
-		_nextObjectID += 1
 	
 	hoverLabel.visible = false
 	add_to_group("interactable_objects")  # UPDATED: Changed to "interactable_objects"

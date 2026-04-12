@@ -49,6 +49,21 @@ rotation = 1.5707964
 theme_override_font_sizes/font_size = 48
 text = "="
 
+[node name="ReturnButton" type="Button" parent="RoomUI" unique_id=1296570481]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 829.0
+offset_top = 1024.5
+offset_right = 1092.0
+offset_bottom = 1066.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 24
+text = "Return To Level Select"
+
 [node name="RoomProgressIndicator" type="Control" parent="RoomUI" unique_id=624713303]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 3

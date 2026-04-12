@@ -16,6 +16,12 @@ script = ExtResource("2_sg6du")
 
 [node name="Level1" parent="RoomManager" unique_id=470420785 instance=ExtResource("3_rkd4u")]
 
+[node name="Level2" parent="RoomManager" unique_id=1010522375 instance=ExtResource("3_rkd4u")]
+
+[node name="Level3" parent="RoomManager" unique_id=1198155098 instance=ExtResource("3_rkd4u")]
+
+[node name="Level4" parent="RoomManager" unique_id=896979400 instance=ExtResource("3_rkd4u")]
+
 [node name="RoomUI" type="Node2D" parent="." unique_id=887767660]
 
 [node name="LeftButton" type="Button" parent="RoomUI" unique_id=697794029]
