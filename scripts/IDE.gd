@@ -19,6 +19,7 @@ var _llmReady := false
 var _llmReadyCallback
 var _llmProgressCallback
 var _onEditorTab := true
+var _lastTabPerObject := {}  # Tracks last tab state for each object
 
 func _ready():
 	panel.visible = false
@@ -128,6 +129,8 @@ func talk(args):
 func onClose() -> void:
 	if _currentObject:
 		_currentObject.saveScript(inputCE.text)
+		# Save current tab state for this object
+		_lastTabPerObject[_currentObject] = _onEditorTab
 
 	panel.visible = false
 	_currentObject = null
@@ -138,7 +141,18 @@ func open(objectName: String, interactable):
 	outputRCT.clear()
 	outputRCT.append_text("--- %s ---\n" % objectName)
 	inputCE.text = interactable.savedScript
-	_showEditorTab()
+	
+	# Check if this object has a saved tab preference
+	if _lastTabPerObject.has(interactable):
+		# Restore last tab
+		if _lastTabPerObject[interactable]:
+			_showEditorTab()
+		else:
+			_showGuideTab()
+	else:
+		# Default to Task Guide for first-time open
+		_showGuideTab()
+	
 	panel.visible = true
 
 func _setupSyntaxHighlighting():

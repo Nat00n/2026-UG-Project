@@ -1,7 +1,7 @@
 class_name GraphObject
 extends InteractableObject
 
-@export var nodeCount: int = 30
+@export var nodeCount: int = 20
 @export var startNodeId: int = 0
 @export var goalNodeId: int = randi_range(24,30)
 
@@ -280,6 +280,8 @@ func _resetPathColors():
 func _stepPath():
 	if pathIndex >= pendingPath.size():
 		isPathAnimating = false
+		# NEW: Verify path correctness after animation
+		verifyPath()
 		return
 
 	var nodeId = pendingPath[pathIndex]
@@ -293,6 +295,30 @@ func _stepPath():
 			edgeLines[key].width += 2.0
 
 	pathIndex += 1
+
+# NEW: Verify path is valid and reaches goal
+func verifyPath():
+	# Check path starts at start node
+	if pendingPath.is_empty() or pendingPath[0] != startNodeId:
+		print("[" + objectID + "] Path doesn't start at start node!")
+		return
+	
+	# Check path ends at goal node
+	if pendingPath[pendingPath.size() - 1] != goalNodeId:
+		print("[" + objectID + "] Path doesn't reach goal node!")
+		return
+	
+	# Check each edge in path exists
+	for i in range(pendingPath.size() - 1):
+		var fromId = pendingPath[i]
+		var toId = pendingPath[i + 1]
+		if not _hasEdge(fromId, toId):
+			print("[" + objectID + "] Invalid edge in path: " + str(fromId) + " -> " + str(toId))
+			return
+	
+	print("[" + objectID + "] Valid path found from " + str(startNodeId) + " to " + str(goalNodeId))
+	Global.submitScore()
+	roomTaskCompleted.emit(objectID)  # Complete room
 
 # --- Python bridge ---
 

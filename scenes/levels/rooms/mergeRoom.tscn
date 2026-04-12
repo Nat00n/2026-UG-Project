@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://cacyagyj6ffxl"]
+
+[ext_resource type="Script" uid="uid://e0y3asayi4ga" path="res://scripts/room.gd" id="1_sola5"]
+[ext_resource type="PackedScene" uid="uid://vuvlclyj1tpw" path="res://scenes/SortObject.tscn" id="2_oy47q"]
+
+[node name="MergeRoom" type="Node2D" unique_id=470420785]
+script = ExtResource("1_sola5")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1634516390]
+offset_right = 1930.0
+offset_bottom = 1096.0
+color = Color(0.27387273, 0.27387273, 0.27387273, 1)
+
+[node name="Floor" type="ColorRect" parent="." unique_id=356980670]
+offset_left = 146.0
+offset_top = 152.0
+offset_right = 1605.0
+offset_bottom = 822.0
+color = Color(0.004679383, 0.13212621, 0.13827685, 1)
+
+[node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_oy47q")]
+position = Vector2(1090, 433)
+objectName = "Em"
+objectID = "object_002"
+taskDescription = "To sort an array using a merge sort algorithm"
+taskName = "Merge Sort"
+taskGuide = "To implement a merge sort algorithm to return a sorted array"

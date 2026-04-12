@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://b7pfcomn7yk0l"]
+
+[ext_resource type="Script" uid="uid://e0y3asayi4ga" path="res://scripts/room.gd" id="1_l1p0q"]
+[ext_resource type="PackedScene" uid="uid://vuvlclyj1tpw" path="res://scenes/SortObject.tscn" id="2_1qfdc"]
+
+[node name="QuickRoom" type="Node2D" unique_id=470420785]
+script = ExtResource("1_l1p0q")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1634516390]
+offset_right = 1930.0
+offset_bottom = 1096.0
+color = Color(0.27387273, 0.27387273, 0.27387273, 1)
+
+[node name="Floor" type="ColorRect" parent="." unique_id=356980670]
+offset_left = 146.0
+offset_top = 152.0
+offset_right = 1605.0
+offset_bottom = 822.0
+color = Color(0.004679383, 0.13212621, 0.13827685, 1)
+
+[node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_1qfdc")]
+position = Vector2(729, 406)
+objectName = "Billy"
+objectID = "object_004"
+taskDescription = "To sort an array using a quick sort algorithm"
+taskName = "Quick Sort"
+taskGuide = "To implement a quick sort algorithm to return a sorted array"

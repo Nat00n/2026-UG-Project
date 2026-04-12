@@ -1,16 +1,19 @@
 class_name SearchObject
 extends InteractableObject
 
-
 @onready var selectionBeam: Line2D = $selectionBeam
 
-@export var targetValue: int = 5
+var targetValue
 @export var sortReq: bool = false
 
 var checkQueue: Array = []
 var isAnimating: bool = false
 var checkTimer: float = 0.0
 var checkDelay: float = 0.3
+
+# NEW: Track if array was received from sort
+var arrayReceivedFromSort: bool = false
+var expectedPosition: int = -1
 
 func _init_object():
 	if is_instance_valid(selectionBeam):
@@ -40,22 +43,38 @@ func resetDisplay():
 	checkQueue.clear()
 	isAnimating = false
 	checkTimer = 0.0
+	arrayReceivedFromSort = false
+	expectedPosition = -1
 	if is_instance_valid(selectionBeam):
 		selectionBeam.visible = false
 	if initialDataNodes.is_empty():
 		return
 	super.resetDisplay()
 
+# NEW: Called by SortObject when it sends the sorted array
 func receiveArray(sortedNodes: Array):
 	dataNodes = sortedNodes.duplicate(true)
 	initialDataNodes = dataNodes.duplicate(true)
 	checkQueue.clear()
 	isAnimating = false
 	checkTimer = 0.0
+	arrayReceivedFromSort = true
+	
 	if is_instance_valid(selectionBeam):
 		selectionBeam.visible = false
+	
 	targetValue = dataNodes[randi() % dataNodes.size()]["value"]
+	
+	# Find expected position for verification
+	expectedPosition = -1
+	for i in range(dataNodes.size()):
+		if dataNodes[i]["value"] == targetValue:
+			expectedPosition = i
+			break
+	
 	_buildDisplay()
+	
+	print("[" + objectID + "] Received sorted array. Target: " + str(targetValue) + " at position: " + str(expectedPosition))
 
 func _process(delta):
 	# Mouse hover handled by base class
@@ -120,8 +139,36 @@ func queueSelect(index: int):
 	checkQueue.append({"type": "select", "index": index})
 	isAnimating = true
 
+# NEW: Verify position is correct
 func commitSearch():
 	isAnimating = true
+	# Wait for animation to finish, then verify
+	await get_tree().create_timer(checkDelay * checkQueue.size() + 0.3).timeout
+	verifySearchResult()
+
+func verifySearchResult():
+	# Find the last "select" in the queue to get the found position
+	var foundPosition = -1
+	for step in checkQueue:
+		if step["type"] == "select":
+			foundPosition = step["index"]
+	
+	# If we're in standalone mode (no sort object), we need to find expected position
+	if not arrayReceivedFromSort:
+		expectedPosition = -1
+		for i in range(dataNodes.size()):
+			if dataNodes[i]["value"] == targetValue:
+				expectedPosition = i
+				break
+	
+	# Verify correctness
+	if foundPosition != expectedPosition:
+		print("[" + objectID + "] Incorrect position! Found: " + str(foundPosition) + ", Expected: " + str(expectedPosition))
+		return
+	
+	print("[" + objectID + "] Correct position found: " + str(foundPosition))
+	Global.submitScore()
+	roomTaskCompleted.emit(objectID)  # Complete room
 
 func getPreambleFunctions() -> String:
 	return """

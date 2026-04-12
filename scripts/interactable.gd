@@ -1,12 +1,17 @@
 class_name InteractableObject
 extends Area2D
 
+# Emitted by child classes (SortObject, SearchObject, etc.) when their task is completed correctly
+# The Level script connects to this signal to track room completion
+signal roomTaskCompleted(objectID: String)
+
 @onready var hoverLabel: Label = $hoverLabel
 @onready var visual: ColorRect = $visual
 @onready var nodeDisplay: Control = $nodeDisplay
 
 @export var objectName: String = "Object"
-@export var objectID: String = "object_000"
+static var _nextObjectID := 1
+var objectID: String = ""
 @export_multiline var taskDescription: String = "None"
 @export var taskName: String = "None"
 @export_multiline var taskGuide: String = "None"
@@ -19,14 +24,17 @@ var cardNodes: Array = []
 var savedScript: String = ""
 var activeTweens: Array = []
 
-
 const cardWidth = 60
 const cardHeight = 60
 const cardGap = 15
 
 func _ready():
+	if objectID == "":
+		objectID = "obj_%d" % _nextObjectID
+		_nextObjectID += 1
+	
 	hoverLabel.visible = false
-	add_to_group("interactable")
+	add_to_group("interactable_objects")  # UPDATED: Changed to "interactable_objects"
 	_loadScript()
 	_init_object()
 
@@ -38,21 +46,16 @@ func _buildDisplay():
 	for child in nodeDisplay.get_children():
 		child.queue_free()
 	cardNodes.clear()
-
 	if dataNodes.is_empty():
 		return
-
 	var totalWidth = dataNodes.size() * (cardWidth + cardGap) - cardGap
 	var startX = -totalWidth / 2.0
-
 	for i in range(dataNodes.size()):
 		var node = dataNodes[i]
 		var scaledHeight = (1.0 + node["value"] / 10.0) * cardHeight
-
 		var card = PanelContainer.new()
 		card.size = Vector2(cardWidth, scaledHeight)
 		card.position = Vector2(startX + i * (cardWidth + cardGap), 2.0 * cardHeight - scaledHeight)
-
 		var label = Label.new()
 		label.text = "%s\n%d" % [node["name"], node["value"]]
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -61,9 +64,8 @@ func _buildDisplay():
 		card.add_child(label)
 		nodeDisplay.add_child(card)
 		cardNodes.append(card)
-
 	nodeDisplay.size = Vector2(totalWidth, 2.0 * cardHeight)
-	
+
 func getBaseGuide() -> String:
 	return ""
 

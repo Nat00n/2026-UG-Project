@@ -151,12 +151,38 @@ func clearAllStacks():
 				coin.queue_free()
 		coinStacks[coinVal].clear()
 		
+# NEW: Verify coin list sums to target and complete room
 func commitChange(coinList: Array):
 	clearAllStacks()
 	var delay = 0.0
 	for coin in coinList:
 		addCoinToStack(coin, delay)
 		delay += 0.2
+	
+	# Wait for animation, then verify
+	await get_tree().create_timer(delay + 0.5).timeout
+	verifyCoinChange(coinList)
+
+# NEW: Verification function
+func verifyCoinChange(coinList: Array):
+	# Check sum equals target
+	var sum = 0
+	for coin in coinList:
+		sum += coin
+	
+	if sum != targetAmount:
+		print("[" + objectID + "] Incorrect sum! Got: " + str(sum) + ", Target: " + str(targetAmount))
+		return
+	
+	# Check all coins are valid denominations
+	for coin in coinList:
+		if not COIN_VALUES.has(coin):
+			print("[" + objectID + "] Invalid coin: " + str(coin))
+			return
+	
+	print("[" + objectID + "] Correct coin change! Sum: " + str(sum))
+	Global.submitScore()
+	roomTaskCompleted.emit(objectID)  # Complete room
 
 func getPreambleFunctions() -> String:
 	return """

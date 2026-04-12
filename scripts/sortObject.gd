@@ -6,6 +6,19 @@ var isAnimating: bool = false
 var pivotIndex: int = -1
 var hasSentToSearch: bool = false
 
+# NEW: Search object linking
+var linkedSearchObject: SearchObject = null
+
+func _ready():
+	super._ready()
+	# Check for linked search object in the same room
+	await get_tree().process_frame  # Wait for scene to be ready
+	for node in get_parent().get_children():
+		if node is SearchObject:
+			linkedSearchObject = node
+			print("[" + objectID + "] Linked to search object: " + node.objectID)
+			break
+
 func _init_object():
 	for i in range(10):
 		dataNodes.append({
@@ -82,9 +95,9 @@ func _playNextSwap():
 				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 		tween.set_parallel(false)
 		tween.tween_callback(func():
-			if not hasSentToSearch and _isSorted():
-				Global.submitScore()
-				_sendToSearch()
+			# NEW: Verify sorting is correct before completing
+			if not hasSentToSearch:
+				verifyAndComplete()
 		)
 		return
 
@@ -124,12 +137,30 @@ func _playNextSwap():
 		tween.tween_callback(func():
 			_playNextSwap()
 		)
-		
+
+# NEW: Verification function
 func _isSorted() -> bool:
 	for i in range(dataNodes.size() - 1):
 		if dataNodes[i]["value"] > dataNodes[i + 1]["value"]:
 			return false
 	return true
+
+# NEW: Verify correctness before completing
+func verifyAndComplete():
+	if not _isSorted():
+		print("[" + objectID + "] Array is NOT sorted correctly!")
+		return
+	
+	print("[" + objectID + "] Array sorted correctly!")
+	
+	# Check if we should send to search or complete room
+	if linkedSearchObject != null:
+		# Has linked search - send array, DON'T complete room
+		_sendToSearch()
+	else:
+		# No linked search - complete room now
+		Global.submitScore()
+		roomTaskCompleted.emit(objectID)
 
 func _applyPivot(index: int):
 	if pivotIndex >= 0 and pivotIndex < cardNodes.size():
@@ -211,15 +242,10 @@ func _animateMove(fromIndex: int, toIndex: int):
 	)
 
 func _sendToSearch():
-	var searchNode: SearchObject = null
-	for node in get_parent().get_children():
-		if node is SearchObject:
-			searchNode = node
-			break
-	if searchNode == null:
+	if linkedSearchObject == null:
 		return
 
-	var targetPos = searchNode.visual.global_position + searchNode.visual.size / 2.0
+	var targetPos = linkedSearchObject.visual.global_position + linkedSearchObject.visual.size / 2.0
 
 	var tween = createTrackedTween()
 	tween.set_parallel(true)
@@ -235,7 +261,8 @@ func _sendToSearch():
 		for child in nodeDisplay.get_children():
 			child.queue_free()
 		cardNodes.clear()
-		searchNode.receiveArray(dataNodes.duplicate(true))
+		linkedSearchObject.receiveArray(dataNodes.duplicate(true))
+		print("[" + objectID + "] Sorted array sent to search. Room NOT complete yet.")
 	)
 	
 	hasSentToSearch = true

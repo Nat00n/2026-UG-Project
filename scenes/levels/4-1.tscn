@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bhxnfy7wb3rmp" path="res://scripts/levels.gd" id="1_8uc4v"]
 [ext_resource type="Script" uid="uid://0aj1e5d62pul" path="res://scripts/roomManager.gd" id="2_0j81r"]
 [ext_resource type="PackedScene" uid="uid://c2khoy27nacsl" path="res://scenes/Level1.tscn" id="3_k7miw"]
+[ext_resource type="Script" uid="uid://bqcx8t8huv42y" path="res://scripts/roomProgressIndicator.gd" id="4_0j81r"]
 [ext_resource type="PackedScene" uid="uid://bm85j7tdoavkf" path="res://scenes/IDE.tscn" id="4_dfaro"]
 [ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="5_3dgw1"]
 
@@ -39,6 +40,19 @@ offset_bottom = 93.0
 rotation = 1.5707964
 theme_override_font_sizes/font_size = 48
 text = "="
+
+[node name="RoomProgressIndicator" type="Control" parent="RoomUI" unique_id=1836472164]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 960.0
+offset_top = 20.0
+offset_right = 960.0
+offset_bottom = 40.0
+grow_horizontal = 2
+script = ExtResource("4_0j81r")
 
 [node name="IDE" parent="." unique_id=1106617920 instance=ExtResource("4_dfaro")]
 
