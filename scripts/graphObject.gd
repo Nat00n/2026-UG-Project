@@ -3,7 +3,7 @@ extends InteractableObject
 
 @export var nodeCount: int = 20
 @export var startNodeId: int = 0
-@export var goalNodeId: int = randi_range(24,30)
+@export var goalNodeId: int = nodeCount-1
 
 var graphNodes: Array = []
 var nodeCircles: Array = []

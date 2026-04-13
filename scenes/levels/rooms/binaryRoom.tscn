@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bq2numgh0dqt2"]
+
+[ext_resource type="Script" uid="uid://e0y3asayi4ga" path="res://scripts/room.gd" id="1_f13vf"]
+[ext_resource type="PackedScene" uid="uid://cuastweaprt2q" path="res://scenes/SearchObject.tscn" id="2_3mtg4"]
+
+[node name="BinaryRoom" type="Node2D" unique_id=470420785]
+script = ExtResource("1_f13vf")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1634516390]
+offset_right = 1930.0
+offset_bottom = 1096.0
+color = Color(0.27387273, 0.27387273, 0.27387273, 1)
+
+[node name="Floor" type="ColorRect" parent="." unique_id=356980670]
+offset_left = 146.0
+offset_top = 152.0
+offset_right = 1605.0
+offset_bottom = 822.0
+color = Color(0.004679383, 0.13212621, 0.13827685, 1)
+
+[node name="SearchObject" parent="." unique_id=1672652981 instance=ExtResource("2_3mtg4")]
+position = Vector2(936, 629)
+sortReq = true
+objectName = "Whis"
+objectID = "obj_8"

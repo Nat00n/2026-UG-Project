@@ -2,10 +2,13 @@
 
 [ext_resource type="Script" uid="uid://bhxnfy7wb3rmp" path="res://scripts/levels.gd" id="1_vq46n"]
 [ext_resource type="Script" uid="uid://0aj1e5d62pul" path="res://scripts/roomManager.gd" id="2_sg6du"]
-[ext_resource type="PackedScene" uid="uid://c2khoy27nacsl" path="res://scenes/Level1.tscn" id="3_rkd4u"]
+[ext_resource type="PackedScene" uid="uid://cmxtsdawuajw6" path="res://scenes/levels/rooms/dfsRoom.tscn" id="3_qsyff"]
 [ext_resource type="PackedScene" uid="uid://bm85j7tdoavkf" path="res://scenes/IDE.tscn" id="4_8w6cp"]
 [ext_resource type="Script" uid="uid://bqcx8t8huv42y" path="res://scripts/roomProgressIndicator.gd" id="4_sg6du"]
+[ext_resource type="PackedScene" uid="uid://bwrjov1hkmusj" path="res://scenes/levels/rooms/bfsRoom.tscn" id="4_uhd0x"]
+[ext_resource type="PackedScene" uid="uid://bsydo5tx366t3" path="res://scenes/levels/rooms/dijkstrasRoom.tscn" id="5_btv8o"]
 [ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="5_qsyff"]
+[ext_resource type="PackedScene" uid="uid://ch3gdpk7lrlty" path="res://scenes/levels/rooms/aStarRoom.tscn" id="6_1ygnx"]
 
 [node name="Level3-1" type="Node2D" unique_id=655865353]
 script = ExtResource("1_vq46n")
@@ -14,13 +17,13 @@ levelId = "3-1"
 [node name="RoomManager" type="Node2D" parent="." unique_id=514760587]
 script = ExtResource("2_sg6du")
 
-[node name="Level1" parent="RoomManager" unique_id=470420785 instance=ExtResource("3_rkd4u")]
+[node name="DFSRoom" parent="RoomManager" unique_id=470420785 instance=ExtResource("3_qsyff")]
 
-[node name="Level2" parent="RoomManager" unique_id=1010522375 instance=ExtResource("3_rkd4u")]
+[node name="BFSRoom" parent="RoomManager" unique_id=814706834 instance=ExtResource("4_uhd0x")]
 
-[node name="Level3" parent="RoomManager" unique_id=1198155098 instance=ExtResource("3_rkd4u")]
+[node name="DijkstrasRoom" parent="RoomManager" unique_id=409035667 instance=ExtResource("5_btv8o")]
 
-[node name="Level4" parent="RoomManager" unique_id=896979400 instance=ExtResource("3_rkd4u")]
+[node name="AStarRoom" parent="RoomManager" unique_id=1845576199 instance=ExtResource("6_1ygnx")]
 
 [node name="RoomUI" type="Node2D" parent="." unique_id=887767660]
 
@@ -46,6 +49,21 @@ offset_bottom = 93.0
 rotation = 1.5707964
 theme_override_font_sizes/font_size = 48
 text = "="
+
+[node name="ReturnButton" type="Button" parent="RoomUI" unique_id=1831167550]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 829.0
+offset_top = 1024.5
+offset_right = 1092.0
+offset_bottom = 1066.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 24
+text = "Return To Level Select"
 
 [node name="RoomProgressIndicator" type="Control" parent="RoomUI" unique_id=598915334]
 custom_minimum_size = Vector2(0, 20)

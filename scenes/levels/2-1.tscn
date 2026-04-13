@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://bhxnfy7wb3rmp" path="res://scripts/levels.gd" id="1_6fje0"]
 [ext_resource type="Script" uid="uid://0aj1e5d62pul" path="res://scripts/roomManager.gd" id="2_u2tjx"]
 [ext_resource type="PackedScene" uid="uid://cf5ecujohdhsn" path="res://scenes/levels/rooms/sortAndSearchRoom.tscn" id="3_6fje0"]
+[ext_resource type="PackedScene" uid="uid://41h4jd7ldtla" path="res://scenes/levels/rooms/linearRoom.tscn" id="3_jdauw"]
+[ext_resource type="PackedScene" uid="uid://bq2numgh0dqt2" path="res://scenes/levels/rooms/binaryRoom.tscn" id="4_h4cr3"]
 [ext_resource type="PackedScene" uid="uid://bm85j7tdoavkf" path="res://scenes/IDE.tscn" id="4_jdauw"]
 [ext_resource type="Script" uid="uid://bqcx8t8huv42y" path="res://scripts/roomProgressIndicator.gd" id="4_u2tjx"]
 [ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="5_h4cr3"]
@@ -15,11 +17,11 @@ totalRooms = 3
 [node name="RoomManager" type="Node2D" parent="." unique_id=514760587]
 script = ExtResource("2_u2tjx")
 
-[node name="SAndSRoom" parent="RoomManager" unique_id=470420785 instance=ExtResource("3_6fje0")]
+[node name="LinearRoom" parent="RoomManager" unique_id=470420785 instance=ExtResource("3_jdauw")]
 
-[node name="SAndSRoom2" parent="RoomManager" unique_id=1736917868 instance=ExtResource("3_6fje0")]
+[node name="BinaryRoom" parent="RoomManager" unique_id=1370074387 instance=ExtResource("4_h4cr3")]
 
-[node name="SAndSRoom3" parent="RoomManager" unique_id=826496709 instance=ExtResource("3_6fje0")]
+[node name="SAndSRoom" parent="RoomManager" unique_id=762609470 instance=ExtResource("3_6fje0")]
 
 [node name="RoomUI" type="Node2D" parent="." unique_id=887767660]
 
@@ -45,6 +47,21 @@ offset_bottom = 93.0
 rotation = 1.5707964
 theme_override_font_sizes/font_size = 48
 text = "="
+
+[node name="ReturnButton" type="Button" parent="RoomUI" unique_id=425682202]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 829.0
+offset_top = 1024.5
+offset_right = 1092.0
+offset_bottom = 1066.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 24
+text = "Return To Level Select"
 
 [node name="RoomProgressIndicator" type="Control" parent="RoomUI" unique_id=830702401]
 custom_minimum_size = Vector2(0, 20)
