@@ -325,11 +325,32 @@ func queueSkipped(row: int, col: int):
 
 func commitKnapsack(selectedIndices: Array):
 	slotOffsetMap.clear()
+	
+	# Validation checks
+	if selectedIndices.is_empty():
+		print("[Knapsack] Rejected: no items selected")
+		return
+	
+	var totalWeight = 0
+	for idx in selectedIndices:
+		if idx < items.size():
+			totalWeight += items[idx]["weight"]
+	
+	if totalWeight > capacity:
+		print("[Knapsack] Rejected: total weight %d exceeds capacity %d" % [totalWeight, capacity])
+		return
+	
+	print("[Knapsack] Valid solution: %d items, weight %d/%d" % [selectedIndices.size(), totalWeight, capacity])
+	
+	# Build slot offset map for animation
 	var offset = 0
 	for idx in selectedIndices:
 		if idx < items.size():
 			slotOffsetMap[idx] = offset
 			offset += items[idx]["weight"]
+	
+	# Emit completion signal
+	roomTaskCompleted.emit(objectID)
 
 func getPreambleFunctions() -> String:
 	var itemsStr = "["

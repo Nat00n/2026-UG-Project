@@ -26,16 +26,18 @@ func _ready():
 # CRITICAL: Refresh display when screen becomes visible
 func _notification(what):
 	if what == NOTIFICATION_VISIBILITY_CHANGED and visible:
+		if not progressionManager:
+			return
 		print("\n[LevelSelect] Screen shown - refreshing display")
 		refreshDisplay()
 
 func refreshDisplay():
-	"""Refresh the level map and progression display"""
+	if not progressionManager:
+		return
 	print("[LevelSelect] Refreshing display with current progression:")
 	for levelId in progressionManager.levels:
 		var level = progressionManager.levels[levelId]
 		print("  ", levelId, ": ", level.completedRooms.size(), "/", level.totalRooms, " (unlocked: ", level.isUnlocked, ")")
-	
 	if levelMap:
 		levelMap.refreshDisplay()
 

@@ -6,7 +6,7 @@ extends CanvasLayer
 @onready var settingsPanel: PanelContainer = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/SettingsPanel
 @onready var volumeSlider: HSlider = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/SettingsPanel/VBoxContainer/VolumeSlider
 @onready var settingsBackButton: Button = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/SettingsPanel/VBoxContainer/SettingsBackButton
-@onready var leaderboardLabel: RichTextLabel = $Control/HBoxContainer/RightHalf/CenterContainer/VBoxContainer/leaderboardLabel
+@onready var leaderboardBox: VBoxContainer = $Control/HBoxContainer/RightHalf/CenterContainer/LeaderboardContainer/leaderboardBox
 @onready var levelSelectButton: Button = $Control/HBoxContainer/LeftHalf/CenterContainer/VBoxContainer/LevelSelectButton
 
 
@@ -30,6 +30,14 @@ func _ready():
 	volumeSlider.step = 0.01
 	volumeSlider.value = AudioServer.get_bus_volume_db(0)
 	
+	await get_tree().process_frame
+	Global.populateLeaderboard(leaderboardBox)
+	
+
+func _exit_tree():
+	# Cancel leaderboard when leaving this scene
+	Global.cancelLeaderboard()
+
 func _input(event):
 	if event.is_action_pressed("escape"):
 		if visible:
@@ -40,7 +48,7 @@ func _input(event):
 func openPause():
 	show()
 	get_tree().paused = true
-	_fetchLeaderboard()
+	Global.populateLeaderboard(leaderboardBox)
 
 func onResume():
 	hide()
@@ -50,6 +58,7 @@ func _setMainButtonsVisible(value: bool):
 	resumeButton.visible = value
 	settingsButton.visible = value
 	quitButton.visible = value
+	levelSelectButton.visible = value
 
 func onSettings():
 	_setMainButtonsVisible(false)
@@ -69,9 +78,3 @@ func onLevelSelect():
 
 func onVolumeChanged(value: float):
 	AudioServer.set_bus_volume_db(0, linear_to_db(value))
-
-func _fetchLeaderboard():
-	await Global.populateLeaderboard(leaderboardLabel)
-
-func _onScoresReceived():
-	await Global.populateLeaderboard(leaderboardLabel)

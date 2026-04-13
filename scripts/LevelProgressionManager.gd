@@ -43,28 +43,22 @@ func registerLevel(levelData: LevelData):
 	updateLevelStates()
 
 func completeRoom(levelId: String, roomIndex: int):
-	print("\n[ProgressionMgr] completeRoom called: ", levelId, ", room ", roomIndex)
-	
 	if levelId not in levels:
-		print("  ERROR: Level not found!")
 		return
-	
+
 	var level = levels[levelId]
-	print("  Before: ", level.completedRooms)
-	
 	level.completeRoom(roomIndex)
-	
-	print("  After: ", level.completedRooms)
-	
-	# Mark level as completed if this is the first room
+
+	# Award points for this first-time completion and submit
+	Global.gameScore += 1
+	if level.isFullyComplete():
+		Global.gameScore += 3
+	Global.submitScore()
+
 	if level.isMinimumComplete() and not completedLevels.has(levelId):
 		completedLevels.append(levelId)
-		print("  ✓ Level added to completedLevels")
-	
-	# CRITICAL: Update which levels are unlocked
+
 	updateLevelStates()
-	
-	# CRITICAL: Save to localStorage
 	saveProgression()
 	
 	print("  Total completed: ", level.completedRooms.size(), "/", level.totalRooms)

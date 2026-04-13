@@ -100,7 +100,6 @@ func connectObjectSignals():
 func onObjectCompleted(objectId: String):
 	print("\n[Level] 🎯 Object completed: ", objectId)
 	
-	# CRITICAL FIX: Get the room index where this object actually is
 	if not objectToRoomMap.has(objectId):
 		print("  ERROR: Object not in room map!")
 		print("  Available objects: ", objectToRoomMap.keys())
