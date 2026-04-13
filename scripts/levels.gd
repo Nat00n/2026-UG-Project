@@ -59,11 +59,16 @@ func updateReturnButtonVisibility():
 			print("[Level] Showing return button (minimum complete)")
 			returnButton.visible = true
 			
-			# Pulse animation
+			# Set pivot to center so it scales from the middle
+			returnButton.pivot_offset = returnButton.size / 2
+			
+			# Pulse animation - slower with color change
 			var tween = create_tween()
 			tween.set_loops()
-			tween.tween_property(returnButton, "scale", Vector2(1.1, 1.1), 0.5)
-			tween.tween_property(returnButton, "scale", Vector2(1.0, 1.0), 0.5)
+			tween.tween_property(returnButton, "scale", Vector2(1.1, 1.1), 1.2)
+			tween.parallel().tween_property(returnButton, "modulate", Color(1.3, 1.3, 1.0), 1.2)  # Slight yellow tint
+			tween.tween_property(returnButton, "scale", Vector2(1.0, 1.0), 1.2)
+			tween.parallel().tween_property(returnButton, "modulate", Color.WHITE, 1.2)
 
 func onReturnPressed():
 	"""Return to level selection screen"""
