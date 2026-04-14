@@ -16,7 +16,6 @@ var pathCommitted: bool = false
 var totalVisitCount: int = 0
 var currentNodeId: int = -1
 
-# _process driven animation — no chained timers
 var visitTimer: float = 0.0
 var visitDelay: float = 0.35
 var isVisiting: bool = false
@@ -222,12 +221,20 @@ func _setNodeColor(nodeId: int, color: Color):
 	style.border_color = Color(0.8, 0.8, 0.8, 0.3)
 	nodeCircles[nodeId].add_theme_stylebox_override("panel", style)
 
-# --- _process driven animation ---
-
 func _process(delta):
 	# Mouse hover
 	var mouse = get_global_mouse_position()
-	var rect = Rect2(visual.global_position, visual.size)
+	# Calculate Sprite2D bounds
+	var sprite_size = Vector2.ZERO
+	if visual.texture:
+		sprite_size = visual.texture.get_size() * visual.scale
+
+	# Account for centered sprite
+	var sprite_pos = visual.global_position
+	if visual.centered:
+		sprite_pos -= sprite_size / 2.0
+
+	var rect = Rect2(sprite_pos, sprite_size)
 	var wasHovered = _hovered
 	_hovered = rect.has_point(mouse)
 	if _hovered != wasHovered:

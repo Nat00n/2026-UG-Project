@@ -5,7 +5,7 @@ extends Area2D
 signal roomTaskCompleted(objectID: String)
 
 @onready var hoverLabel: Label = $hoverLabel
-@onready var visual: ColorRect = $visual
+@onready var visual: Sprite2D = $visual
 @onready var nodeDisplay: Control = $nodeDisplay
 
 @export var objectName: String = "Object"
@@ -13,7 +13,7 @@ signal roomTaskCompleted(objectID: String)
 @export_multiline var taskDescription: String = "None"
 @export var taskName: String = "None"
 @export_multiline var taskGuide: String = "None"
-@export_multiline var exampleCode: String = ""
+@export_multiline var exampleCode: String = ""  # NEW: Example code for the task
 
 var _hovered := false
 var _popup: CanvasLayer
@@ -86,7 +86,18 @@ func resetDisplay():
 
 func _process(_delta):
 	var mouse = get_global_mouse_position()
-	var rect = Rect2(visual.global_position, visual.size)
+	
+	# Calculate Sprite2D bounds
+	var sprite_size = Vector2.ZERO
+	if visual.texture:
+		sprite_size = visual.texture.get_size() * visual.scale
+	
+	# Account for centered sprite (default for Sprite2D)
+	var sprite_pos = visual.global_position
+	if visual.centered:
+		sprite_pos -= sprite_size / 2.0
+	
+	var rect = Rect2(sprite_pos, sprite_size)
 	var wasHovered = _hovered
 	_hovered = rect.has_point(mouse)
 	if _hovered != wasHovered:

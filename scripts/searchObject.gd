@@ -81,7 +81,17 @@ func receiveArray(sortedNodes: Array):
 func _process(delta):
 	# Mouse hover handled by base class
 	var mouse = get_global_mouse_position()
-	var rect = Rect2(visual.global_position, visual.size)
+	# Calculate Sprite2D bounds
+	var sprite_size = Vector2.ZERO
+	if visual.texture:
+		sprite_size = visual.texture.get_size() * visual.scale
+
+	# Account for centered sprite
+	var sprite_pos = visual.global_position
+	if visual.centered:
+		sprite_pos -= sprite_size / 2.0
+
+	var rect = Rect2(sprite_pos, sprite_size)
 	var wasHovered = _hovered
 	_hovered = rect.has_point(mouse)
 	if _hovered != wasHovered:
