@@ -76,7 +76,7 @@ for i in range(n):
 commitSort()"
 
 [node name="SearchObject" parent="." unique_id=1672652981 instance=ExtResource("3_rbc2q")]
-position = Vector2(826, 368)
+position = Vector2(832, 371)
 objectName = "Sammy"
 objectID = "obj_5"
 taskDescription = "Find the target value in a sorted array using binary search. Repeatedly divide the search space in half by comparing the target with the middle element until you find the target or determine it doesn't exist."
@@ -116,19 +116,19 @@ Algorithm Steps:
 
 4. Compare middle element with target:
    - If array[mid] equals targetValue: Found it!
-     → Use commitSelect(mid) and end the search
+     -> Use commitSelect(mid) and end the search
    
    - If array[mid] is less than targetValue:
-     → Target must be in the right half
-     → Set low = mid + 1 to search right half only
+     -> Target must be in the right half
+     -> Set low = mid + 1 to search right half only
    
    - If array[mid] is greater than targetValue:
-     → Target must be in the left half
-     → Set high = mid - 1 to search left half only
+     -> Target must be in the left half
+     -> Set high = mid - 1 to search left half only
 
 5. Repeat the halving process:
    - Each iteration eliminates half of the remaining elements
-   - Search space shrinks exponentially: n → n/2 → n/4 → n/8 ...
+   - Search space shrinks exponentially: n -> n/2 -> n/4 -> n/8 ...
    - Continues until target is found or search space becomes empty
 
 6. If search space becomes empty (low > high):
@@ -145,10 +145,10 @@ while low <= high:
     mid = (low + high) // 2
     check(mid)
     
-    if array[mid] == targetValue:
+    if array[lb]mid[rb] == targetValue:
         commitSelect(mid)
         break
-    elif array[mid] < targetValue:
+    elif array[lb]mid[rb] < targetValue:
         low = mid + 1
     else:
         high = mid - 1"

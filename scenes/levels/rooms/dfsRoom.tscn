@@ -19,7 +19,7 @@ offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="GraphObject" parent="." unique_id=1779530000 instance=ExtResource("2_wbxm0")]
-position = Vector2(345, 419)
+position = Vector2(350, 439)
 objectName = "Dan"
 objectID = "obj_10"
 taskDescription = "Find a path from the start node to the goal node using depth-first search. Explore as far as possible along each branch before backtracking, using a stack to track which nodes to visit next."
@@ -60,9 +60,9 @@ Algorithm Steps:
 4. Explore neighbors:
    - Use getNeighbours(currentNode) to get adjacent nodes
    - For each unvisited neighbor:
-     → Add it to the stack (or recurse)
-     → Record current node as its parent
-     → This will be explored in depth-first order
+     -> Add it to the stack (or recurse)
+     -> Record current node as its parent
+     -> This will be explored in depth-first order
 
 5. Depth-first exploration pattern:
    - Always explore the most recently discovered node first
@@ -72,7 +72,7 @@ Algorithm Steps:
 6. Reconstruct the path:
    - Once goal is found, work backwards using parent dictionary
    - Start at goalNode, follow parents back to startNode
-   - Reverse the path to get start → goal direction
+   - Reverse the path to get start -> goal direction
 
 7. Animate the path:
    - Use commitPath(pathList) to display the found path
@@ -99,7 +99,7 @@ def dfs(node):
     
     for neighborId, weight in getNeighbours(node):
         if neighborId not in visited:
-            parent[neighborId] = node
+            parent[lb]neighborId[rb] = node
             dfs(neighborId)
             if found:
                 return
@@ -108,11 +108,11 @@ dfs(startNode)
 
 # Reconstruct path
 if found:
-    path = []
+    path = [lb][rb]
     current = goalNode
     while current in parent:
         path.append(current)
-        current = parent[current]
+        current = parent[lb]current[rb]
     path.append(startNode)
     path.reverse()
     commitPath(path)"

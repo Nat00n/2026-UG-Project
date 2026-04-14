@@ -71,10 +71,10 @@ Algorithm Steps:
 
 6. Update if better path found:
    - If tentative_g < neighbor's current g_cost:
-     → Update neighbor's g_cost to tentative_g
-     → Calculate f_cost = tentative_g + heuristic(neighbor, goal)
-     → Record current as neighbor's parent
-     → Add (f_cost, neighbor) to priority queue
+     -> Update neighbor's g_cost to tentative_g
+     -> Calculate f_cost = tentative_g + heuristic(neighbor, goal)
+     -> Record current as neighbor's parent
+     -> Add (f_cost, neighbor) to priority queue
 
 7. Heuristic guidance:
    - Lower f_cost = more promising node
@@ -87,22 +87,16 @@ Algorithm Steps:
 
 Key Advantage:
 A* combines Dijkstra's guarantee of optimality with heuristic guidance. Good heuristic drastically reduces nodes explored. If heuristic = 0, A* becomes Dijkstra's."
-exampleCode = "# A* algorithm with Euclidean distance heuristic
+exampleCode = "# A* algorithm with heuristic = 0 (becomes Dijkstra's)
 import heapq
-import math
 
-# Simple heuristic: straight-line distance estimate
-# For grid graphs, use actual positions
-# For general graphs, estimate based on minimum edge weight
 def heuristic(nodeId):
-    # Simplified: assume uniform cost estimate
-    # In practice, use actual coordinate distance
-    return 0  # Falls back to Dijkstra's without coordinates
+    return 0
 
 g_cost = {i: float('inf') for i in graph}
-g_cost[startNode] = 0
+g_cost[lb]startNode[rb] = 0
 parent = {}
-pq = [(0 + heuristic(startNode), 0, startNode)]  # (f, g, node)
+pq = [lb](0, 0, startNode)[rb]
 
 while pq:
     f, g, current = heapq.heappop(pq)
@@ -111,23 +105,23 @@ while pq:
     if current == goalNode:
         break
     
-    if g > g_cost[current]:
+    if g > g_cost[lb]current[rb]:
         continue
     
     for neighborId, weight in getNeighbours(current):
         tentative_g = g + weight
-        if tentative_g < g_cost[neighborId]:
-            g_cost[neighborId] = tentative_g
-            parent[neighborId] = current
+        if tentative_g < g_cost[lb]neighborId[rb]:
+            g_cost[lb]neighborId[rb] = tentative_g
+            parent[lb]neighborId[rb] = current
             f_cost = tentative_g + heuristic(neighborId)
             heapq.heappush(pq, (f_cost, tentative_g, neighborId))
 
 # Reconstruct shortest path
-path = []
+path = [lb][rb]
 current = goalNode
 while current in parent:
     path.append(current)
-    current = parent[current]
+    current = parent[lb]current[rb]
 path.append(startNode)
 path.reverse()
 commitPath(path)"

@@ -19,10 +19,11 @@ offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="SearchObject" parent="." unique_id=1672652981 instance=ExtResource("2_sscrq")]
-position = Vector2(635, 610)
+position = Vector2(629, 597)
 objectName = "Boris"
 objectID = "obj_7"
 taskDescription = "Find the target value in the array using linear search. Check each element sequentially from the beginning until you find the target or reach the end of the array."
+taskName = "Linear Search"
 taskGuide = "Big O Notation:
 - Time Complexity: O(n) in worst and average cases, O(1) best case
 - Space Complexity: O(1) - only needs a few variables
@@ -73,6 +74,6 @@ Simple and intuitive - checks every element until finding the target. Guaranteed
 exampleCode = "# Linear search
 for i in range(len(array)):
     check(i)
-    if array[i] == targetValue:
+    if array[lb]i[rb] == targetValue:
         commitSelect(i)
         break"

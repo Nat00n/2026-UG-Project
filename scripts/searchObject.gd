@@ -168,23 +168,23 @@ func verifySearchResult():
 	
 	# Check if commitSelect was called
 	if foundPosition == -1:
-		print("  ✗ ERROR: commitSelect() was never called!")
+		print("  x ERROR: commitSelect() was never called!")
 		print("  User's Python code must call: commitSelect(index)")
 		return
 	
 	# Verify correctness
 	if foundPosition < 0 or foundPosition >= dataNodes.size():
-		print("  ✗ Found position out of bounds!")
+		print("  x Found position out of bounds!")
 		return
 	
 	var valueAtFound = dataNodes[foundPosition]["value"]
 	print("  Value at found position: ", valueAtFound)
 	
 	if valueAtFound != targetValue:
-		print("  ✗ Incorrect! Found position ", foundPosition, " has value ", valueAtFound, ", not ", targetValue)
+		print("  x Incorrect! Found position ", foundPosition, " has value ", valueAtFound, ", not ", targetValue)
 		return
 	
-	print("  ✓ CORRECT! Found ", targetValue, " at position ", foundPosition)
+	print("  o CORRECT! Found ", targetValue, " at position ", foundPosition)
 	Global.submitScore()
 	roomTaskCompleted.emit(objectID)  # Complete room
 

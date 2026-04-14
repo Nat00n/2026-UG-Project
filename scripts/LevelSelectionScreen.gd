@@ -51,7 +51,7 @@ func _onLevelSelected(levelId: String):
 	
 	# Update button text based on completion state
 	if level.isFullyComplete():
-		startButton.text = "Replay ★"
+		startButton.text = "Replay *"
 		print("  Status: Fully complete")
 	elif level.isMinimumComplete():
 		var roomsComplete = level.completedRooms.size()

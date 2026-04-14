@@ -13,7 +13,7 @@ signal roomTaskCompleted(objectID: String)
 @export_multiline var taskDescription: String = "None"
 @export var taskName: String = "None"
 @export_multiline var taskGuide: String = "None"
-@export_multiline var exampleCode: String = ""  # NEW: Example code for the task
+@export_multiline var exampleCode: String = ""
 
 var _hovered := false
 var _popup: CanvasLayer

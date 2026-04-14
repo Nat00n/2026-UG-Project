@@ -116,7 +116,7 @@ func populateLeaderboard(container: VBoxContainer):
 
 	if state["scores"].is_empty():
 		var emptyLabel = Label.new()
-		emptyLabel.text = "No scores yet — be the first!"
+		emptyLabel.text = "No scores yet - be the first!"
 		emptyLabel.add_theme_font_size_override("font_size", 18)
 		container.add_child(emptyLabel)
 		activeLeaderboardRequest = null

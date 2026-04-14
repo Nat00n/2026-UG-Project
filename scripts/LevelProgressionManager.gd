@@ -109,9 +109,9 @@ func updateLevelStates():
 			var requiredLevel = levels.get(level.requiredLevelId)
 			if requiredLevel and requiredLevel.isMinimumComplete():
 				level.isUnlocked = true
-				print("  ✓ Unlocked ", levelId, " (required ", level.requiredLevelId, " is minimum complete)")
+				print("  o Unlocked ", levelId, " (required ", level.requiredLevelId, " is minimum complete)")
 			else:
-				print("  ✗ ", levelId, " still locked (required ", level.requiredLevelId, " not complete)")
+				print("  x ", levelId, " still locked (required ", level.requiredLevelId, " not complete)")
 	
 	print("  Unlocked levels: ", _getUnlockedLevelsList())
 
@@ -141,9 +141,9 @@ func saveProgression():
 	""" % SAVE_KEY)
 	
 	if verification:
-		print("  ✓ Saved successfully")
+		print("  o Saved successfully")
 	else:
-		print("  ✗ Save failed!")
+		print("  x Save failed!")
 
 func loadProgression():
 	print("\n[ProgressionMgr] Loading progression...")
@@ -164,7 +164,7 @@ func loadProgression():
 	var parseResult = json.parse(dataStr)
 	
 	if parseResult != OK:
-		print("  ✗ Parse error: ", json.get_error_message())
+		print("  x Parse error: ", json.get_error_message())
 		pendingSavedData = {}
 		updateLevelStates()
 		return
@@ -201,7 +201,7 @@ func loadProgression():
 	# Update level states after loading
 	updateLevelStates()
 	
-	print("  ✓ Load complete")
+	print("  o Load complete")
 
 func resetProgression():
 	print("\n[ProgressionMgr] Resetting all progression...")
@@ -217,7 +217,7 @@ func resetProgression():
 	""" % SAVE_KEY)
 	
 	updateLevelStates()
-	print("  ✓ Reset complete")
+	print("  o Reset complete")
 
 func getUnlockedLevelsInArea(areaIndex: int) -> Array[LevelData]:
 	var areaLevels: Array[LevelData] = []

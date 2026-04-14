@@ -19,7 +19,7 @@ offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_md4o6")]
-position = Vector2(880, 628)
+position = Vector2(855, 636)
 objectName = "Chuck"
 objectID = "obj_3"
 taskDescription = "Sort the array in ascending order using insertion sort. Build the sorted array one element at a time by repeatedly taking the next unsorted element and inserting it into its correct position among the previously sorted elements."
@@ -72,7 +72,7 @@ Like sorting playing cards in your hand - you pick up one card at a time and ins
 exampleCode = "# Insertion sort
 for i in range(1, len(array)):
     j = i
-    while j > 0 and array[j - 1] > array[j]:
+    while j > 0 and array[lb]j - 1[rb] > array[lb]j[rb]:
         swap(j - 1, j)
         j -= 1
 commitSort()"

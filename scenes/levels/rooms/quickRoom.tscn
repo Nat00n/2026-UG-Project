@@ -82,10 +82,10 @@ The partition step is key - it ensures the pivot is in its correct final positio
 exampleCode = "# Quick sort
 def partition(low, high):
     setPivot(high)
-    pivot = array[high]
+    pivot = array[lb]high[rb]
     i = low - 1
     for j in range(low, high):
-        if array[j] <= pivot:
+        if array[lb]j[rb] <= pivot:
             i += 1
             swap(i, j)
     swap(i + 1, high)

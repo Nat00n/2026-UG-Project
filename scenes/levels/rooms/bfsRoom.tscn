@@ -60,9 +60,9 @@ Algorithm Steps:
 4. Explore all neighbors at current level:
    - Use getNeighbours(currentNode) to get adjacent nodes
    - For each unvisited neighbor:
-     → Mark it as visited immediately (prevents duplicates in queue)
-     → Record current node as its parent
-     → Add neighbor to end of queue
+     -> Mark it as visited immediately (prevents duplicates in queue)
+     -> Record current node as its parent
+     -> Add neighbor to end of queue
 
 5. Level-by-level exploration pattern:
    - Queue ensures nodes are explored in order of discovery
@@ -72,7 +72,7 @@ Algorithm Steps:
 6. Reconstruct the shortest path:
    - Once goal is found, work backwards using parent dictionary
    - Start at goalNode, follow parents back to startNode  
-   - Reverse to get start → goal direction
+   - Reverse to get start -> goal direction
 
 7. Animate the path:
    - Use commitPath(pathList) to display the shortest path
@@ -83,7 +83,7 @@ BFS finds the shortest path in terms of number of edges. The first time it reach
 exampleCode = "# BFS for shortest path
 from collections import deque
 
-queue = deque([startNode])
+queue = deque([lb]startNode[rb])
 visited = {startNode}
 parent = {}
 
@@ -97,15 +97,15 @@ while queue:
     for neighborId, weight in getNeighbours(current):
         if neighborId not in visited:
             visited.add(neighborId)
-            parent[neighborId] = current
+            parent[lb]neighborId[rb] = current
             queue.append(neighborId)
 
 # Reconstruct path
-path = []
+path = [lb][rb]
 current = goalNode
 while current in parent:
     path.append(current)
-    current = parent[current]
+    current = parent[lb]current[rb]
 path.append(startNode)
 path.reverse()
 commitPath(path)"

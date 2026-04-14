@@ -65,9 +65,9 @@ Algorithm Steps:
 
 5. Distance comparison (relaxation):
    - If newDistance < neighbor's current distance:
-     → Update neighbor's distance to newDistance
-     → Record current node as neighbor's parent
-     → Add (newDistance, neighbor) to priority queue
+     -> Update neighbor's distance to newDistance
+     -> Record current node as neighbor's parent
+     -> Add (newDistance, neighbor) to priority queue
 
 6. Greedy selection guarantee:
    - Always processing closest unvisited node ensures optimality
@@ -77,7 +77,7 @@ Algorithm Steps:
 7. Path reconstruction:
    - When goal is reached, work backwards via parent links
    - Start at goalNode, follow parents to startNode
-   - Reverse to get start → goal direction
+   - Reverse to get start -> goal direction
    - Use commitPath(pathList) to animate
 
 Key Insight:
@@ -86,9 +86,9 @@ exampleCode = "# Dijkstra's algorithm
 import heapq
 
 distances = {i: float('inf') for i in graph}
-distances[startNode] = 0
+distances[lb]startNode[rb] = 0
 parent = {}
-pq = [(0, startNode)]
+pq = [lb](0, startNode)[rb]
 
 while pq:
     currentDist, current = heapq.heappop(pq)
@@ -97,22 +97,22 @@ while pq:
     if current == goalNode:
         break
     
-    if currentDist > distances[current]:
+    if currentDist > distances[lb]current[rb]:
         continue
     
     for neighborId, weight in getNeighbours(current):
         newDist = currentDist + weight
-        if newDist < distances[neighborId]:
-            distances[neighborId] = newDist
-            parent[neighborId] = current
+        if newDist < distances[lb]neighborId[rb]:
+            distances[lb]neighborId[rb] = newDist
+            parent[lb]neighborId[rb] = current
             heapq.heappush(pq, (newDist, neighborId))
 
 # Reconstruct shortest path
-path = []
+path = [lb][rb]
 current = goalNode
 while current in parent:
     path.append(current)
-    current = parent[current]
+    current = parent[lb]current[rb]
 path.append(startNode)
 path.reverse()
 commitPath(path)"

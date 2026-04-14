@@ -88,9 +88,9 @@ func connectObjectSignals():
 				
 				# CRITICAL: Map this object to its room index
 				objectToRoomMap[obj.objectID] = roomIndex
-				print("  ✓ ", obj.objectID, " → Room ", roomIndex)
+				print("  o ", obj.objectID, " → Room ", roomIndex)
 			else:
-				print("  ✗ ", obj.objectID, " has no signal!")
+				print("  x ", obj.objectID, " has no signal!")
 	
 	print("[Level] Total objects mapped: ", objectToRoomMap.size())
 	print("[Level] Object-to-room mapping complete")
@@ -132,7 +132,7 @@ func markRoomComplete(roomIndex: int):
 	# Complete the room
 	progressionManager.completeRoom(levelId, roomIndex)
 	
-	print("  ✓ Room ", roomIndex, " marked complete")
+	print("  o Room ", roomIndex, " marked complete")
 	print("  Progress: ", level.completedRooms.size(), "/", level.totalRooms)
 	
 	# Update the indicator
@@ -143,10 +143,10 @@ func markRoomComplete(roomIndex: int):
 	
 	# Show message
 	if level.isFullyComplete():
-		print("  ★ ALL ROOMS COMPLETE!")
+		print("  ! ALL ROOMS COMPLETE!")
 	elif level.completedRooms.size() == 1:
-		print("  ✓ First room complete - next level unlocked!")
-		print("  ✓ Return button now available!")
+		print("  o First room complete - next level unlocked!")
+		print("  o Return button now available!")
 
 func onRoomChanged(newRoomIndex: int):
 	print("[Level] Room changed: ", currentRoomIndex, " → ", newRoomIndex)

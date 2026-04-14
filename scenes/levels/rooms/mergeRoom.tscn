@@ -19,7 +19,7 @@ offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_oy47q")]
-position = Vector2(1026, 461)
+position = Vector2(1007, 478)
 objectName = "Em"
 objectID = "obj_2"
 taskDescription = "Sort the array in ascending order using merge sort. Divide the array into smaller subarrays until each contains one element, then repeatedly merge subarrays to produce new sorted subarrays until there's only one sorted array remaining."
@@ -73,7 +73,7 @@ Algorithm Steps:
 
 Divide and Conquer Strategy:
 Break the problem into smaller identical subproblems, solve them recursively, then combine solutions. This guarantees O(n log n) performance regardless of initial order."
-exampleCode = "# Working Merge Sort
+exampleCode = "# Merge sort
 def mergeSort(start, end):
     if end - start <= 1:
         return
@@ -90,10 +90,10 @@ def mergeSort(start, end):
     right = mid
     
     while left < right and right < end:
-        if array[left] <= array[right]:
+        if array[lb]left[rb] <= array[lb]right[rb]:
             left += 1
         else:
-            # Move array[right] to position left
+            # Move array[lb]right[rb] to position left
             move(right, left)
             left += 1
             right += 1

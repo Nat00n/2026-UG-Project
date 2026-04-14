@@ -67,7 +67,7 @@ n = len(array)
 for i in range(n):
     swapped = False
     for j in range(0, n - i - 1):
-        if array[j] > array[j + 1]:
+        if array[lb]j[rb] > array[lb]j + 1[rb]:
             swap(j, j + 1)
             swapped = True
     if not swapped:

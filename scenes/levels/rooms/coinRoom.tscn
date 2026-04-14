@@ -72,7 +72,7 @@ Greedy Strategy:
 Always take the largest coin possible at each step. This is fast and works for standard currency systems, but won't always find a solution for arbitrary coin sets."
 exampleCode = "# Greedy Coin Change
 remaining = targetAmount
-result = []
+result = [lb][rb]
 
 for coin in sorted(coins, reverse=True):
     while remaining >= coin:
