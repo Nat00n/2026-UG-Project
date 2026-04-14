@@ -19,6 +19,60 @@ offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="SearchObject" parent="." unique_id=1672652981 instance=ExtResource("2_sscrq")]
-position = Vector2(656, 602)
+position = Vector2(635, 610)
 objectName = "Boris"
 objectID = "obj_7"
+taskDescription = "Find the target value in the array using linear search. Check each element sequentially from the beginning until you find the target or reach the end of the array."
+taskGuide = "Big O Notation:
+- Time Complexity: O(n) in worst and average cases, O(1) best case
+- Space Complexity: O(1) - only needs a few variables
+
+Use Cases:
+- Small datasets where simplicity matters more than speed
+- Unsorted data - works on any arrangement
+- When you need to search only once (overhead of sorting not justified)
+- Searching for multiple criteria or complex conditions
+- Linked lists or data structures without random access
+
+Suitable Data Structures:
+- Arrays, lists, linked lists
+- Any sequential data structure
+- Works on both sorted and unsorted data
+
+Algorithm Steps:
+
+1. Start at the beginning of the array:
+   - You'll examine each element one by one
+   - No preprocessing or sorting required
+
+2. For each element in sequence:
+   - Use check(index) to highlight the current element being examined
+   - This shows which position you're currently inspecting
+
+3. Compare the current element with the target:
+   - Check if array[index] equals targetValue
+   - If it matches, you've found your target
+
+4. If target is found:
+   - Use commitSelect(index) to mark this position
+   - This highlights the found element and ends the search
+   - The search is complete
+
+5. If target is not found:
+   - Move to the next element
+   - Continue checking until you reach the end
+   - If you've checked all elements without finding it, target doesn't exist
+
+6. Early termination:
+   - Stop as soon as you find the target
+   - No need to check remaining elements
+   - Use break to exit the search loop
+
+Key Characteristics:
+Simple and intuitive - checks every element until finding the target. Guaranteed to find the element if it exists, but may be slow for large datasets."
+exampleCode = "# Linear search
+for i in range(len(array)):
+    check(i)
+    if array[i] == targetValue:
+        commitSelect(i)
+        break"

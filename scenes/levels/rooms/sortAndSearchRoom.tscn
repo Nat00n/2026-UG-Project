@@ -20,11 +20,135 @@ offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_nvlyb")]
-position = Vector2(840, 669)
+position = Vector2(829, 675)
 objectName = "Seasalt"
 objectID = "obj_6"
+taskDescription = "Sort the array in ascending order using bubble sort. The algorithm repeatedly steps through the list, compares adjacent elements, and swaps them if they're in the wrong order. Continue until no swaps are needed."
+taskName = "Bubble Sort"
+taskGuide = "Big O Notation:
+- Time Complexity: O(n²) in worst and average cases, O(n) best case (already sorted)
+- Space Complexity: O(1) - sorts in place
+
+Use Cases:
+- Educational purposes - simple to understand and implement
+- Small datasets where simplicity is more important than efficiency
+- Nearly sorted data where best-case O(n) performance is achievable
+- When memory is extremely limited (in-place sorting)
+
+Suitable Data Structures:
+- Arrays or lists with random access
+- Works with any comparable elements (numbers, strings, objects with comparison)
+
+Algorithm Steps:
+
+1. Start with the full array
+   - You'll make multiple passes through the data
+   - Each pass moves the largest unsorted element to its final position
+
+2. For each pass through the array:
+   - Compare adjacent pairs of elements from left to right
+   - If the left element is greater than the right element, they're out of order
+
+3. When you find an out-of-order pair:
+   - Use swap(i, j) to exchange their positions
+   - This \"bubbles\" larger values toward the end
+
+4. After each complete pass:
+   - The largest unsorted element is now in its correct final position
+   - You can reduce the range of the next pass (exclude the last sorted element)
+
+5. Repeat passes until you complete a full pass with no swaps:
+   - No swaps means the array is sorted
+   - Call commitSort() to finalize and trigger the completion animation
+
+Optimization Tip:
+Track whether any swaps occurred in a pass. If a pass completes without swaps, the array is already sorted and you can stop early."
+exampleCode = "# Bubble sort with optimization
+n = len(array)
+for i in range(n):
+    swapped = False
+    for j in range(0, n - i - 1):
+        if array[j] > array[j + 1]:
+            swap(j, j + 1)
+            swapped = True
+    if not swapped:
+        break
+commitSort()"
 
 [node name="SearchObject" parent="." unique_id=1672652981 instance=ExtResource("3_rbc2q")]
-position = Vector2(840, 382)
+position = Vector2(826, 368)
 objectName = "Sammy"
 objectID = "obj_5"
+taskDescription = "Find the target value in a sorted array using binary search. Repeatedly divide the search space in half by comparing the target with the middle element until you find the target or determine it doesn't exist."
+taskName = "Binary Search"
+taskGuide = "Big O Notation:
+- Time Complexity: O(log n) in all cases
+- Space Complexity: O(1) for iterative, O(log n) for recursive
+
+Use Cases:
+- Large sorted datasets - dramatically faster than linear search
+- When data is already sorted or cost of sorting is justified
+- Searching in sorted ranges or finding boundaries
+- Dictionary lookups, phonebooks, sorted databases
+- Finding insertion positions in sorted arrays
+
+Suitable Data Structures:
+- Sorted arrays with random access
+- Any data structure supporting efficient middle element access
+- CRITICAL: Array must be sorted for binary search to work correctly
+
+Algorithm Steps:
+
+1. Prerequisites check:
+   - Ensure the array is sorted in ascending order
+   - Binary search only works on sorted data
+   - If array came from Sort Object, it's already sorted
+
+2. Define the search range:
+   - Start with 'low' pointing to the beginning (index 0)
+   - 'high' pointing to the end (index len(array) - 1)
+   - These boundaries define where the target could be
+
+3. While the search range is valid (low ≤ high):
+   - Calculate the middle index: mid = (low + high) // 2
+   - Use check(mid) to highlight the middle element
+   - This shows which element you're currently examining
+
+4. Compare middle element with target:
+   - If array[mid] equals targetValue: Found it!
+     → Use commitSelect(mid) and end the search
+   
+   - If array[mid] is less than targetValue:
+     → Target must be in the right half
+     → Set low = mid + 1 to search right half only
+   
+   - If array[mid] is greater than targetValue:
+     → Target must be in the left half
+     → Set high = mid - 1 to search left half only
+
+5. Repeat the halving process:
+   - Each iteration eliminates half of the remaining elements
+   - Search space shrinks exponentially: n → n/2 → n/4 → n/8 ...
+   - Continues until target is found or search space becomes empty
+
+6. If search space becomes empty (low > high):
+   - Target doesn't exist in the array
+   - Search terminates without calling commitSelect()
+
+Divide and Conquer:
+Binary search halves the problem size with each comparison. For an array of 1,000,000 elements, it needs at most 20 comparisons (log₂(1,000,000) ≈ 20)."
+exampleCode = "# Binary search (requires sorted array)
+low = 0
+high = len(array) - 1
+
+while low <= high:
+    mid = (low + high) // 2
+    check(mid)
+    
+    if array[mid] == targetValue:
+        commitSelect(mid)
+        break
+    elif array[mid] < targetValue:
+        low = mid + 1
+    else:
+        high = mid - 1"

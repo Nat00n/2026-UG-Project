@@ -19,6 +19,100 @@ offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="GraphObject" parent="." unique_id=1779530000 instance=ExtResource("2_el3vb")]
-position = Vector2(276, 461)
+position = Vector2(287, 475)
 objectName = "Mark"
 objectID = "obj_11"
+taskDescription = "Find the shortest path from the start node to the goal node in a weighted graph using Dijkstra's algorithm. Explore nodes in order of their distance from the start, always processing the closest unvisited node next."
+taskName = "Dijkstra's Algorithm"
+taskGuide = "Big O Notation:
+- Time Complexity: O((V + E) log V) with min-heap priority queue
+- Space Complexity: O(V) for distance tracking and priority queue
+
+Use Cases:
+- Finding shortest path in weighted graphs with non-negative weights
+- GPS navigation and route planning
+- Network routing protocols (OSPF)
+- Game AI pathfinding when weights represent cost/difficulty
+- Resource optimization problems
+- ANY shortest path problem with non-negative edge weights
+
+Suitable Data Structures:
+- Min-heap priority queue (heapq in Python)
+- Dictionary/array for distance tracking
+- Dictionary for parent/predecessor tracking
+- Graph with non-negative edge weights
+
+Algorithm Steps:
+
+1. Initialize distance tracking:
+   - Set distance to startNode = 0
+   - Set distance to all other nodes = infinity
+   - Create parent dictionary for path reconstruction
+   - Create min-heap priority queue with (distance, node) pairs
+
+2. Main loop - while priority queue has nodes:
+   - Extract node with minimum distance (heap guarantees this)
+   - Use visitNode(currentNode) to animate exploration
+   - If this node is the goal, you've found the shortest path
+
+3. Skip if already processed:
+   - If extracted distance > recorded distance, skip this entry
+   - This handles duplicate entries in the priority queue
+
+4. For each neighbor of current node:
+   - Calculate: newDistance = currentDistance + edgeWeight
+   - Get edge weight using getNeighbours(currentNode)
+
+5. Distance comparison (relaxation):
+   - If newDistance < neighbor's current distance:
+     → Update neighbor's distance to newDistance
+     → Record current node as neighbor's parent
+     → Add (newDistance, neighbor) to priority queue
+
+6. Greedy selection guarantee:
+   - Always processing closest unvisited node ensures optimality
+   - Once a node is processed, its distance is final
+   - Cannot find a shorter path to it later
+
+7. Path reconstruction:
+   - When goal is reached, work backwards via parent links
+   - Start at goalNode, follow parents to startNode
+   - Reverse to get start → goal direction
+   - Use commitPath(pathList) to animate
+
+Key Insight:
+Dijkstra's is a greedy algorithm. By always expanding the closest node, it guarantees that the first time a node is reached, it's via the shortest path."
+exampleCode = "# Dijkstra's algorithm
+import heapq
+
+distances = {i: float('inf') for i in graph}
+distances[startNode] = 0
+parent = {}
+pq = [(0, startNode)]
+
+while pq:
+    currentDist, current = heapq.heappop(pq)
+    visitNode(current)
+    
+    if current == goalNode:
+        break
+    
+    if currentDist > distances[current]:
+        continue
+    
+    for neighborId, weight in getNeighbours(current):
+        newDist = currentDist + weight
+        if newDist < distances[neighborId]:
+            distances[neighborId] = newDist
+            parent[neighborId] = current
+            heapq.heappush(pq, (newDist, neighborId))
+
+# Reconstruct shortest path
+path = []
+current = goalNode
+while current in parent:
+    path.append(current)
+    current = parent[current]
+path.append(startNode)
+path.reverse()
+commitPath(path)"

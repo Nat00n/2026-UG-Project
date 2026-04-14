@@ -22,3 +22,97 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 position = Vector2(345, 419)
 objectName = "Dan"
 objectID = "obj_10"
+taskDescription = "Find a path from the start node to the goal node using depth-first search. Explore as far as possible along each branch before backtracking, using a stack to track which nodes to visit next."
+taskName = "Depth First Search (DFS))"
+taskGuide = "Big O Notation:
+- Time Complexity: O(V + E) where V is vertices, E is edges
+- Space Complexity: O(V) for the visited set and stack
+
+Use Cases:
+- Finding any path between two nodes (not necessarily shortest)
+- Maze solving and puzzle solving
+- Detecting cycles in graphs
+- Topological sorting of directed acyclic graphs
+- Finding connected components
+- When memory is limited (uses less memory than BFS)
+
+Suitable Data Structures:
+- Stack (explicit or recursion call stack)
+- Set or dictionary to track visited nodes
+- Graph represented as adjacency list
+
+Algorithm Steps:
+
+1. Initialize your data structures:
+   - Create a stack (or use recursion) starting with startNode
+   - Create a visited set to track explored nodes
+   - Create a parent/predecessor dictionary to reconstruct the path
+
+2. While there are nodes to explore:
+   - Pop a node from the stack (or process current in recursion)
+   - Use visitNode(currentNode) to animate the exploration
+   - Mark this node as visited
+
+3. Check if goal is reached:
+   - If current node equals goalNode, you've found a path
+   - Stop exploration and move to path reconstruction
+
+4. Explore neighbors:
+   - Use getNeighbours(currentNode) to get adjacent nodes
+   - For each unvisited neighbor:
+     → Add it to the stack (or recurse)
+     → Record current node as its parent
+     → This will be explored in depth-first order
+
+5. Depth-first exploration pattern:
+   - Always explore the most recently discovered node first
+   - This creates deep exploration before wide exploration
+   - Backtracks when reaching a dead end (no unvisited neighbors)
+
+6. Reconstruct the path:
+   - Once goal is found, work backwards using parent dictionary
+   - Start at goalNode, follow parents back to startNode
+   - Reverse the path to get start → goal direction
+
+7. Animate the path:
+   - Use commitPath(pathList) to display the found path
+   - The path shows one possible route, not necessarily shortest
+
+Key Characteristic:
+Goes deep into the graph before exploring broadly. Like exploring a maze by following one path as far as possible before trying alternatives."
+exampleCode = "# DFS using recursion
+visited = set()
+parent = {}
+found = False
+
+def dfs(node):
+    global found
+    if found:
+        return
+    
+    visitNode(node)
+    visited.add(node)
+    
+    if node == goalNode:
+        found = True
+        return
+    
+    for neighborId, weight in getNeighbours(node):
+        if neighborId not in visited:
+            parent[neighborId] = node
+            dfs(neighborId)
+            if found:
+                return
+
+dfs(startNode)
+
+# Reconstruct path
+if found:
+    path = []
+    current = goalNode
+    while current in parent:
+        path.append(current)
+        current = parent[current]
+    path.append(startNode)
+    path.reverse()
+    commitPath(path)"

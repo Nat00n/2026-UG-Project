@@ -4,7 +4,12 @@ extends CanvasLayer
 @onready var panel: Panel = $Panel
 @onready var inputCE: CodeEdit = $Panel/VSplitContainer/CodeEditor
 @onready var outputRCT: RichTextLabel = $Panel/VSplitContainer/OutputBox
-@onready var guideBox: RichTextLabel = $Panel/VSplitContainer/GuideBox
+@onready var guideContainer: HBoxContainer = $Panel/VSplitContainer/GuideContainer
+@onready var guideTaskColumn: VBoxContainer = $Panel/VSplitContainer/GuideContainer/TaskScrollContainer/TaskColumn
+@onready var guideTaskText: RichTextLabel = $Panel/VSplitContainer/GuideContainer/TaskScrollContainer/TaskColumn/TaskText
+@onready var showExampleButton: Button = $Panel/VSplitContainer/GuideContainer/TaskScrollContainer/TaskColumn/ShowExampleButton
+@onready var exampleCodeLabel: RichTextLabel = $Panel/VSplitContainer/GuideContainer/TaskScrollContainer/TaskColumn/ExampleCode
+@onready var guideDataColumn: RichTextLabel = $Panel/VSplitContainer/GuideContainer/DataColumn
 @onready var runButton: Button = $Panel/VSplitContainer/HSplitContainer/RunButton
 @onready var closeButton: Button = $Panel/VSplitContainer/HSplitContainer/CloseButton
 @onready var aiButton: Button = $Panel/VSplitContainer/HSplitContainer/AIButton
@@ -29,8 +34,10 @@ func _ready():
 	aiButton.pressed.connect(onAITips)
 	editorTabButton.pressed.connect(_showEditorTab)
 	guideTabButton.pressed.connect(_showGuideTab)
+	showExampleButton.pressed.connect(_onShowExamplePressed)
 
 	_setupSyntaxHighlighting()
+	_setupExampleButton()
 	_showEditorTab()
 
 	if OS.has_feature("web"):
@@ -188,11 +195,55 @@ func _setupSyntaxHighlighting():
 
 	inputCE.syntax_highlighter = highlighter
 
+func _setupExampleButton():
+	# Add green styling to match example solution text
+	var normal_style = StyleBoxFlat.new()
+	normal_style.bg_color = Color(0.23, 0.23, 0.23)
+	normal_style.border_width_left = 2
+	normal_style.border_width_right = 2
+	normal_style.border_width_top = 2
+	normal_style.border_width_bottom = 2
+	normal_style.border_color = Color.html("#90EE90")  # Light green
+	normal_style.corner_radius_top_left = 8
+	normal_style.corner_radius_top_right = 8
+	normal_style.corner_radius_bottom_left = 8
+	normal_style.corner_radius_bottom_right = 8
+	showExampleButton.add_theme_stylebox_override("normal", normal_style)
+	
+	var hover_style = StyleBoxFlat.new()
+	hover_style.bg_color = Color(0.3, 0.3, 0.3)
+	hover_style.border_width_left = 2
+	hover_style.border_width_right = 2
+	hover_style.border_width_top = 2
+	hover_style.border_width_bottom = 2
+	hover_style.border_color = Color.html("#B0FFB0")  # Lighter green on hover
+	hover_style.corner_radius_top_left = 8
+	hover_style.corner_radius_top_right = 8
+	hover_style.corner_radius_bottom_left = 8
+	hover_style.corner_radius_bottom_right = 8
+	showExampleButton.add_theme_stylebox_override("hover", hover_style)
+	
+	var pressed_style = StyleBoxFlat.new()
+	pressed_style.bg_color = Color(0.15, 0.15, 0.15)
+	pressed_style.border_width_left = 2
+	pressed_style.border_width_right = 2
+	pressed_style.border_width_top = 2
+	pressed_style.border_width_bottom = 2
+	pressed_style.border_color = Color.html("#90EE90")  # Light green
+	pressed_style.corner_radius_top_left = 8
+	pressed_style.corner_radius_top_right = 8
+	pressed_style.corner_radius_bottom_left = 8
+	pressed_style.corner_radius_bottom_right = 8
+	showExampleButton.add_theme_stylebox_override("pressed", pressed_style)
+	
+	# Add spacing between TaskText and ShowExampleButton
+	guideTaskColumn.add_theme_constant_override("separation", 20)
+
 func _showEditorTab():
 	_onEditorTab = true
 	inputCE.visible = true
 	outputRCT.visible = true
-	guideBox.visible = false
+	guideContainer.visible = false
 	aiButton.visible = true
 	runButton.visible = true
 	_setActiveTab(editorTabButton, guideTabButton)
@@ -201,7 +252,7 @@ func _showGuideTab():
 	_onEditorTab = false
 	inputCE.visible = false
 	outputRCT.visible = false
-	guideBox.visible = true
+	guideContainer.visible = true
 	aiButton.visible = false
 	runButton.visible = false
 	_setActiveTab(guideTabButton, editorTabButton)
@@ -222,20 +273,47 @@ func _setActiveTab(activeButton: Button, inactiveButton: Button):
 	inactiveButton.add_theme_stylebox_override("hover", inactiveStyle)
 
 func _populateGuide():
-	guideBox.clear()
-	guideBox.add_theme_font_size_override("normal_font_size",24)
+	guideTaskText.clear()
+	guideDataColumn.clear()
+	
+	# Reset example button/code visibility
+	showExampleButton.visible = false
+	exampleCodeLabel.visible = false
+	
 	if _currentObject == null:
 		return
 	
+	# LEFT COLUMN - Task information
 	if _currentObject.taskName.strip_edges() != "":
-		guideBox.append_text("[b]%s[/b]\n\n" % _currentObject.taskName)
-	
-	var base = _currentObject.getBaseGuide()
-	if base.strip_edges() != "":
-		guideBox.append_text(base + "\n\n")
+		guideTaskText.append_text("[b][font_size=28]%s[/font_size][/b]\n\n" % _currentObject.taskName)
 	
 	if _currentObject.taskGuide.strip_edges() != "":
-		guideBox.append_text("[b]Your Task:[/b]\n" + _currentObject.taskGuide)
+		guideTaskText.append_text("[b][color=#FFDD88]Your Task:[/color][/b]\n")
+		guideTaskText.append_text(_currentObject.taskGuide + "\n")
+	
+	# Show example button if example code exists
+	if _currentObject.exampleCode.strip_edges() != "":
+		showExampleButton.visible = true
+		exampleCodeLabel.text = ""  # Clear previous example
+	
+	# RIGHT COLUMN - Data & Functions reference
+	var base = _currentObject.getBaseGuide()
+	if base.strip_edges() != "":
+		guideDataColumn.append_text("[b][font_size=22][color=#88DDFF]Reference[/color][/font_size][/b]\n\n")
+		guideDataColumn.append_text(base)
+
+func _onShowExamplePressed():
+	if _currentObject == null:
+		return
+	
+	# Hide the button
+	showExampleButton.visible = false
+	
+	# Show the example code
+	exampleCodeLabel.clear()
+	exampleCodeLabel.append_text("[b][color=#90EE90]Example Solution:[/color][/b]\n\n")
+	exampleCodeLabel.append_text("[code]%s[/code]" % _currentObject.exampleCode)
+	exampleCodeLabel.visible = true
 
 
 func onLLMReady(args):

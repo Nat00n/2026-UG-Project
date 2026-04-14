@@ -22,3 +22,90 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 position = Vector2(342, 366)
 objectName = "Gary"
 objectID = "obj_9"
+taskDescription = "Find the shortest path from the start node to the goal node using breadth-first search. Explore all neighbors at the current depth before moving to nodes at the next depth level, using a queue to track which nodes to visit next."
+taskName = "Breadth First Search (BFS)"
+taskGuide = "Big O Notation:
+- Time Complexity: O(V + E) where V is vertices, E is edges  
+- Space Complexity: O(V) for the queue and visited set
+
+Use Cases:
+- Finding shortest path in unweighted graphs
+- Finding all nodes within k distance from start
+- Level-order traversal of trees
+- Social network analysis (degrees of separation)
+- Web crawling with bounded depth
+- Finding shortest transformation sequences
+
+Suitable Data Structures:
+- Queue (FIFO - First In First Out)
+- Set or dictionary to track visited nodes
+- Graph represented as adjacency list
+
+Algorithm Steps:
+
+1. Initialize data structures:
+   - Create a queue (use collections.deque) with startNode
+   - Create a visited set to prevent revisiting nodes
+   - Create a parent dictionary to reconstruct the path later
+
+2. While the queue is not empty:
+   - Dequeue the front node (earliest added)
+   - Use visitNode(currentNode) to animate exploration
+   - This node is now being explored
+
+3. Check if goal is reached:
+   - If current node equals goalNode, you've found the shortest path
+   - Stop exploration and move to path reconstruction
+
+4. Explore all neighbors at current level:
+   - Use getNeighbours(currentNode) to get adjacent nodes
+   - For each unvisited neighbor:
+     → Mark it as visited immediately (prevents duplicates in queue)
+     → Record current node as its parent
+     → Add neighbor to end of queue
+
+5. Level-by-level exploration pattern:
+   - Queue ensures nodes are explored in order of discovery
+   - All nodes at distance d are explored before any at distance d+1
+   - This guarantees the first path found is the shortest
+
+6. Reconstruct the shortest path:
+   - Once goal is found, work backwards using parent dictionary
+   - Start at goalNode, follow parents back to startNode  
+   - Reverse to get start → goal direction
+
+7. Animate the path:
+   - Use commitPath(pathList) to display the shortest path
+   - In unweighted graphs, this is guaranteed to be optimal
+
+Key Guarantee:
+BFS finds the shortest path in terms of number of edges. The first time it reaches the goal, that path has the minimum number of hops."
+exampleCode = "# BFS for shortest path
+from collections import deque
+
+queue = deque([startNode])
+visited = {startNode}
+parent = {}
+
+while queue:
+    current = queue.popleft()
+    visitNode(current)
+    
+    if current == goalNode:
+        break
+    
+    for neighborId, weight in getNeighbours(current):
+        if neighborId not in visited:
+            visited.add(neighborId)
+            parent[neighborId] = current
+            queue.append(neighborId)
+
+# Reconstruct path
+path = []
+current = goalNode
+while current in parent:
+    path.append(current)
+    current = parent[current]
+path.append(startNode)
+path.reverse()
+commitPath(path)"

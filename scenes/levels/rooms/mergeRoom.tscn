@@ -19,9 +19,84 @@ offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_oy47q")]
-position = Vector2(1090, 433)
+position = Vector2(1026, 461)
 objectName = "Em"
 objectID = "obj_2"
-taskDescription = "To sort an array using a merge sort algorithm"
+taskDescription = "Sort the array in ascending order using merge sort. Divide the array into smaller subarrays until each contains one element, then repeatedly merge subarrays to produce new sorted subarrays until there's only one sorted array remaining."
 taskName = "Merge Sort"
-taskGuide = "To implement a merge sort algorithm to return a sorted array"
+taskGuide = "Big O Notation:
+- Time Complexity: O(n log n) in all cases (worst, average, best)
+- Space Complexity: O(n) - requires additional space for merging
+
+Use Cases:
+- Large datasets where O(n log n) performance is required
+- When stable sorting is needed (preserves relative order of equal elements)
+- Sorting linked lists - very efficient due to pointer manipulation
+- External sorting - when data doesn't fit in memory
+- When predictable O(n log n) performance is critical (no worst-case degradation)
+
+Suitable Data Structures:
+- Arrays and lists
+- Linked lists (particularly efficient)
+- External storage (files, databases)
+
+Algorithm Steps:
+
+1. Divide Phase - Split the problem recursively:
+   - If array has 0 or 1 elements, it's already sorted (base case)
+   - Otherwise, find the middle point to divide array into two halves
+   - Use showSplit(start, mid, end) to visualize the division
+
+2. Recursively sort each half:
+   - Apply merge sort to the left half
+   - Apply merge sort to the right half
+   - Each recursive call further divides until reaching single elements
+
+3. Merge Phase - Combine sorted halves:
+   - Compare elements from the front of each sorted half
+   - Take the smaller element first
+   - Use move(fromIndex, toIndex) to reposition elements
+
+4. Continue merging:
+   - Keep comparing and taking the smaller element
+   - When one half is exhausted, remaining elements are already in order
+   - The result is a sorted combination of both halves
+
+5. Recursive returns build the solution:
+   - Merged pairs become sorted subarrays
+   - These merge with other sorted subarrays
+   - Eventually produces one fully sorted array
+
+6. Call commitSort() when complete:
+   - Triggers the final animation
+   - Confirms the array is fully sorted
+
+Divide and Conquer Strategy:
+Break the problem into smaller identical subproblems, solve them recursively, then combine solutions. This guarantees O(n log n) performance regardless of initial order."
+exampleCode = "# Working Merge Sort
+def mergeSort(start, end):
+    if end - start <= 1:
+        return
+    
+    mid = (start + end) // 2
+    showSplit(start, mid, end)
+    
+    # Recursively sort both halves
+    mergeSort(start, mid)
+    mergeSort(mid, end)
+    
+    # Merge the sorted halves
+    left = start
+    right = mid
+    
+    while left < right and right < end:
+        if array[left] <= array[right]:
+            left += 1
+        else:
+            # Move array[right] to position left
+            move(right, left)
+            left += 1
+            right += 1
+
+mergeSort(0, len(array))
+commitSort()"

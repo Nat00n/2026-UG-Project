@@ -1,6 +1,5 @@
 class_name InteractableObject
 extends Area2D
-
 # Emitted by child classes (SortObject, SearchObject, etc.) when their task is completed correctly
 # The Level script connects to this signal to track room completion
 signal roomTaskCompleted(objectID: String)
@@ -14,6 +13,7 @@ signal roomTaskCompleted(objectID: String)
 @export_multiline var taskDescription: String = "None"
 @export var taskName: String = "None"
 @export_multiline var taskGuide: String = "None"
+@export_multiline var exampleCode: String = ""  # NEW: Example code for the task
 
 var _hovered := false
 var _popup: CanvasLayer
@@ -42,24 +42,30 @@ func _buildDisplay():
 	for child in nodeDisplay.get_children():
 		child.queue_free()
 	cardNodes.clear()
+	
 	if dataNodes.is_empty():
 		return
+	
 	var totalWidth = dataNodes.size() * (cardWidth + cardGap) - cardGap
 	var startX = -totalWidth / 2.0
+	
 	for i in range(dataNodes.size()):
 		var node = dataNodes[i]
 		var scaledHeight = (1.0 + node["value"] / 10.0) * cardHeight
 		var card = PanelContainer.new()
 		card.size = Vector2(cardWidth, scaledHeight)
 		card.position = Vector2(startX + i * (cardWidth + cardGap), 2.0 * cardHeight - scaledHeight)
+		
 		var label = Label.new()
 		label.text = "%s\n%d" % [node["name"], node["value"]]
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		card.add_child(label)
+		
 		nodeDisplay.add_child(card)
 		cardNodes.append(card)
+	
 	nodeDisplay.size = Vector2(totalWidth, 2.0 * cardHeight)
 
 func getBaseGuide() -> String:

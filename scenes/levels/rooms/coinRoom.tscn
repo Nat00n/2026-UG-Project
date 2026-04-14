@@ -22,3 +22,61 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 position = Vector2(290, 288)
 objectName = "Charlie"
 objectID = "obj_13"
+taskDescription = "Find a combination of coins that makes the target amount using a greedy algorithm. Start with the largest coin denomination and use as many as possible, then move to the next smaller denomination, repeating until the target is reached."
+taskName = "Greedy Coin Change"
+taskGuide = "Big O Notation:
+- Time Complexity: O(n) where n is number of coin types
+- Space Complexity: O(1) - only tracks remaining amount
+
+Use Cases:
+- Making change with standard currency denominations (UK, US, Euro)
+- Vending machines and cash registers
+- Fast approximation when exact solution not critical
+- When coin system is \"canonical\" (greedy gives optimal result)
+
+Suitable Data Structures:
+- List of coin denominations (sorted largest to smallest)
+- List to accumulate the result
+
+Important Note:
+Greedy works for UK coins [1, 2, 5, 10, 20, 50, 100] because the system is designed this way. For arbitrary denominations, greedy may fail or give non-optimal solutions.
+
+Algorithm Steps:
+
+1. Sort coins from largest to smallest:
+   - Process high-value coins first
+   - This minimizes the number of coins used
+
+2. For each coin denomination:
+   - Check if coin fits in remaining amount
+   - Use as many of this coin as possible
+
+3. While coin fits (coin ≤ remaining):
+   - Add coin to result list
+   - Subtract coin value from remaining amount
+   - Repeat until coin no longer fits
+
+4. Move to next smaller coin:
+   - Continue process with next denomination
+   - Keep reducing remaining amount
+
+5. When remaining reaches 0:
+   - You've made exact change
+   - Result contains all coins to use
+
+6. Animate the solution:
+   - Use commitChange(result) to show all coins
+   - Coins stack up in their respective columns
+
+Greedy Strategy:
+Always take the largest coin possible at each step. This is fast and works for standard currency systems, but won't always find a solution for arbitrary coin sets."
+exampleCode = "# Greedy Coin Change
+remaining = targetAmount
+result = []
+
+for coin in sorted(coins, reverse=True):
+    while remaining >= coin:
+        result.append(coin)
+        remaining -= coin
+
+commitChange(result)"

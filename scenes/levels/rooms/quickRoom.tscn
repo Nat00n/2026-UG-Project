@@ -19,9 +19,85 @@ offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_1qfdc")]
-position = Vector2(729, 406)
+position = Vector2(689, 451)
 objectName = "Billy"
 objectID = "obj_4"
-taskDescription = "To sort an array using a quick sort algorithm"
+taskDescription = "Sort the array in ascending order using quick sort. Select a pivot element, partition the array so elements smaller than the pivot come before it and larger elements come after it, then recursively sort the partitions."
 taskName = "Quick Sort"
-taskGuide = "To implement a quick sort algorithm to return a sorted array"
+taskGuide = "Big O Notation:
+- Time Complexity: O(n log n) average case, O(n²) worst case
+- Space Complexity: O(log n) for recursion stack
+
+Use Cases:
+- General-purpose sorting for large datasets
+- When average-case performance is more important than worst-case
+- In-place sorting with minimal extra memory
+- Cache-friendly algorithm - good locality of reference
+- Often faster in practice than other O(n log n) algorithms
+
+Suitable Data Structures:
+- Arrays with random access
+- Works best when random access is efficient
+- Can be adapted for linked lists but less efficient
+
+Algorithm Steps:
+
+1. Choose a pivot element:
+   - Common strategy: use the last element in the range
+   - Use setPivot(index) to highlight the chosen pivot
+   - The pivot will end up in its final sorted position
+
+2. Partition the array around the pivot:
+   - Goal: all elements ≤ pivot go to the left
+   - All elements > pivot go to the right
+   - Pivot ends up between these two groups
+
+3. Partitioning process:
+   - Track a boundary between small and large elements
+   - Scan through the array comparing each element to pivot
+   - When you find an element ≤ pivot, swap it to the left side
+   - Use swap(i, j) to move elements
+
+4. Place the pivot in its final position:
+   - After scanning, swap pivot with the first large element
+   - Pivot is now correctly positioned
+   - Everything left of pivot is smaller, everything right is larger
+
+5. Recursively sort the partitions:
+   - Apply quick sort to elements left of the pivot
+   - Apply quick sort to elements right of the pivot
+   - Base case: partition with 0 or 1 elements is already sorted
+
+6. Recursive returns build the solution:
+   - Each level of recursion sorts a smaller range
+   - When all recursive calls complete, entire array is sorted
+   - Call commitSort() to finalize
+
+7. Update pivot visualization:
+   - After partitioning, call setPivot(newPivotIndex) 
+   - Or setPivot(-1) to clear pivot highlighting
+
+Partitioning Strategy:
+The partition step is key - it ensures the pivot is in its correct final position and divides the problem into two smaller independent subproblems."
+exampleCode = "# Quick sort
+def partition(low, high):
+    setPivot(high)
+    pivot = array[high]
+    i = low - 1
+    for j in range(low, high):
+        if array[j] <= pivot:
+            i += 1
+            swap(i, j)
+    swap(i + 1, high)
+    setPivot(i + 1)
+    return i + 1
+
+def quickSort(low, high):
+    if low < high:
+        pi = partition(low, high)
+        setPivot(-1)
+        quickSort(low, pi - 1)
+        quickSort(pi + 1, high)
+
+quickSort(0, len(array) - 1)
+commitSort()"

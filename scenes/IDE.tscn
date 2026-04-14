@@ -33,7 +33,7 @@ anchor_bottom = 1.0
 offset_bottom = -1.0
 grow_horizontal = 2
 grow_vertical = 2
-split_offsets = PackedInt32Array(42, 7)
+split_offsets = PackedInt32Array(42, 7, 0)
 split_offset = 42
 
 [node name="HSplitContainer" type="HSplitContainer" parent="Panel/VSplitContainer" unique_id=316253582]
@@ -103,9 +103,55 @@ theme_override_font_sizes/mono_font_size = 24
 bbcode_enabled = true
 selection_enabled = true
 
-[node name="GuideBox" type="RichTextLabel" parent="Panel/VSplitContainer" unique_id=1925186903]
-visible = false
+[node name="GuideContainer" type="HBoxContainer" parent="Panel/VSplitContainer" unique_id=207426750]
 layout_mode = 2
+
+[node name="TaskScrollContainer" type="ScrollContainer" parent="Panel/VSplitContainer/GuideContainer" unique_id=149994226]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+
+[node name="TaskColumn" type="VBoxContainer" parent="Panel/VSplitContainer/GuideContainer/TaskScrollContainer" unique_id=363090673]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TaskText" type="RichTextLabel" parent="Panel/VSplitContainer/GuideContainer/TaskScrollContainer/TaskColumn" unique_id=178994633]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+theme_override_font_sizes/bold_font_size = 24
+theme_override_font_sizes/bold_italics_font_size = 24
+theme_override_font_sizes/italics_font_size = 24
+theme_override_font_sizes/mono_font_size = 24
+bbcode_enabled = true
+fit_content = true
+
+[node name="ShowExampleButton" type="Button" parent="Panel/VSplitContainer/GuideContainer/TaskScrollContainer/TaskColumn" unique_id=996165218]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 24
+text = "+ Show Example Solution +"
+
+[node name="ExampleCode" type="RichTextLabel" parent="Panel/VSplitContainer/GuideContainer/TaskScrollContainer/TaskColumn" unique_id=2067173494]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 24
+theme_override_font_sizes/bold_font_size = 24
+theme_override_font_sizes/bold_italics_font_size = 24
+theme_override_font_sizes/italics_font_size = 24
+theme_override_font_sizes/mono_font_size = 24
+bbcode_enabled = true
+fit_content = true
+
+[node name="BottomSpacer" type="Control" parent="Panel/VSplitContainer/GuideContainer/TaskScrollContainer/TaskColumn" unique_id=1202140840]
+custom_minimum_size = Vector2(0, 600)
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="Panel/VSplitContainer/GuideContainer" unique_id=1967141304]
+layout_mode = 2
+
+[node name="DataColumn" type="RichTextLabel" parent="Panel/VSplitContainer/GuideContainer" unique_id=1925186903]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/normal_font_size = 24
 theme_override_font_sizes/bold_font_size = 24
 theme_override_font_sizes/bold_italics_font_size = 24

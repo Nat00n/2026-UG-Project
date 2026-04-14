@@ -22,3 +22,112 @@ color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 position = Vector2(291, 326)
 objectName = "Aly"
 objectID = "obj_12"
+taskDescription = "Find the shortest path from the start node to the goal node using A* algorithm. Use both the actual cost from start and an estimated cost to goal (heuristic) to guide the search toward the goal more efficiently than Dijkstra's."
+taskName = "A* Algorithm"
+taskGuide = "Big O Notation:
+- Time Complexity: O((V + E) log V) with good heuristic, can be better than Dijkstra's in practice
+- Space Complexity: O(V) for tracking costs and priority queue
+
+Use Cases:
+- Game AI pathfinding (maps, mazes, grid worlds)
+- GPS navigation with straight-line distance heuristic
+- Robotics path planning
+- Any scenario where you have a good distance estimate to goal
+- Puzzle solving (15-puzzle, Rubik's cube with heuristics)
+- When you want shortest path but faster than Dijkstra's
+
+Suitable Data Structures:
+- Min-heap priority queue (heapq)
+- Dictionary for g-cost (actual cost from start)
+- Dictionary for parent/predecessor tracking
+- Heuristic function (often Euclidean or Manhattan distance)
+
+Algorithm Steps:
+
+1. Define your heuristic function:
+   - Estimates cost from any node to goal
+   - Must be admissible: never overestimate actual cost
+   - Example: straight-line distance (Euclidean)
+   - For graphs with weights, use minimum edge weight × hop count
+
+2. Initialize tracking structures:
+   - g_cost: actual cost from start to each node (start = 0, others = infinity)
+   - f_cost: g_cost + heuristic estimate to goal
+   - parent dictionary for path reconstruction
+   - Priority queue ordered by f_cost (g + heuristic)
+
+3. Main loop - while priority queue has nodes:
+   - Extract node with minimum f_cost
+   - Use visitNode(currentNode) to animate
+   - If current node is goal, shortest path found
+
+4. Skip if already processed optimally:
+   - If extracted g_cost > recorded g_cost, skip
+   - This entry is outdated
+
+5. For each neighbor:
+   - Calculate: tentative_g = current_g_cost + edgeWeight
+   - Use getNeighbours(currentNode) for edges and weights
+
+6. Update if better path found:
+   - If tentative_g < neighbor's current g_cost:
+     → Update neighbor's g_cost to tentative_g
+     → Calculate f_cost = tentative_g + heuristic(neighbor, goal)
+     → Record current as neighbor's parent
+     → Add (f_cost, neighbor) to priority queue
+
+7. Heuristic guidance:
+   - Lower f_cost = more promising node
+   - Heuristic biases search toward goal
+   - Explores fewer nodes than Dijkstra's while maintaining optimality
+
+8. Path reconstruction:
+   - Work backwards from goal via parent links
+   - Reverse and use commitPath(pathList)
+
+Key Advantage:
+A* combines Dijkstra's guarantee of optimality with heuristic guidance. Good heuristic drastically reduces nodes explored. If heuristic = 0, A* becomes Dijkstra's."
+exampleCode = "# A* algorithm with Euclidean distance heuristic
+import heapq
+import math
+
+# Simple heuristic: straight-line distance estimate
+# For grid graphs, use actual positions
+# For general graphs, estimate based on minimum edge weight
+def heuristic(nodeId):
+    # Simplified: assume uniform cost estimate
+    # In practice, use actual coordinate distance
+    return 0  # Falls back to Dijkstra's without coordinates
+
+g_cost = {i: float('inf') for i in graph}
+g_cost[startNode] = 0
+parent = {}
+pq = [(0 + heuristic(startNode), 0, startNode)]  # (f, g, node)
+
+while pq:
+    f, g, current = heapq.heappop(pq)
+    visitNode(current)
+    
+    if current == goalNode:
+        break
+    
+    if g > g_cost[current]:
+        continue
+    
+    for neighborId, weight in getNeighbours(current):
+        tentative_g = g + weight
+        if tentative_g < g_cost[neighborId]:
+            g_cost[neighborId] = tentative_g
+            parent[neighborId] = current
+            f_cost = tentative_g + heuristic(neighborId)
+            heapq.heappush(pq, (f_cost, tentative_g, neighborId))
+
+# Reconstruct shortest path
+path = []
+current = goalNode
+while current in parent:
+    path.append(current)
+    current = parent[current]
+path.append(startNode)
+path.reverse()
+commitPath(path)"

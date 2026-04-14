@@ -19,9 +19,57 @@ offset_bottom = 822.0
 color = Color(0.004679383, 0.13212621, 0.13827685, 1)
 
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_itjfx")]
-position = Vector2(716, 547)
+position = Vector2(762, 599)
 objectName = "Bob"
 objectID = "obj_1"
-taskDescription = "To sort an array using bubble sort"
+taskDescription = "Sort the array in ascending order using bubble sort. The algorithm repeatedly steps through the list, compares adjacent elements, and swaps them if they're in the wrong order. Continue until no swaps are needed."
 taskName = "Bubble Sort"
-taskGuide = "To implement a bubble sort algorithm to return a sorted array"
+taskGuide = "Big O Notation:
+- Time Complexity: O(n²) in worst and average cases, O(n) best case (already sorted)
+- Space Complexity: O(1) - sorts in place
+
+Use Cases:
+- Educational purposes - simple to understand and implement
+- Small datasets where simplicity is more important than efficiency
+- Nearly sorted data where best-case O(n) performance is achievable
+- When memory is extremely limited (in-place sorting)
+
+Suitable Data Structures:
+- Arrays or lists with random access
+- Works with any comparable elements (numbers, strings, objects with comparison)
+
+Algorithm Steps:
+
+1. Start with the full array
+   - You'll make multiple passes through the data
+   - Each pass moves the largest unsorted element to its final position
+
+2. For each pass through the array:
+   - Compare adjacent pairs of elements from left to right
+   - If the left element is greater than the right element, they're out of order
+
+3. When you find an out-of-order pair:
+   - Use swap(i, j) to exchange their positions
+   - This \"bubbles\" larger values toward the end
+
+4. After each complete pass:
+   - The largest unsorted element is now in its correct final position
+   - You can reduce the range of the next pass (exclude the last sorted element)
+
+5. Repeat passes until you complete a full pass with no swaps:
+   - No swaps means the array is sorted
+   - Call commitSort() to finalize and trigger the completion animation
+
+Optimization Tip:
+Track whether any swaps occurred in a pass. If a pass completes without swaps, the array is already sorted and you can stop early."
+exampleCode = "# Bubble sort with optimization
+n = len(array)
+for i in range(n):
+    swapped = False
+    for j in range(0, n - i - 1):
+        if array[j] > array[j + 1]:
+            swap(j, j + 1)
+            swapped = True
+    if not swapped:
+        break
+commitSort()"
