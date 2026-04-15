@@ -10,7 +10,6 @@ class_name LevelData
 
 # Room tracking
 @export var totalRooms: int = 1  # How many rooms are in this level
-@export var roomNames: Array[String] = []  # Optional: names for each room
 
 var isUnlocked: bool = false
 var completedRooms: Array[int] = []  # Indices of completed rooms (0-based)

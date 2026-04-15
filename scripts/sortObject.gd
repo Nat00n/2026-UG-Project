@@ -161,6 +161,7 @@ func verifyAndComplete():
 		# No linked search - complete room now
 		Global.submitScore()
 		roomTaskCompleted.emit(objectID)
+	Analytics.recordComplete(objectID)
 
 func _applyPivot(index: int):
 	if pivotIndex >= 0 and pivotIndex < cardNodes.size():

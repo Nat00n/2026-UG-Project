@@ -351,6 +351,7 @@ func commitKnapsack(selectedIndices: Array):
 	
 	# Emit completion signal
 	roomTaskCompleted.emit(objectID)
+	Analytics.recordComplete(objectID)
 
 func getPreambleFunctions() -> String:
 	var itemsStr = "["

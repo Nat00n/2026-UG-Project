@@ -183,6 +183,7 @@ func verifyCoinChange(coinList: Array):
 	print("[" + objectID + "] Correct coin change! Sum: " + str(sum))
 	Global.submitScore()
 	roomTaskCompleted.emit(objectID)  # Complete room
+	Analytics.recordComplete(objectID)
 
 func getPreambleFunctions() -> String:
 	return """

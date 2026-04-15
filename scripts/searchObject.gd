@@ -197,6 +197,7 @@ func verifySearchResult():
 	print("  o CORRECT! Found ", targetValue, " at position ", foundPosition)
 	Global.submitScore()
 	roomTaskCompleted.emit(objectID)  # Complete room
+	Analytics.recordComplete(objectID)
 
 func getPreambleFunctions() -> String:
 	return """

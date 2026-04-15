@@ -326,6 +326,7 @@ func verifyPath():
 	print("[" + objectID + "] Valid path found from " + str(startNodeId) + " to " + str(goalNodeId))
 	Global.submitScore()
 	roomTaskCompleted.emit(objectID)  # Complete room
+	Analytics.recordComplete(objectID)
 
 # --- Python bridge ---
 

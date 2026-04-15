@@ -1,5 +1,5 @@
 extends CanvasLayer
-
+#IDE
 
 @onready var panel: Panel = $Panel
 @onready var inputCE: CodeEdit = $Panel/VSplitContainer/CodeEditor
@@ -145,6 +145,9 @@ func onClose() -> void:
 
 func open(objectName: String, interactable):
 	_currentObject = interactable
+	
+	Analytics.startTask(_currentObject)
+	
 	outputRCT.clear()
 	outputRCT.append_text("--- %s ---\n" % objectName)
 	inputCE.text = interactable.savedScript
@@ -305,7 +308,9 @@ func _populateGuide():
 func _onShowExamplePressed():
 	if _currentObject == null:
 		return
-	
+		
+	Analytics.recordRevealedCode(_currentObject)
+		
 	# Hide the button
 	showExampleButton.visible = false
 	
@@ -320,13 +325,23 @@ func onLLMReady(args):
 	_llmReady = true
 	aiButton.disabled = false
 	aiButton.text = "= AI Tips ="
+	
+	print("LLM ready")
 
 func onLLMProgress(args):
 	aiButton.text = "= AI Loading ="
 
 func onAITips():
-	if _currentObject == null or not _llmReady:
+	if _currentObject == null:
 		return
+
+	var llmReady = JavaScriptBridge.eval("window.llmReady === true")
+	if not llmReady:
+		aiButton.text = "= AI Loading ="
+		print("LLM not ready")
+		return
+		
+	Analytics.recordAiTip(_currentObject)
 
 	aiButton.disabled = true
 	aiButton.text = "= AI Thinking... ="
@@ -383,6 +398,8 @@ func onAIResponse(args):
 func onRun():
 	if _currentObject:
 		_currentObject.saveScript(inputCE.text)
+		Analytics.recordRun(_currentObject)
+		
 	_executeCode(inputCE.text, _currentObject, false)
 
 # Called by interactable for silent background run

@@ -15,7 +15,7 @@ func _ready() -> void:
 var username: String = ""
 var startTime: float = 0.0
 var gameScore: int = 0
-var activeLeaderboardRequest = null  # Track if request is active
+var activeLeaderboardRequest = null
 
 func startTimer():
 	startTime = Time.get_unix_time_from_system()

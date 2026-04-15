@@ -43,13 +43,13 @@ func _ready():
 	connectObjectSignals()
 
 func setupReturnButton():
-	"""Configure the return button"""
+	# Configure the return button
 	returnButton.visible = false
 	returnButton.text = "Return to Level Select"
 	returnButton.pressed.connect(onReturnPressed)
 
 func updateReturnButtonVisibility():
-	"""Show button if minimum rooms are complete"""
+	# Show button if minimum rooms are complete
 	var level = progressionManager.levels.get(levelId)
 	if not level:
 		return
@@ -85,9 +85,10 @@ func connectObjectSignals():
 				# Connect the signal (avoid duplicate connections)
 				if not obj.roomTaskCompleted.is_connected(onObjectCompleted):
 					obj.roomTaskCompleted.connect(onObjectCompleted)
-				
+
 				# CRITICAL: Map this object to its room index
 				objectToRoomMap[obj.objectID] = roomIndex
+				Analytics.registerObject(obj.objectID, levelId)
 				print("  o ", obj.objectID, " → Room ", roomIndex)
 			else:
 				print("  x ", obj.objectID, " has no signal!")

@@ -283,6 +283,7 @@ const engine = new Engine(GODOT_CONFIG);
 			);
 
 			console.log("WebLLM ready");
+			window.llmReady = true;
 			if (window.godotLLMReady) {
 				window.godotLLMReady("ready");
 			}
