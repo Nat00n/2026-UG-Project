@@ -43,11 +43,11 @@ func extractRailroadTile():
 
 func setupLevels():
 	var levels = [
-		{"id": "1-1", "name": "Level 1", "pos": Vector2(450, 950), "required": "", "rooms": 4},
-		{"id": "2-1", "name": "Level 2", "pos": Vector2(1500, 700), "required": "1-1", "rooms": 3},
-		{"id": "3-1", "name": "Level 3", "pos": Vector2(700, 400), "required": "2-1", "rooms": 4},
-		{"id": "4-1", "name": "Level 4", "pos": Vector2(250, 250), "required": "3-1", "rooms": 1},
-		{"id": "4-2", "name": "Level 5", "pos": Vector2(1250, 250), "required": "3-1", "rooms": 1},
+		{"id": "1-1", "name": "Sorting Train", "pos": Vector2(450, 950), "required": "", "rooms": 4},
+		{"id": "2-1", "name": "Searching Train", "pos": Vector2(1500, 700), "required": "1-1", "rooms": 3},
+		{"id": "3-1", "name": "Graph Traversal Train", "pos": Vector2(700, 400), "required": "2-1", "rooms": 4},
+		{"id": "4-1", "name": "0/1 Knapsack Train", "pos": Vector2(250, 250), "required": "3-1", "rooms": 1},
+		{"id": "4-2", "name": "Coin Change Train", "pos": Vector2(1250, 250), "required": "3-1", "rooms": 1},
 	]
 	
 	for levelInfo in levels:
