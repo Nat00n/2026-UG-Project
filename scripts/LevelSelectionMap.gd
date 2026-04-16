@@ -4,29 +4,53 @@ extends Control
 
 const NODE_RADIUS = 30
 const LINE_WIDTH = 4
+const RAIL_TILE_SIZE = 16
+const RAIL_SPACING = 30
+const RAIL_SCALE = 2.0
 
-var levelNodes: Dictionary = {}  # levelId -> LevelData
+var levelNodes: Dictionary = {}
 var hoveredLevel: String = ""
+var railroadTexture: ImageTexture
 
 signal levelSelected(levelId: String)
 
 func _ready():
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_ARROW
+	
+	# Extract railroad tile from atlas
+	extractRailroadTile()
+	
 	setupLevels()
 	call_deferred("queue_redraw")
+
+func extractRailroadTile():
+	# Load your complete atlas
+	var atlasTexture = load("res://graphics/trains.png")
+	if atlasTexture == null:
+		push_error("Could not load railroad atlas texture")
+		return
+	
+	var atlasImage = atlasTexture.get_image()
+	
+	# Extract the tile at position (4, 0)
+	var tileX = 4
+	var tileY = 0
+	var region = Rect2i(tileX * RAIL_TILE_SIZE, tileY * RAIL_TILE_SIZE, RAIL_TILE_SIZE, RAIL_TILE_SIZE)
+	
+	var tileImage = atlasImage.get_region(region)
+	railroadTexture = ImageTexture.create_from_image(tileImage)
 
 func setupLevels():
 	var levels = [
 		{"id": "1-1", "name": "Level 1", "pos": Vector2(450, 950), "required": "", "rooms": 4},
 		{"id": "2-1", "name": "Level 2", "pos": Vector2(1500, 700), "required": "1-1", "rooms": 3},
-		{"id": "3-1", "name": "Level 3", "pos": Vector2(800, 400), "required": "2-1", "rooms": 4},
-		{"id": "4-1", "name": "Level 4", "pos": Vector2(300, 220), "required": "3-1", "rooms": 1},
+		{"id": "3-1", "name": "Level 3", "pos": Vector2(700, 400), "required": "2-1", "rooms": 4},
+		{"id": "4-1", "name": "Level 4", "pos": Vector2(250, 250), "required": "3-1", "rooms": 1},
 		{"id": "4-2", "name": "Level 5", "pos": Vector2(1250, 250), "required": "3-1", "rooms": 1},
 	]
 	
 	for levelInfo in levels:
-		# If already registered, reuse the existing LevelData (has live completion state)
 		if progressionManager.levels.has(levelInfo["id"]):
 			levelNodes[levelInfo["id"]] = progressionManager.levels[levelInfo["id"]]
 			continue
@@ -46,7 +70,7 @@ func _draw():
 	if levelNodes.is_empty():
 		return
 	
-	# Draw connection lines
+	# Draw railroad connections
 	for levelId in levelNodes:
 		var level = levelNodes[levelId]
 		if level == null:
@@ -58,8 +82,7 @@ func _draw():
 			var fromPos = fromLevel.position
 			var toPos = level.position
 			
-			var lineColor = Color.WHITE if level.isUnlocked else Color(0.4, 0.4, 0.4)
-			draw_line(fromPos, toPos, lineColor, LINE_WIDTH)
+			drawRailroadPath(fromPos, toPos, level.isUnlocked)
 	
 	# Draw level nodes
 	for levelId in levelNodes:
@@ -88,29 +111,45 @@ func _draw():
 			nodeColor = Color.WHITE
 			outlineColor = Color(0.9, 0.7, 0.2)
 		
-		# Enhanced hover effect for unlocked levels
 		if hoveredLevel == levelId and level.isUnlocked:
 			nodeColor = nodeColor.lightened(0.4)
-			# Draw pulsing outer ring for unlocked levels
 			draw_circle(pos, NODE_RADIUS + 6, Color(1, 1, 1, 0.5))
 		elif hoveredLevel == levelId:
 			nodeColor = nodeColor.lightened(0.2)
 		
-		# Draw outline
 		draw_circle(pos, NODE_RADIUS + 3, outlineColor)
 		
-		# Draw node
 		if showHalfFill:
 			drawHalfFilledCircle(pos, NODE_RADIUS, nodeColor)
 		else:
 			draw_circle(pos, NODE_RADIUS, nodeColor)
 		
-		# Draw indicators
 		if showStar:
 			drawStar(pos)
 		elif not level.isUnlocked:
 			drawLock(pos)
 
+func drawRailroadPath(fromPos: Vector2, toPos: Vector2, isUnlocked: bool):
+	if railroadTexture == null:
+		var lineColor = Color.WHITE if isUnlocked else Color(0.4, 0.4, 0.4)
+		draw_line(fromPos, toPos, lineColor, LINE_WIDTH)
+		return
+	
+	var direction = (toPos - fromPos).normalized()
+	var distance = fromPos.distance_to(toPos)
+	var angle = direction.angle()
+	
+	var numTiles = int(distance / RAIL_SPACING)
+	var modulate = Color.WHITE if isUnlocked else Color(0.5, 0.5, 0.5)
+	
+	for i in range(numTiles + 1):
+		var t = float(i) / max(numTiles, 1)
+		var pos = fromPos.lerp(toPos, t)
+		
+		# Draw rotated and scaled railroad tile
+		draw_set_transform(pos, angle, Vector2(RAIL_SCALE, RAIL_SCALE))  # Changed this line
+		draw_texture(railroadTexture, Vector2(-RAIL_TILE_SIZE / 2, -RAIL_TILE_SIZE / 2), modulate)
+		draw_set_transform(Vector2.ZERO, 0, Vector2.ONE)
 func drawHalfFilledCircle(pos: Vector2, radius: float, fillColor: Color):
 	draw_circle(pos, radius, Color(0.5, 0.5, 0.5))
 	var points = PackedVector2Array()
@@ -179,7 +218,6 @@ func _process(_delta):
 				overUnlockedLevel = level.isUnlocked
 				break
 	
-	# Change cursor when over unlocked level
 	if overUnlockedLevel:
 		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	else:
