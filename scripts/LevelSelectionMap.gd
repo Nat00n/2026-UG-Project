@@ -2,15 +2,6 @@ extends Control
 
 @onready var progressionManager = get_node("/root/LevelProgressionManager")
 
-# Area colors matching the image
-const AREA_COLORS = [
-	Color(0.2, 0.8, 0.3),  # Green
-	Color(0.95, 0.85, 0.2),  # Yellow
-	Color(0.3, 0.6, 0.9),  # Blue
-	Color(0.7, 0.4, 0.8)   # Purple
-]
-
-const AREA_HEIGHT = 200  # Height of each colored area
 const NODE_RADIUS = 30
 const LINE_WIDTH = 4
 
@@ -26,20 +17,12 @@ func _ready():
 	call_deferred("queue_redraw")
 
 func setupLevels():
-	# UPDATE THIS to match your actual levels and room counts
 	var levels = [
-		# Green area (bottom)
-		{"id": "1-1", "name": "Level 1", "area": 0, "pos": Vector2(200, 100), "required": "", "rooms": 4},
-		
-		# Yellow area
-		{"id": "2-1", "name": "Level 2", "area": 1, "pos": Vector2(250, 100), "required": "1-1", "rooms": 3},
-		
-		# Blue area
-		{"id": "3-1", "name": "Level 3", "area": 2, "pos": Vector2(180, 130), "required": "2-1", "rooms": 4},
-		
-		# Purple area (top)
-		{"id": "4-1", "name": "Level 4", "area": 3, "pos": Vector2(220, 120), "required": "3-1", "rooms": 1},
-		{"id": "4-2", "name": "Level 5", "area": 3, "pos": Vector2(300, 120), "required": "3-1", "rooms": 1},
+		{"id": "1-1", "name": "Level 1", "pos": Vector2(450, 950), "required": "", "rooms": 4},
+		{"id": "2-1", "name": "Level 2", "pos": Vector2(1500, 700), "required": "1-1", "rooms": 3},
+		{"id": "3-1", "name": "Level 3", "pos": Vector2(800, 400), "required": "2-1", "rooms": 4},
+		{"id": "4-1", "name": "Level 4", "pos": Vector2(300, 220), "required": "3-1", "rooms": 1},
+		{"id": "4-2", "name": "Level 5", "pos": Vector2(1250, 250), "required": "3-1", "rooms": 1},
 	]
 	
 	for levelInfo in levels:
@@ -51,7 +34,6 @@ func setupLevels():
 		var levelData = LevelData.new()
 		levelData.levelId = levelInfo["id"]
 		levelData.levelName = levelInfo["name"]
-		levelData.areaIndex = levelInfo["area"]
 		levelData.position = levelInfo["pos"]
 		levelData.requiredLevelId = levelInfo["required"]
 		levelData.totalRooms = levelInfo["rooms"]
@@ -61,14 +43,6 @@ func setupLevels():
 		levelNodes[levelData.levelId] = levelData
 
 func _draw():
-	# Draw colored area backgrounds
-	for i in range(4):
-		var yPos = size.y - (i + 1) * AREA_HEIGHT
-		var rect = Rect2(0, yPos, size.x, AREA_HEIGHT)
-		var color = AREA_COLORS[i]
-		color.a = 0.3
-		draw_rect(rect, color)
-	
 	if levelNodes.is_empty():
 		return
 	
@@ -81,8 +55,8 @@ func _draw():
 			var fromLevel = levelNodes[level.requiredLevelId]
 			if fromLevel == null:
 				continue
-			var fromPos = getLevelScreenPosition(fromLevel)
-			var toPos = getLevelScreenPosition(level)
+			var fromPos = fromLevel.position
+			var toPos = level.position
 			
 			var lineColor = Color.WHITE if level.isUnlocked else Color(0.4, 0.4, 0.4)
 			draw_line(fromPos, toPos, lineColor, LINE_WIDTH)
@@ -92,7 +66,7 @@ func _draw():
 		var level = levelNodes[levelId]
 		if level == null:
 			continue
-		var pos = getLevelScreenPosition(level)
+		var pos = level.position
 		
 		var nodeColor: Color
 		var outlineColor: Color
@@ -137,10 +111,6 @@ func _draw():
 		elif not level.isUnlocked:
 			drawLock(pos)
 
-func getLevelScreenPosition(level: LevelData) -> Vector2:
-	var areaY = size.y - (level.areaIndex + 1) * AREA_HEIGHT
-	return Vector2(level.position.x, areaY + level.position.y)
-
 func drawHalfFilledCircle(pos: Vector2, radius: float, fillColor: Color):
 	draw_circle(pos, radius, Color(0.5, 0.5, 0.5))
 	var points = PackedVector2Array()
@@ -183,7 +153,7 @@ func _gui_input(event):
 			var level = levelNodes[levelId]
 			if level == null:
 				continue
-			var nodePos = getLevelScreenPosition(level)
+			var nodePos = level.position
 			if mousePos.distance_to(nodePos) <= NODE_RADIUS:
 				if level.isUnlocked:
 					levelSelected.emit(levelId)
@@ -203,7 +173,7 @@ func _process(_delta):
 			var level = levelNodes[levelId]
 			if level == null:
 				continue
-			var nodePos = getLevelScreenPosition(level)
+			var nodePos = level.position
 			if mousePos.distance_to(nodePos) <= NODE_RADIUS:
 				newHovered = levelId
 				overUnlockedLevel = level.isUnlocked

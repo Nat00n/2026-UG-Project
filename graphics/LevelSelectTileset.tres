@@ -1,0 +1,76 @@
+[gd_resource type="TileSet" format=3 uid="uid://cjxix4niutcth"]
+
+[ext_resource type="Texture2D" uid="uid://dvqakdug4pb4i" path="res://graphics/fullTiles.png" id="1_b8d8y"]
+[ext_resource type="Texture2D" uid="uid://5e0vuy5k4cs0" path="res://graphics/topTiles.png" id="2_lifu7"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lifu7"]
+texture = ExtResource("1_b8d8y")
+texture_region_size = Vector2i(65, 89)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, -11)
+0:0/0/z_index = 1
+1:0/0 = 0
+1:0/0/texture_origin = Vector2i(0, -11)
+2:0/0 = 0
+2:0/0/texture_origin = Vector2i(0, -11)
+3:0/0 = 0
+3:0/0/texture_origin = Vector2i(0, -11)
+0:1/0 = 0
+0:1/0/texture_origin = Vector2i(0, -11)
+1:1/0 = 0
+1:1/0/texture_origin = Vector2i(0, -11)
+1:1/0/z_index = 1
+2:1/0 = 0
+2:1/0/texture_origin = Vector2i(0, -11)
+3:1/0 = 0
+3:1/0/texture_origin = Vector2i(0, -11)
+3:1/0/z_index = 1
+0:2/0 = 0
+0:2/0/texture_origin = Vector2i(0, -11)
+0:2/0/z_index = 1
+1:2/0 = 0
+1:2/0/texture_origin = Vector2i(0, -11)
+2:2/0 = 0
+2:2/0/texture_origin = Vector2i(0, -11)
+2:2/0/z_index = 1
+3:2/0 = 0
+3:2/0/texture_origin = Vector2i(0, -11)
+0:3/0 = 0
+0:3/0/texture_origin = Vector2i(0, -11)
+1:3/0 = 0
+1:3/0/texture_origin = Vector2i(0, -11)
+1:3/0/z_index = 1
+2:3/0 = 0
+2:3/0/texture_origin = Vector2i(0, -11)
+3:3/0 = 0
+3:3/0/texture_origin = Vector2i(0, -11)
+3:3/0/z_index = 1
+0:4/0 = 0
+0:4/0/texture_origin = Vector2i(0, -11)
+1:4/0 = 0
+1:4/0/texture_origin = Vector2i(0, -11)
+2:4/0 = 0
+2:4/0/texture_origin = Vector2i(0, -11)
+2:4/0/z_index = 1
+3:4/0 = 0
+3:4/0/texture_origin = Vector2i(0, -11)
+3:4/0/z_index = 1
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_geb8x"]
+texture = ExtResource("2_lifu7")
+texture_region_size = Vector2i(65, 65)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+
+[resource]
+tile_shape = 3
+tile_layout = 5
+tile_size = Vector2i(65, 65)
+sources/1 = SubResource("TileSetAtlasSource_lifu7")
+sources/3 = SubResource("TileSetAtlasSource_geb8x")

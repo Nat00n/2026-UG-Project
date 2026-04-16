@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dmvs30b2b4afm"]
 
 [ext_resource type="Script" uid="uid://ctqhtni7hsajb" path="res://scripts/LevelSelectionScreen.gd" id="1_4tn7f"]
+[ext_resource type="PackedScene" uid="uid://b8pqg666a6avh" path="res://scenes/LevelSelectBackground.tscn" id="2_dtmcj"]
 [ext_resource type="Script" uid="uid://6il3a10mhot1" path="res://scripts/LevelSelectionMap.gd" id="2_og16j"]
 [ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="3_b387n"]
 
@@ -13,8 +14,13 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_4tn7f")
 
-[node name="Map" type="Control" parent="." unique_id=216737646]
-layout_mode = 1
+[node name="LevelSelectBackground" parent="." unique_id=631616675 instance=ExtResource("2_dtmcj")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2079454570]
+
+[node name="Map" type="Control" parent="CanvasLayer" unique_id=216737646]
+z_index = 10
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -22,8 +28,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_og16j")
 
-[node name="LevelInfo" type="Panel" parent="." unique_id=1273515998]
-layout_mode = 1
+[node name="LevelInfo" type="Panel" parent="CanvasLayer" unique_id=1273515998]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -35,7 +40,7 @@ offset_right = 325.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="LevelInfo" unique_id=1626904527]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LevelInfo" unique_id=1626904527]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -43,20 +48,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="LevelName" type="Label" parent="LevelInfo/VBoxContainer" unique_id=1845953576]
+[node name="LevelName" type="Label" parent="CanvasLayer/LevelInfo/VBoxContainer" unique_id=1845953576]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 48
 text = "X Algorithms"
 
-[node name="StartButton" type="Button" parent="LevelInfo/VBoxContainer" unique_id=1079590893]
+[node name="StartButton" type="Button" parent="CanvasLayer/LevelInfo/VBoxContainer" unique_id=1079590893]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 32
 text = "Start Level"
 
-[node name="PauseButton" type="Button" parent="." unique_id=1929197231]
-layout_mode = 0
+[node name="PauseButton" type="Button" parent="CanvasLayer" unique_id=1929197231]
 offset_left = 1899.0
 offset_top = 18.0
 offset_right = 1955.5

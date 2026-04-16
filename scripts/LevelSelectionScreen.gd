@@ -1,10 +1,11 @@
 extends Control
 
-@onready var levelMap: Control = $Map
-@onready var levelInfo: Panel = $LevelInfo
-@onready var levelName: Label = $LevelInfo/VBoxContainer/LevelName
-@onready var startButton: Button = $LevelInfo/VBoxContainer/StartButton
-@onready var pauseButton: Button = $PauseButton
+
+@onready var levelMap: Control = $CanvasLayer/Map
+@onready var levelInfo: Panel = $CanvasLayer/LevelInfo
+@onready var levelName: Label = $CanvasLayer/LevelInfo/VBoxContainer/LevelName
+@onready var startButton: Button = $CanvasLayer/LevelInfo/VBoxContainer/StartButton
+@onready var pauseButton: Button = $CanvasLayer/PauseButton
 @onready var pauseMenu: CanvasLayer = $PauseMenu
 
 var progressionManager
