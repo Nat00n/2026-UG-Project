@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://coi0dwxarp1xe"]
+
+[ext_resource type="Script" uid="uid://ikme7iewoe13" path="res://scripts/startBackground.gd" id="1_7e5u4"]
+[ext_resource type="TileSet" uid="uid://ddd7hsc7xryt2" path="res://graphics/trainTileset.tres" id="2_kyu7q"]
+
+[node name="StartMenuBackground" type="Node2D" unique_id=676154047]
+script = ExtResource("1_7e5u4")
+
+[node name="skyLayer" type="TileMapLayer" parent="." unique_id=1139810063]
+z_index = -4
+tile_set = ExtResource("2_kyu7q")
+
+[node name="groundLayer" type="TileMapLayer" parent="." unique_id=1123925298]
+z_index = -3
+tile_set = ExtResource("2_kyu7q")
+
+[node name="trackLayer" type="TileMapLayer" parent="." unique_id=1106942538]
+z_index = -1
+tile_set = ExtResource("2_kyu7q")
