@@ -6,20 +6,8 @@
 [node name="InsertionRoom" type="Node2D" unique_id=470420785]
 script = ExtResource("1_x48rf")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1634516390]
-offset_right = 1930.0
-offset_bottom = 1096.0
-color = Color(0.27387273, 0.27387273, 0.27387273, 1)
-
-[node name="Floor" type="ColorRect" parent="." unique_id=356980670]
-offset_left = 146.0
-offset_top = 152.0
-offset_right = 1605.0
-offset_bottom = 822.0
-color = Color(0.004679383, 0.13212621, 0.13827685, 1)
-
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_md4o6")]
-position = Vector2(855, 636)
+position = Vector2(855, 436)
 objectName = "Chuck"
 objectID = "obj_3"
 taskDescription = "Sort the array in ascending order using insertion sort. Build the sorted array one element at a time by repeatedly taking the next unsorted element and inserting it into its correct position among the previously sorted elements."

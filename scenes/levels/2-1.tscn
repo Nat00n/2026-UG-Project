@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://xhuq22xoufcc"]
 
 [ext_resource type="Script" uid="uid://bhxnfy7wb3rmp" path="res://scripts/levels.gd" id="1_6fje0"]
+[ext_resource type="PackedScene" uid="uid://c8w4bbilbrt33" path="res://scenes/LevelBackgrounds.tscn" id="2_h4cr3"]
 [ext_resource type="Script" uid="uid://0aj1e5d62pul" path="res://scripts/roomManager.gd" id="2_u2tjx"]
 [ext_resource type="PackedScene" uid="uid://cf5ecujohdhsn" path="res://scenes/levels/rooms/sortAndSearchRoom.tscn" id="3_6fje0"]
 [ext_resource type="PackedScene" uid="uid://41h4jd7ldtla" path="res://scenes/levels/rooms/linearRoom.tscn" id="3_jdauw"]
@@ -13,6 +14,8 @@
 script = ExtResource("1_6fje0")
 levelId = "2-1"
 totalRooms = 3
+
+[node name="LevelBackgrounds" parent="." unique_id=984418191 instance=ExtResource("2_h4cr3")]
 
 [node name="RoomManager" type="Node2D" parent="." unique_id=514760587]
 script = ExtResource("2_u2tjx")

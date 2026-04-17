@@ -38,28 +38,10 @@ var nextSpawnTime = 0.0
 func _ready():
 	trainTexture = load("res://graphics/trains.png")
 	
-	# Simple test - paint a few tiles manually first
-	testTilePainting()
-	
 	paintBackground()
 	
 	randomize()
 	nextSpawnTime = randf_range(SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_MAX)
-
-func testTilePainting():
-	print("=== Testing tile painting ===")
-	# Try painting a single grass tile
-	groundLayer.set_cell(Vector2i(0, 0), 0, Vector2i(0, 0))
-	print("Painted grass at (0,0)")
-	
-	# Try painting a track tile
-	trackLayer.set_cell(Vector2i(1, 0), 0, Vector2i(4, 0))
-	print("Painted track at (1,0)")
-	
-	# Try painting a sky tile
-	skyLayer.set_cell(Vector2i(2, 0), 0, Vector2i(5, 0))
-	print("Painted sky at (2,0)")
-	print("=== Test complete - check top-left corner ===")
 
 func paintBackground():
 	print("=== Starting paintBackground ===")

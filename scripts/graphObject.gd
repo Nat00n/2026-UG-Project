@@ -1,7 +1,7 @@
 class_name GraphObject
 extends InteractableObject
 
-@export var nodeCount: int = 20
+@export var nodeCount: int = 15
 @export var startNodeId: int = 0
 @export var goalNodeId: int = nodeCount-1
 
@@ -31,7 +31,7 @@ var waitDuration: float = 0.0
 
 const NODE_RADIUS = 22
 const GRAPH_WIDTH = 900
-const GRAPH_HEIGHT = 600
+const GRAPH_HEIGHT = 450
 const MAX_NEIGHBOURS = 4
 
 func _init_object():
@@ -58,38 +58,39 @@ func _buildDisplay():
 
 func _generateGraph():
 	graphNodes.clear()
-	var positions: Array = []
-	var attempts = 0
 
-	while positions.size() < nodeCount and attempts < 1000:
-		var pos = Vector2(
-			randf_range(NODE_RADIUS + 20, GRAPH_WIDTH - NODE_RADIUS - 20),
-			randf_range(NODE_RADIUS + 20, GRAPH_HEIGHT - NODE_RADIUS - 20)
-		)
-		var valid = true
-		for existing in positions:
-			if pos.distance_to(existing) < NODE_RADIUS * 3.5:
-				valid = false
-				break
-		if valid:
-			positions.append(pos)
-		attempts += 1
+	# Grid-based placement — divide canvas into cells, one node per cell with jitter
+	var cols = int(ceil(sqrt(nodeCount * float(GRAPH_WIDTH) / GRAPH_HEIGHT)))
+	var rows = int(ceil(float(nodeCount) / cols))
+	var cellW = float(GRAPH_WIDTH) / cols
+	var cellH = float(GRAPH_HEIGHT) / rows
+	var jitterX = cellW * 0.28
+	var jitterY = cellH * 0.28
+
+	var cells = []
+	for r in range(rows):
+		for c in range(cols):
+			cells.append(Vector2(c, r))
+	cells.shuffle()
+
+	var positions = []
+	for k in range(nodeCount):
+		var cell = cells[k]
+		var cx = (cell.x + 0.5) * cellW
+		var cy = (cell.y + 0.5) * cellH
+		positions.append(Vector2(
+			clamp(cx + randf_range(-jitterX, jitterX), NODE_RADIUS + 20, GRAPH_WIDTH - NODE_RADIUS - 20),
+			clamp(cy + randf_range(-jitterY, jitterY), NODE_RADIUS + 20, GRAPH_HEIGHT - NODE_RADIUS - 20)
+		))
 
 	nodeCount = positions.size()
-
 	for i in range(nodeCount):
-		graphNodes.append({
-			"id": i,
-			"pos": positions[i],
-			"neighbours": []
-		})
+		graphNodes.append({"id": i, "pos": positions[i], "neighbours": []})
 
-	# Spanning tree — always connect to nearest unconnected node
+	# Spanning tree
 	var connected = [0]
-	var unconnected = []
-	for i in range(1, nodeCount):
-		unconnected.append(i)
-
+	var unconnected = range(1, nodeCount)
+	unconnected = Array(unconnected)
 	while not unconnected.is_empty():
 		var bestFrom = -1
 		var bestTo = -1
@@ -105,22 +106,27 @@ func _generateGraph():
 		connected.append(bestTo)
 		unconnected.erase(bestTo)
 
-	# Extra nearby edges sorted by distance up to MAX_NEIGHBOURS
+	# Extra nearby edges up to MAX_NEIGHBOURS
 	var pairs = []
 	for i in range(nodeCount):
 		for j in range(i + 1, nodeCount):
 			if not _hasEdge(i, j):
-				var d = graphNodes[i]["pos"].distance_to(graphNodes[j]["pos"])
-				pairs.append({"i": i, "j": j, "dist": d})
-
+				pairs.append({"i": i, "j": j, "dist": graphNodes[i]["pos"].distance_to(graphNodes[j]["pos"])})
 	pairs.sort_custom(func(a, b): return a["dist"] < b["dist"])
-
 	for pair in pairs:
-		var i = pair["i"]
-		var j = pair["j"]
-		if graphNodes[i]["neighbours"].size() < MAX_NEIGHBOURS and \
-		   graphNodes[j]["neighbours"].size() < MAX_NEIGHBOURS:
-			_addEdge(i, j)
+		if graphNodes[pair["i"]]["neighbours"].size() < MAX_NEIGHBOURS and \
+		   graphNodes[pair["j"]]["neighbours"].size() < MAX_NEIGHBOURS:
+			_addEdge(pair["i"], pair["j"])
+
+	# Pick start and goal as the two nodes furthest apart
+	var maxDist = 0.0
+	for i in range(nodeCount):
+		for j in range(i + 1, nodeCount):
+			var d = graphNodes[i]["pos"].distance_to(graphNodes[j]["pos"])
+			if d > maxDist:
+				maxDist = d
+				startNodeId = i
+				goalNodeId = j
 
 func _addEdge(fromId: int, toId: int):
 	var weight = int(graphNodes[fromId]["pos"].distance_to(graphNodes[toId]["pos"]) / 10)
@@ -142,6 +148,13 @@ func _buildGraphDisplay():
 	weightLabels.clear()
 
 	nodeDisplay.size = Vector2(GRAPH_WIDTH, GRAPH_HEIGHT)
+
+	var bg = ColorRect.new()
+	bg.color = Color(0.3, 0.3, 0.3, 0.6)
+	bg.position = Vector2(0, 0)
+	bg.size = Vector2(GRAPH_WIDTH, GRAPH_HEIGHT)
+	nodeDisplay.add_child(bg)
+	bg.z_index = -1
 
 	for i in range(graphNodes.size()):
 		for neighbour in graphNodes[i]["neighbours"]:

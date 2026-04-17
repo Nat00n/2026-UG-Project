@@ -6,20 +6,8 @@
 [node name="BubbleRoom" type="Node2D" unique_id=470420785]
 script = ExtResource("1_3xrw2")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1634516390]
-offset_right = 1930.0
-offset_bottom = 1096.0
-color = Color(0.27387273, 0.27387273, 0.27387273, 1)
-
-[node name="Floor" type="ColorRect" parent="." unique_id=356980670]
-offset_left = 146.0
-offset_top = 152.0
-offset_right = 1605.0
-offset_bottom = 822.0
-color = Color(0.004679383, 0.13212621, 0.13827685, 1)
-
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_itjfx")]
-position = Vector2(762, 599)
+position = Vector2(870, 436)
 objectName = "Bob"
 objectID = "obj_1"
 taskDescription = "Sort the array in ascending order using bubble sort. The algorithm repeatedly steps through the list, compares adjacent elements, and swaps them if they're in the wrong order. Continue until no swaps are needed."

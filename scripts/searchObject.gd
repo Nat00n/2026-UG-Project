@@ -47,6 +47,9 @@ func resetDisplay():
 	arrayReceivedFromSort = false
 	expectedPosition = -1
 	foundPosition = -1  # Reset found position
+	for card in cardNodes:
+		if is_instance_valid(card):
+			card.modulate = Color.WHITE
 	if is_instance_valid(selectionBeam):
 		selectionBeam.visible = false
 	if initialDataNodes.is_empty():
@@ -105,6 +108,11 @@ func _process(delta):
 	elif isAnimating and checkQueue.is_empty():
 		isAnimating = false
 
+func _restoreTileStyle(card: PanelContainer):
+	var tileStyle = StyleBoxTexture.new()
+	tileStyle.texture = _getCardTileTexture()
+	card.add_theme_stylebox_override("panel", tileStyle)
+
 func _stepCheck():
 	if checkQueue.is_empty():
 		isAnimating = false
@@ -112,23 +120,28 @@ func _stepCheck():
 
 	var step = checkQueue.pop_front()
 
-	# Clear all card highlights first
+	# Clear all highlights — restore tile style instead of removing it
 	for i in range(cardNodes.size()):
 		cardNodes[i].get_child(0).remove_theme_color_override("font_color")
-		cardNodes[i].remove_theme_stylebox_override("panel")
+		cardNodes[i].modulate = Color.WHITE
+		_restoreTileStyle(cardNodes[i])
 
 	if step["type"] == "check":
 		var card = cardNodes[step["index"]]
 		card.get_child(0).add_theme_color_override("font_color", Color.CYAN)
-		card.add_theme_stylebox_override("panel", _makeStyleBox(Color(0.2, 0.6, 0.8, 0.4)))
+		card.modulate = Color(0.5, 1.0, 1.0)
 
 	elif step["type"] == "select":
 		var card = cardNodes[step["index"]]
 		card.get_child(0).add_theme_color_override("font_color", Color.YELLOW)
-		card.add_theme_stylebox_override("panel", _makeStyleBox(Color(0.8, 0.7, 0.0, 0.4)))
+		card.modulate = Color(1.0, 1.0, 0.5)
 
 		var cardCentre = card.global_position + Vector2(cardWidth / 2.0, 0)
-		var objectCentre = visual.global_position + visual.size / 2.0
+		var spriteSize = visual.texture.get_size() * visual.scale
+		var spritePos = visual.global_position
+		if visual.centered:
+			spritePos -= spriteSize / 2.0
+		var objectCentre = spritePos + spriteSize / 2.0
 		selectionBeam.clear_points()
 		selectionBeam.add_point(to_local(objectCentre))
 		selectionBeam.add_point(to_local(cardCentre))

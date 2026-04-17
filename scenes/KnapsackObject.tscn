@@ -1,20 +1,21 @@
 [gd_scene format=3 uid="uid://58f7f2b0anqu"]
 
 [ext_resource type="Script" uid="uid://djif218hudhc6" path="res://scripts/knapsackObject.gd" id="1_5n7wa"]
-[ext_resource type="Texture2D" uid="uid://d1nhqp8ou8nxr" path="res://graphics/RobotSprite.png" id="2_jkq1b"]
+[ext_resource type="Texture2D" uid="uid://dx18kkphjxrm6" path="res://graphics/CommTerminal.png" id="2_jkq1b"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c6f01"]
-size = Vector2(63.4875, 63.854996)
+size = Vector2(94.4875, 94.854996)
 
 [node name="KnapsackObject" type="Area2D" unique_id=1779530000]
 script = ExtResource("1_5n7wa")
 
 [node name="visual" type="Sprite2D" parent="." unique_id=1857981917]
+scale = Vector2(3, 3)
 texture = ExtResource("2_jkq1b")
 centered = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=577107706]
-position = Vector2(32.25625, 33.072502)
+position = Vector2(47.75625, 48.572502)
 shape = SubResource("RectangleShape2D_c6f01")
 
 [node name="hoverLabel" type="Label" parent="." unique_id=793281200]

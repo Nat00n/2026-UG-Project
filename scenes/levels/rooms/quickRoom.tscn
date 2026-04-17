@@ -6,20 +6,8 @@
 [node name="QuickRoom" type="Node2D" unique_id=470420785]
 script = ExtResource("1_l1p0q")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1634516390]
-offset_right = 1930.0
-offset_bottom = 1096.0
-color = Color(0.27387273, 0.27387273, 0.27387273, 1)
-
-[node name="Floor" type="ColorRect" parent="." unique_id=356980670]
-offset_left = 146.0
-offset_top = 152.0
-offset_right = 1605.0
-offset_bottom = 822.0
-color = Color(0.004679383, 0.13212621, 0.13827685, 1)
-
 [node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_1qfdc")]
-position = Vector2(689, 451)
+position = Vector2(833, 444)
 objectName = "Billy"
 objectID = "obj_4"
 taskDescription = "Sort the array in ascending order using quick sort. Select a pivot element, partition the array so elements smaller than the pivot come before it and larger elements come after it, then recursively sort the partitions."

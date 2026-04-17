@@ -1,33 +1,34 @@
 [gd_scene format=3 uid="uid://c4ga25vdopg7g"]
 
 [ext_resource type="Script" uid="uid://d0jum1e6fcxic" path="res://scripts/coinObject.gd" id="1_52ffu"]
-[ext_resource type="Texture2D" uid="uid://d1nhqp8ou8nxr" path="res://graphics/RobotSprite.png" id="2_hniw8"]
+[ext_resource type="Texture2D" uid="uid://dx18kkphjxrm6" path="res://graphics/CommTerminal.png" id="2_hniw8"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c6f01"]
-size = Vector2(66.4875, 64.854996)
+size = Vector2(94.4875, 94.854996)
 
 [node name="CoinObject" type="Area2D" unique_id=1779530000]
 script = ExtResource("1_52ffu")
 
 [node name="visual" type="Sprite2D" parent="." unique_id=552516262]
+scale = Vector2(3, 3)
 texture = ExtResource("2_hniw8")
 centered = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=577107706]
-position = Vector2(33.75625, 33.572502)
+position = Vector2(47.75625, 48.572502)
 shape = SubResource("RectangleShape2D_c6f01")
 
 [node name="hoverLabel" type="Label" parent="." unique_id=793281200]
-offset_left = -38.0
-offset_top = -29.0
-offset_right = 104.0
-offset_bottom = -6.0
+offset_left = -22.0
+offset_top = -32.0
+offset_right = 120.0
+offset_bottom = -9.0
 text = "[LMB] Open Editor"
 
 [node name="nodeDisplay" type="Control" parent="." unique_id=1863098277]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 83.0
-offset_top = -150.0
-offset_right = 123.00002
-offset_bottom = -110.0
+offset_left = 135.0
+offset_top = -187.0
+offset_right = 175.00003
+offset_bottom = -147.0

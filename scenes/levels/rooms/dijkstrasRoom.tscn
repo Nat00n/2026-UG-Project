@@ -6,20 +6,10 @@
 [node name="DijkstrasRoom" type="Node2D" unique_id=470420785]
 script = ExtResource("1_mox5v")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1634516390]
-offset_right = 1930.0
-offset_bottom = 1096.0
-color = Color(0.27387273, 0.27387273, 0.27387273, 1)
-
-[node name="Floor" type="ColorRect" parent="." unique_id=356980670]
-offset_left = 146.0
-offset_top = 152.0
-offset_right = 1605.0
-offset_bottom = 822.0
-color = Color(0.004679383, 0.13212621, 0.13827685, 1)
-
 [node name="GraphObject" parent="." unique_id=1779530000 instance=ExtResource("2_el3vb")]
-position = Vector2(287, 475)
+position = Vector2(349, 447)
+nodeCount = 15
+startNodeId = 0
 objectName = "Mark"
 objectID = "obj_11"
 taskDescription = "Find the shortest path from the start node to the goal node in a weighted graph using Dijkstra's algorithm. Explore nodes in order of their distance from the start, always processing the closest unvisited node next."

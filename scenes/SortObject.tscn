@@ -1,33 +1,34 @@
 [gd_scene format=3 uid="uid://vuvlclyj1tpw"]
 
 [ext_resource type="Script" uid="uid://e71xn68q4kv2" path="res://scripts/sortObject.gd" id="1_xq37s"]
-[ext_resource type="Texture2D" uid="uid://d1nhqp8ou8nxr" path="res://graphics/RobotSprite.png" id="2_sdpo2"]
+[ext_resource type="Texture2D" uid="uid://dx18kkphjxrm6" path="res://graphics/CommTerminal.png" id="2_sdpo2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c6f01"]
-size = Vector2(62.487503, 65.854996)
+size = Vector2(95.4875, 94.854996)
 
 [node name="SortObject" type="Area2D" unique_id=1779530000]
 script = ExtResource("1_xq37s")
 
 [node name="visual" type="Sprite2D" parent="." unique_id=742782993]
+scale = Vector2(3, 3)
 texture = ExtResource("2_sdpo2")
 centered = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=577107706]
-position = Vector2(31.756252, 34.0725)
+position = Vector2(48.25625, 48.572502)
 shape = SubResource("RectangleShape2D_c6f01")
 
 [node name="hoverLabel" type="Label" parent="." unique_id=793281200]
-offset_left = -39.0
+offset_left = -24.0
 offset_top = -28.0
-offset_right = 103.0
+offset_right = 118.0
 offset_bottom = -5.0
 text = "[LMB] Open Editor"
 
 [node name="nodeDisplay" type="Control" parent="." unique_id=1863098277]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 15.0
-offset_top = -157.0
-offset_right = 55.000023
-offset_bottom = -117.0
+offset_left = 30.0
+offset_top = -160.0
+offset_right = 70.00002
+offset_bottom = -120.0

@@ -49,12 +49,19 @@ func _buildDisplay():
 	var totalWidth = dataNodes.size() * (cardWidth + cardGap) - cardGap
 	var startX = -totalWidth / 2.0
 	
+	var tileTexture = _getCardTileTexture()
+	
 	for i in range(dataNodes.size()):
 		var node = dataNodes[i]
 		var scaledHeight = (1.0 + node["value"] / 10.0) * cardHeight
 		var card = PanelContainer.new()
 		card.size = Vector2(cardWidth, scaledHeight)
 		card.position = Vector2(startX + i * (cardWidth + cardGap), 2.0 * cardHeight - scaledHeight)
+		
+		var tileStyle = StyleBoxTexture.new()
+		tileStyle.texture = tileTexture
+		card.add_theme_stylebox_override("panel", tileStyle)
+		
 		
 		var label = Label.new()
 		label.text = "%s\n%d" % [node["name"], node["value"]]
@@ -67,6 +74,14 @@ func _buildDisplay():
 		cardNodes.append(card)
 	
 	nodeDisplay.size = Vector2(totalWidth, 2.0 * cardHeight)
+
+func _getCardTileTexture() -> AtlasTexture:
+	var tileSet = load("res://graphics/LevelGroundTileset.tres") as TileSet
+	var source = tileSet.get_source(0) as TileSetAtlasSource
+	var atlas = AtlasTexture.new()
+	atlas.atlas = source.texture
+	atlas.region = Rect2(source.get_tile_texture_region(Vector2i(9, 0)))
+	return atlas
 
 func getBaseGuide() -> String:
 	return ""

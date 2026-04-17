@@ -1,36 +1,37 @@
 [gd_scene format=3 uid="uid://cuastweaprt2q"]
 
 [ext_resource type="Script" uid="uid://0t8sj3lw1p7v" path="res://scripts/searchObject.gd" id="1_chixk"]
-[ext_resource type="Texture2D" uid="uid://d1nhqp8ou8nxr" path="res://graphics/RobotSprite.png" id="2_ne2a2"]
+[ext_resource type="Texture2D" uid="uid://dx18kkphjxrm6" path="res://graphics/CommTerminal.png" id="2_ne2a2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c6f01"]
-size = Vector2(64.4875, 70.854996)
+size = Vector2(94.4875, 93.854996)
 
 [node name="SearchObject" type="Area2D" unique_id=1779530000]
 script = ExtResource("1_chixk")
 
 [node name="visual" type="Sprite2D" parent="." unique_id=59089838]
+scale = Vector2(3, 3)
 texture = ExtResource("2_ne2a2")
 centered = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=577107706]
-position = Vector2(32.756252, 36.5725)
+position = Vector2(47.75625, 48.072502)
 shape = SubResource("RectangleShape2D_c6f01")
 
 [node name="hoverLabel" type="Label" parent="." unique_id=793281200]
-offset_left = -38.0
+offset_left = -24.0
 offset_top = -27.0
-offset_right = 104.0
+offset_right = 118.0
 offset_bottom = -4.0
 text = "[LMB] Open Editor"
 
 [node name="nodeDisplay" type="Control" parent="." unique_id=1863098277]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 17.0
-offset_top = -160.0
-offset_right = 57.000023
-offset_bottom = -120.0
+offset_left = 27.0
+offset_top = -158.0
+offset_right = 67.00002
+offset_bottom = -118.0
 
 [node name="selectionBeam" type="Line2D" parent="." unique_id=401556129]
 points = PackedVector2Array(0, 1)

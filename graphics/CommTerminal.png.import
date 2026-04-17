@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2aqk5gtk7vqg"
-path="res://.godot/imported/carriage_v18_car6.png-5c0312ff4a23c3846b624737fbb26d2b.ctex"
+uid="uid://dx18kkphjxrm6"
+path="res://.godot/imported/CommTerminal.png-9992f8dbeefaa80680ab4ab15bb3db1d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://graphics/carriages/carriage_v18_car6.png"
-dest_files=["res://.godot/imported/carriage_v18_car6.png-5c0312ff4a23c3846b624737fbb26d2b.ctex"]
+source_file="res://graphics/CommTerminal.png"
+dest_files=["res://.godot/imported/CommTerminal.png-9992f8dbeefaa80680ab4ab15bb3db1d.ctex"]
 
 [params]
 

@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://c8w4bbilbrt33"]
+
+[ext_resource type="Script" uid="uid://mwwooke035x1" path="res://scripts/LevelBackground.gd" id="1_1etfy"]
+[ext_resource type="TileSet" uid="uid://tq251mv1uxh3" path="res://graphics/LevelGroundTileset.tres" id="2_rk0xl"]
+
+[node name="LevelBackgrounds" type="CanvasLayer" unique_id=984418191]
+layer = -1
+script = ExtResource("1_1etfy")
+
+[node name="SkyParallax" type="Parallax2D" parent="." unique_id=666056671]
+
+[node name="SkySprite" type="Sprite2D" parent="SkyParallax" unique_id=1196461520]
+
+[node name="CloudParallax" type="Parallax2D" parent="." unique_id=1060833289]
+
+[node name="CloudSprite" type="Sprite2D" parent="CloudParallax" unique_id=1907406117]
+
+[node name="FoliageParallax" type="Parallax2D" parent="." unique_id=1149174937]
+
+[node name="FoliageSprite" type="Sprite2D" parent="FoliageParallax" unique_id=511716303]
+
+[node name="GroundScroller" type="Node2D" parent="." unique_id=1249817389]
+
+[node name="GroundBackdrop" type="Sprite2D" parent="GroundScroller" unique_id=2065930300]
+
+[node name="GroundTileMap" type="TileMapLayer" parent="GroundScroller" unique_id=2044332714]
+tile_set = ExtResource("2_rk0xl")
+
+[node name="RailroadSprite" type="Sprite2D" parent="GroundScroller" unique_id=377382755]
+
+[node name="TrainSegments" type="Node2D" parent="." unique_id=49197038]
+
+[node name="LeftCarriage" type="Sprite2D" parent="TrainSegments" unique_id=2064772897]
+
+[node name="CentreCarriage" type="Sprite2D" parent="TrainSegments" unique_id=1378628259]
+
+[node name="RightCarriage" type="Sprite2D" parent="TrainSegments" unique_id=2111386554]

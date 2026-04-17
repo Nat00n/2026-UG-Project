@@ -34,6 +34,13 @@ func _buildCoinDisplay():
 	var totalWidth = COIN_VALUES.size() * COL_WIDTH
 	nodeDisplay.size = Vector2(totalWidth, COL_HEIGHT + 80)
 
+	var bg = ColorRect.new()
+	bg.color = Color(0.5, 0.5, 0.5, 0.75)  # adjust alpha for transparency
+	bg.position = Vector2(0, -50)    # extend up to cover the target label
+	bg.size = Vector2(totalWidth, COL_HEIGHT + 130)
+	nodeDisplay.add_child(bg)
+	bg.z_index = -1
+
 	# Target amount label
 	var targetLabel = Label.new()
 	targetLabel.text = "Make: %s" % _formatCoin(targetAmount)

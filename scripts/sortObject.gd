@@ -246,8 +246,13 @@ func _sendToSearch():
 	if linkedSearchObject == null:
 		return
 
-	var targetPos = linkedSearchObject.visual.global_position + linkedSearchObject.visual.size / 2.0
-
+	var sprite = linkedSearchObject.visual
+	var spriteSize = sprite.texture.get_size() * sprite.scale
+	var spritePos = sprite.global_position
+	if sprite.centered:
+		spritePos -= spriteSize / 2.0
+	var targetPos = spritePos + spriteSize / 2.0
+	
 	var tween = createTrackedTween()
 	tween.set_parallel(true)
 

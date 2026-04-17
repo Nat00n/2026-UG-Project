@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bhxnfy7wb3rmp" path="res://scripts/levels.gd" id="1_8uc4v"]
 [ext_resource type="Script" uid="uid://0aj1e5d62pul" path="res://scripts/roomManager.gd" id="2_0j81r"]
+[ext_resource type="PackedScene" uid="uid://c8w4bbilbrt33" path="res://scenes/LevelBackgrounds.tscn" id="2_k7miw"]
 [ext_resource type="PackedScene" uid="uid://d2bth0sasf82p" path="res://scenes/levels/rooms/knapsackRoom.tscn" id="3_0j81r"]
 [ext_resource type="Script" uid="uid://bqcx8t8huv42y" path="res://scripts/roomProgressIndicator.gd" id="4_0j81r"]
 [ext_resource type="PackedScene" uid="uid://bm85j7tdoavkf" path="res://scenes/IDE.tscn" id="4_dfaro"]
@@ -11,6 +12,8 @@
 script = ExtResource("1_8uc4v")
 levelId = "4-1"
 totalRooms = 1
+
+[node name="LevelBackgrounds" parent="." unique_id=984418191 instance=ExtResource("2_k7miw")]
 
 [node name="RoomManager" type="Node2D" parent="." unique_id=514760587]
 script = ExtResource("2_0j81r")

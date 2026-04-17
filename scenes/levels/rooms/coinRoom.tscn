@@ -6,20 +6,8 @@
 [node name="CoinRoom" type="Node2D" unique_id=470420785]
 script = ExtResource("1_rbhh2")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1634516390]
-offset_right = 1930.0
-offset_bottom = 1096.0
-color = Color(0.27387273, 0.27387273, 0.27387273, 1)
-
-[node name="Floor" type="ColorRect" parent="." unique_id=356980670]
-offset_left = 146.0
-offset_top = 152.0
-offset_right = 1605.0
-offset_bottom = 822.0
-color = Color(0.004679383, 0.13212621, 0.13827685, 1)
-
 [node name="CoinObject" parent="." unique_id=1779530000 instance=ExtResource("2_gcsab")]
-position = Vector2(290, 288)
+position = Vector2(502, 421)
 objectName = "Charlie"
 objectID = "obj_13"
 taskDescription = "Find a combination of coins that makes the target amount using a greedy algorithm. Start with the largest coin denomination and use as many as possible, then move to the next smaller denomination, repeating until the target is reached."
