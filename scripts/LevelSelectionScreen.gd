@@ -21,6 +21,8 @@ func _ready():
 	# Hide info panel initially
 	levelInfo.visible = false
 	
+	AudioManager.playMusic("level_select")
+	
 	# CRITICAL: Refresh display on ready
 	refreshDisplay()
 

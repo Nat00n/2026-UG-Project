@@ -399,6 +399,7 @@ func onRun():
 	if _currentObject:
 		_currentObject.saveScript(inputCE.text)
 		Analytics.recordRun(_currentObject)
+		AudioManager.playSFX("code_run")
 		
 	_executeCode(inputCE.text, _currentObject, false)
 

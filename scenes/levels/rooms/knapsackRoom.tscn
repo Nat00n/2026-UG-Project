@@ -7,7 +7,7 @@
 script = ExtResource("1_kjjcc")
 
 [node name="KnapsackObject" parent="." unique_id=1779530000 instance=ExtResource("2_7fq0s")]
-position = Vector2(560, 387)
+position = Vector2(563, 318)
 capacity = 5
 objectName = "Karl"
 objectID = "obj_14"

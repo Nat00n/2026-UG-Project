@@ -288,6 +288,7 @@ func _stepVisit():
 	currentNodeId = nodeId
 	if nodeId != startNodeId and nodeId != goalNodeId:
 		_setNodeColor(nodeId, Color(0.95, 0.55, 0.1))
+		AudioManager.playSFX("jump")
 
 func _resetPathColors():
 	for i in range(nodeCircles.size()):
@@ -321,11 +322,13 @@ func verifyPath():
 	# Check path starts at start node
 	if pendingPath.is_empty() or pendingPath[0] != startNodeId:
 		print("[" + objectID + "] Path doesn't start at start node!")
+		AudioManager.playSFX("error")
 		return
 	
 	# Check path ends at goal node
 	if pendingPath[pendingPath.size() - 1] != goalNodeId:
 		print("[" + objectID + "] Path doesn't reach goal node!")
+		AudioManager.playSFX("error")
 		return
 	
 	# Check each edge in path exists
@@ -334,12 +337,14 @@ func verifyPath():
 		var toId = pendingPath[i + 1]
 		if not _hasEdge(fromId, toId):
 			print("[" + objectID + "] Invalid edge in path: " + str(fromId) + " -> " + str(toId))
+			AudioManager.playSFX("error")
 			return
 	
 	print("[" + objectID + "] Valid path found from " + str(startNodeId) + " to " + str(goalNodeId))
 	Global.submitScore()
 	roomTaskCompleted.emit(objectID)  # Complete room
 	Analytics.recordComplete(objectID)
+	AudioManager.playSFX("task_complete")
 
 # --- Python bridge ---
 

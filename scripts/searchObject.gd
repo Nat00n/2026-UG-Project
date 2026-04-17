@@ -193,11 +193,13 @@ func verifySearchResult():
 	if foundPosition == -1:
 		print("  x ERROR: commitSelect() was never called!")
 		print("  User's Python code must call: commitSelect(index)")
+		AudioManager.playSFX("error")
 		return
 	
 	# Verify correctness
 	if foundPosition < 0 or foundPosition >= dataNodes.size():
 		print("  x Found position out of bounds!")
+		AudioManager.playSFX("error")
 		return
 	
 	var valueAtFound = dataNodes[foundPosition]["value"]
@@ -205,12 +207,14 @@ func verifySearchResult():
 	
 	if valueAtFound != targetValue:
 		print("  x Incorrect! Found position ", foundPosition, " has value ", valueAtFound, ", not ", targetValue)
+		AudioManager.playSFX("error")
 		return
 	
 	print("  o CORRECT! Found ", targetValue, " at position ", foundPosition)
 	Global.submitScore()
 	roomTaskCompleted.emit(objectID)  # Complete room
 	Analytics.recordComplete(objectID)
+	AudioManager.playSFX("task_complete")
 
 func getPreambleFunctions() -> String:
 	return """

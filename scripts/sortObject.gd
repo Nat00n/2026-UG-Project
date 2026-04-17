@@ -149,6 +149,7 @@ func _isSorted() -> bool:
 func verifyAndComplete():
 	if not _isSorted():
 		print("[" + objectID + "] Array is NOT sorted correctly!")
+		AudioManager.playSFX("error")
 		return
 	
 	print("[" + objectID + "] Array sorted correctly!")
@@ -162,6 +163,7 @@ func verifyAndComplete():
 		Global.submitScore()
 		roomTaskCompleted.emit(objectID)
 	Analytics.recordComplete(objectID)
+	AudioManager.playSFX("task_complete")
 
 func _applyPivot(index: int):
 	if pivotIndex >= 0 and pivotIndex < cardNodes.size():
@@ -208,6 +210,8 @@ func _animateSwap(i: int, j: int):
 		await get_tree().create_timer(0.05).timeout
 		_playNextSwap()
 	)
+	
+	AudioManager.playSFX("swap")
 
 func _animateMove(fromIndex: int, toIndex: int):
 	var totalWidth = dataNodes.size() * (cardWidth + cardGap) - cardGap
@@ -241,6 +245,8 @@ func _animateMove(fromIndex: int, toIndex: int):
 		await get_tree().create_timer(0.05).timeout
 		_playNextSwap()
 	)
+	
+	AudioManager.playSFX("swap")
 
 func _sendToSearch():
 	if linkedSearchObject == null:
@@ -272,6 +278,7 @@ func _sendToSearch():
 	)
 	
 	hasSentToSearch = true
+	AudioManager.playSFX("swap")
 	
 func getBaseGuide() -> String:
 	return """[b]Available Data:[/b]

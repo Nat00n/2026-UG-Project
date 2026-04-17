@@ -47,6 +47,14 @@ func _buildDisplay():
 
 	nodeDisplay.size = Vector2(GRID_OFFSET_X + cols * CELL_W + 20, totalH)
 
+	var bg = ColorRect.new()
+	bg.color = Color(0.3, 0.3, 0.3, 0.6)
+	bg.position = Vector2(0, 0)
+	bg.size = nodeDisplay.size
+	nodeDisplay.add_child(bg)
+	bg.z_index = -1
+
+
 	_buildItemShapes()
 	_buildGrid(rows, cols)
 	_buildKnapsackBar()
@@ -239,6 +247,7 @@ func _playNextFill():
 	elif step["type"] == "taken":
 		cell.add_theme_stylebox_override("panel", _makeRoundedStyle(
 			Color(0.2, 0.7, 0.3), Color(0.4, 0.9, 0.5), 6, 3))
+		AudioManager.playSFX("swap")
 		var idx = step["row"]
 		if idx >= 0 and idx < itemShapes.size() and idx in slotOffsetMap:
 			var item = items[idx]
@@ -329,6 +338,7 @@ func commitKnapsack(selectedIndices: Array):
 	# Validation checks
 	if selectedIndices.is_empty():
 		print("[Knapsack] Rejected: no items selected")
+		AudioManager.playSFX("error")
 		return
 	
 	var totalWeight = 0
@@ -338,6 +348,7 @@ func commitKnapsack(selectedIndices: Array):
 	
 	if totalWeight > capacity:
 		print("[Knapsack] Rejected: total weight %d exceeds capacity %d" % [totalWeight, capacity])
+		AudioManager.playSFX("error")
 		return
 	
 	print("[Knapsack] Valid solution: %d items, weight %d/%d" % [selectedIndices.size(), totalWeight, capacity])
@@ -352,6 +363,7 @@ func commitKnapsack(selectedIndices: Array):
 	# Emit completion signal
 	roomTaskCompleted.emit(objectID)
 	Analytics.recordComplete(objectID)
+	AudioManager.playSFX("task_complete")
 
 func getPreambleFunctions() -> String:
 	var itemsStr = "["

@@ -21,6 +21,7 @@ SilentWolf="*uid://db5764g3lpopi"
 Global="*uid://jyt0bn3u4rlt"
 LevelProgressionManager="*uid://btlo0gv8tbypo"
 Analytics="*uid://beyw5dqk5styp"
+AudioManager="*uid://c7tfptlvey00i"
 
 [display]
 

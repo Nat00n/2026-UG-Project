@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bx5lcyri16ikt"
+path="res://.godot/imported/8bit Bossa.mp3-be1ea5370b7e60bdffadc668f5e064b2.mp3str"
+
+[deps]
+
+source_file="res://audio/music/8bit Bossa.mp3"
+dest_files=["res://.godot/imported/8bit Bossa.mp3-be1ea5370b7e60bdffadc668f5e064b2.mp3str"]
+
+[params]
+
+loop=true
+loop_offset=0.0
+bpm=0.0
+beat_count=0
+bar_beats=4

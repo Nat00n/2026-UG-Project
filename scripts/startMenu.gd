@@ -10,6 +10,7 @@ func _ready():
 	playButton.pressed.connect(onPlay)
 	usernameInput.grab_focus()
 	await get_tree().process_frame
+	AudioManager.playMusic("menu")
 	Global.populateLeaderboard(leaderboardBox)
 
 func _exit_tree():

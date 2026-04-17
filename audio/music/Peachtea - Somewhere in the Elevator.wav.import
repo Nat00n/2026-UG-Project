@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://b1t0bblf1y0vi"
+path="res://.godot/imported/Peachtea - Somewhere in the Elevator.wav-469db88e8bd1749ef8992f5a9e1564f8.sample"
+
+[deps]
+
+source_file="res://audio/music/Peachtea - Somewhere in the Elevator.wav"
+dest_files=["res://.godot/imported/Peachtea - Somewhere in the Elevator.wav-469db88e8bd1749ef8992f5a9e1564f8.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

@@ -19,6 +19,8 @@ func _ready():
 	pauseButton.pressed.connect(onPause)
 	roomManager.init(IDE)
 	
+	AudioManager.playMusic(levelId)
+	
 	# Setup return button
 	setupReturnButton()
 	
@@ -145,6 +147,7 @@ func markRoomComplete(roomIndex: int):
 	# Show message
 	if level.isFullyComplete():
 		print("  ! ALL ROOMS COMPLETE!")
+		AudioManager.playSFX("task_complete")
 	elif level.completedRooms.size() == 1:
 		print("  o First room complete - next level unlocked!")
 		print("  o Return button now available!")
