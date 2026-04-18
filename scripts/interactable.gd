@@ -28,10 +28,11 @@ const cardHeight = 60
 const cardGap = 15
 
 func _ready():
-	
+	print("READY: ", objectName, " | ", objectID)
 	hoverLabel.visible = false
 	add_to_group("interactable_objects")  # UPDATED: Changed to "interactable_objects"
 	_loadScript()
+	await get_tree().process_frame
 	_init_object()
 
 # Override in child classes for custom setup
@@ -100,6 +101,8 @@ func resetDisplay():
 	_buildDisplay()
 
 func _process(_delta):
+	if not is_visible_in_tree():
+		return
 	var mouse = get_global_mouse_position()
 	
 	# Calculate Sprite2D bounds
@@ -119,6 +122,8 @@ func _process(_delta):
 		hoverLabel.visible = _hovered
 
 func _input(event):
+	if not is_visible_in_tree():
+		return
 	if _hovered and event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			if _popup:

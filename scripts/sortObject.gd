@@ -6,7 +6,6 @@ var isAnimating: bool = false
 var pivotIndex: int = -1
 var hasSentToSearch: bool = false
 
-# NEW: Search object linking
 var linkedSearchObject: SearchObject = null
 
 func _ready():
