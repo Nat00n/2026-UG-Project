@@ -10,10 +10,22 @@
 [ext_resource type="Script" uid="uid://bqcx8t8huv42y" path="res://scripts/roomProgressIndicator.gd" id="4_u2tjx"]
 [ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="5_h4cr3"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h4cr3"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.39215687, 0.39215687, 0.39215687, 0.8627451)
+
 [node name="Level2-1" type="Node2D" unique_id=655865353]
 script = ExtResource("1_6fje0")
 levelId = "2-1"
 totalRooms = 3
+introContext = "[b]Welcome to the Luggage Car![/b]
+
+A passenger needs their bag retrieved before the next stop and the train isn't slowing down for anyone. Luckily, we already know which rack group the luggage is in, so there's no need to search the entire car.
+
+Write a search algorithm to locate the correct item within the group as efficiently as possible. The next station is closer than you think!"
 
 [node name="LevelBackgrounds" parent="." unique_id=984418191 instance=ExtResource("2_h4cr3")]
 
@@ -78,6 +90,36 @@ offset_right = 960.0
 offset_bottom = 40.0
 grow_horizontal = 2
 script = ExtResource("4_u2tjx")
+
+[node name="IntroContainer" type="VBoxContainer" parent="RoomUI" unique_id=894936503]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 410.0
+offset_top = 190.0
+offset_right = 1510.0
+offset_bottom = 790.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="IntroLabel" type="RichTextLabel" parent="RoomUI/IntroContainer" unique_id=2084382544]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/mono_font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_h4cr3")
+bbcode_enabled = true
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="RoomUI/IntroContainer" unique_id=1125044730]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Start"
 
 [node name="IDE" parent="." unique_id=1106617920 instance=ExtResource("4_jdauw")]
 

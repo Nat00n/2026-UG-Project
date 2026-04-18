@@ -8,10 +8,22 @@
 [ext_resource type="PackedScene" uid="uid://bm85j7tdoavkf" path="res://scenes/IDE.tscn" id="4_dfaro"]
 [ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="5_3dgw1"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k7miw"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.39215687, 0.39215687, 0.39215687, 0.8627451)
+
 [node name="Level4-1" type="Node2D" unique_id=655865353]
 script = ExtResource("1_8uc4v")
 levelId = "4-1"
 totalRooms = 1
+introContext = "[b]Welcome to the Supply Car![/b]
+
+The train has a secure storage compartment reserved for the most valuable cargo but it has a [i]strict weight limit[/i]. Each item on board has a weight and a value, and only the best combination of items should be loaded in.
+
+Write a knapsack algorithm to determine which items to store in the compartment to [i]maximise value[/i] without exceeding the weight limit."
 
 [node name="LevelBackgrounds" parent="." unique_id=984418191 instance=ExtResource("2_k7miw")]
 
@@ -72,6 +84,36 @@ offset_right = 960.0
 offset_bottom = 40.0
 grow_horizontal = 2
 script = ExtResource("4_0j81r")
+
+[node name="IntroContainer" type="VBoxContainer" parent="RoomUI" unique_id=1575972843]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 410.0
+offset_top = 190.0
+offset_right = 1510.0
+offset_bottom = 790.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="IntroLabel" type="RichTextLabel" parent="RoomUI/IntroContainer" unique_id=744264026]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/mono_font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_k7miw")
+bbcode_enabled = true
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="RoomUI/IntroContainer" unique_id=152907161]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Start"
 
 [node name="IDE" parent="." unique_id=1106617920 instance=ExtResource("4_dfaro")]
 

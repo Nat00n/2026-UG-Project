@@ -8,10 +8,22 @@
 [ext_resource type="Script" uid="uid://bqcx8t8huv42y" path="res://scripts/roomProgressIndicator.gd" id="4_ucg12"]
 [ext_resource type="PackedScene" uid="uid://ccdaydmt62m6x" path="res://scenes/PauseMenu.tscn" id="5_gqu0c"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pumn1"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.39215687, 0.39215687, 0.39215687, 0.8627451)
+
 [node name="Level4-2" type="Node2D" unique_id=655865353]
 script = ExtResource("1_2jrij")
 levelId = "4-2"
 totalRooms = 1
+introContext = "[b]Welcome to the Buffet Car![/b]
+
+Passengers are lining up to pay for their food and drinks, and the till needs to give back [i]exact change[/i] using the fewest coins possible. Running out of change at 60mph is not an option.
+
+Write a dynamic programming algorithm to calculate the right combination of coins for each transaction."
 
 [node name="LevelBackgrounds" parent="." unique_id=984418191 instance=ExtResource("2_pumn1")]
 
@@ -72,6 +84,36 @@ offset_right = 960.0
 offset_bottom = 40.0
 grow_horizontal = 2
 script = ExtResource("4_ucg12")
+
+[node name="IntroContainer" type="VBoxContainer" parent="RoomUI" unique_id=496493109]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 410.0
+offset_top = 190.0
+offset_right = 1510.0
+offset_bottom = 790.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="IntroLabel" type="RichTextLabel" parent="RoomUI/IntroContainer" unique_id=312366614]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/mono_font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_pumn1")
+bbcode_enabled = true
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="RoomUI/IntroContainer" unique_id=1800359290]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Start"
 
 [node name="IDE" parent="." unique_id=1106617920 instance=ExtResource("4_7la6k")]
 

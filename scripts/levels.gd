@@ -6,9 +6,13 @@ extends Node2D
 @onready var IDE: CanvasLayer = $IDE
 @onready var roomProgressIndicator: RoomProgressIndicator = $RoomUI/RoomProgressIndicator
 @onready var returnButton: Button = $RoomUI/ReturnButton
+@onready var introLabel: RichTextLabel = $RoomUI/IntroContainer/IntroLabel
+@onready var startButton: Button = $RoomUI/IntroContainer/StartButton
+@onready var introContainer: VBoxContainer = $RoomUI/IntroContainer
 
 @export var levelId: String = "1-1"
 @export var totalRooms: int = 4
+@export_multiline var introContext: String = ""
 
 var progressionManager
 var currentRoomIndex: int = 0
@@ -18,6 +22,8 @@ func _ready():
 	progressionManager = get_node("/root/LevelProgressionManager")
 	pauseButton.pressed.connect(onPause)
 	roomManager.init(IDE)
+	introLabel.text = introContext
+	startButton.pressed.connect(onStartPressed)
 	
 	AudioManager.playMusic(levelId)
 	
@@ -43,6 +49,9 @@ func _ready():
 	
 	# Connect all object completion signals AND map objects to rooms
 	connectObjectSignals()
+
+func onStartPressed():
+	introContainer.visible = false
 
 func setupReturnButton():
 	# Configure the return button

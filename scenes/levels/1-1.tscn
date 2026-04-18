@@ -11,8 +11,20 @@
 [ext_resource type="PackedScene" uid="uid://b7pfcomn7yk0l" path="res://scenes/levels/rooms/quickRoom.tscn" id="6_x64fy"]
 [ext_resource type="Script" uid="uid://bqcx8t8huv42y" path="res://scripts/roomProgressIndicator.gd" id="7_x64fy"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s4w6w"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.39215687, 0.39215687, 0.39215687, 0.8627451)
+
 [node name="Level1-1" type="Node2D" unique_id=655865353]
 script = ExtResource("1_j4fu8")
+introContext = "[b]Welcome to the Storage Car![/b]
+
+The train's cargo hold is a mess ! Crates of all sizes have been loaded in no particular order, and the conductor needs them arranged [i]smallest to largest[/i] before the next stop.
+
+Your job is to write a sorting algorithm to get everything in order. The freight won't sort itself!"
 
 [node name="LevelBackgrounds" parent="." unique_id=984418191 instance=ExtResource("2_s4w6w")]
 
@@ -79,6 +91,36 @@ offset_right = 960.0
 offset_bottom = 40.0
 grow_horizontal = 2
 script = ExtResource("7_x64fy")
+
+[node name="IntroContainer" type="VBoxContainer" parent="RoomUI" unique_id=109143590]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 410.0
+offset_top = 190.0
+offset_right = 1510.0
+offset_bottom = 790.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="IntroLabel" type="RichTextLabel" parent="RoomUI/IntroContainer" unique_id=1539481117]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/mono_font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_s4w6w")
+bbcode_enabled = true
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="RoomUI/IntroContainer" unique_id=154638141]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Start"
 
 [node name="IDE" parent="." unique_id=1106617920 instance=ExtResource("3_by813")]
 
