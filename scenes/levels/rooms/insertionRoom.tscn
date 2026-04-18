@@ -6,8 +6,8 @@
 [node name="InsertionRoom" type="Node2D" unique_id=470420785]
 script = ExtResource("1_x48rf")
 
-[node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_md4o6")]
-position = Vector2(855, 436)
+[node name="InsertionSortObject" parent="." unique_id=1779530000 instance=ExtResource("2_md4o6")]
+position = Vector2(829, 431)
 objectName = "Chuck"
 objectID = "obj_3"
 taskDescription = "Sort the array in ascending order using insertion sort. Build the sorted array one element at a time by repeatedly taking the next unsorted element and inserting it into its correct position among the previously sorted elements."

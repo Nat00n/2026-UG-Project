@@ -146,16 +146,19 @@ func selectNode(index: int):
 
 func _loadScript():
 	var result = JavaScriptBridge.eval("""
-		localStorage.getItem('script_%s') || ''
-	""" % objectID)
+        localStorage.getItem('%s') || ''
+	""" % _getStorageKey())
 	if result != null:
 		savedScript = str(result)
 
 func saveScript(code: String):
 	savedScript = code
 	JavaScriptBridge.eval("""
-		localStorage.setItem('script_%s', %s);
-	""" % [objectID, JSON.stringify(code)])
+        localStorage.setItem('%s', %s);
+	""" % [_getStorageKey(), JSON.stringify(code)])
+
+func _getStorageKey() -> String:
+	return "script_%s_%s" % [get_parent().name, objectID]
 
 func runSavedScript():
 	if savedScript.strip_edges() == "":

@@ -6,8 +6,8 @@
 [node name="MergeRoom" type="Node2D" unique_id=470420785]
 script = ExtResource("1_sola5")
 
-[node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_oy47q")]
-position = Vector2(840, 450)
+[node name="MergeSortObject" parent="." unique_id=1779530000 instance=ExtResource("2_oy47q")]
+position = Vector2(845, 452)
 objectName = "Em"
 objectID = "obj_2"
 taskDescription = "Sort the array in ascending order using merge sort. Divide the array into smaller subarrays until each contains one element, then repeatedly merge subarrays to produce new sorted subarrays until there's only one sorted array remaining."

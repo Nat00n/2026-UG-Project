@@ -6,8 +6,8 @@
 [node name="BubbleRoom" type="Node2D" unique_id=470420785]
 script = ExtResource("1_3xrw2")
 
-[node name="SortObject" parent="." unique_id=1779530000 instance=ExtResource("2_itjfx")]
-position = Vector2(870, 436)
+[node name="BubbleSortObject" parent="." unique_id=1779530000 instance=ExtResource("2_itjfx")]
+position = Vector2(841, 411)
 objectName = "Bob"
 objectID = "obj_1"
 taskDescription = "Sort the array in ascending order using bubble sort. The algorithm repeatedly steps through the list, compares adjacent elements, and swaps them if they're in the wrong order. Continue until no swaps are needed."
