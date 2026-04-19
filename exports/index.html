@@ -221,18 +221,60 @@ const engine = new Engine(GODOT_CONFIG);
 		</script>
 
 		<script type="text/javascript">
-		let pyodide;
+		let worker;
+		let workerReady = false;
 
-		async function initPyodide() {
-			pyodide = await loadPyodide();
+		// Create worker inline (no separate file needed!)
+		function initPyodide() {
+			const workerCode = `
+				let pyodide;
 
-			pyodide.globals.set("talk", (msg) => {
-				if (window.godotTalk) {
-					window.godotTalk(String(msg));
+				self.onmessage = async function(e) {
+					if (e.data.type === 'init') {
+						importScripts('https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js');
+						pyodide = await loadPyodide();
+						
+						pyodide.globals.set("talk", (msg) => {
+							self.postMessage({ type: 'talk', message: String(msg) });
+						});
+						
+						self.postMessage({ type: 'ready' });
+					}
+					else if (e.data.type === 'run') {
+						try {
+							await pyodide.runPythonAsync(e.data.code);
+							self.postMessage({ type: 'done' });
+						} catch (error) {
+							self.postMessage({ type: 'error', message: error.message });
+						}
+					}
+				};
+			`;
+			
+			const blob = new Blob([workerCode], { type: 'application/javascript' });
+			worker = new Worker(URL.createObjectURL(blob));
+			
+			worker.onmessage = function(e) {
+				if (e.data.type === 'ready') {
+					workerReady = true;
+					console.log("Pyodide ready");
 				}
-			});
-
-			console.log("Pyodide ready");
+				else if (e.data.type === 'talk') {
+					if (window.godotTalk) {
+						window.godotTalk(e.data.message);
+					}
+				}
+				else if (e.data.type === 'done') {
+					// Code finished successfully
+				}
+				else if (e.data.type === 'error') {
+					if (window.godotTalk) {
+						window.godotTalk("Error: " + e.data.message);
+					}
+				}
+			};
+			
+			worker.postMessage({ type: 'init' });
 		}
 
 		initPyodide();
@@ -242,8 +284,35 @@ const engine = new Engine(GODOT_CONFIG);
 			if (!code) {
 				throw new Error("No code to run");
 			}
-			return await pyodide.runPythonAsync(code);
+			
+			if (!workerReady) {
+				throw new Error("Pyodide not ready yet");
+			}
+			
+			// Kill and restart worker if code takes >5 seconds
+			const timeout = setTimeout(() => {
+				worker.terminate();
+				if (window.godotTalk) {
+					window.godotTalk("⚠️ Code timeout - infinite loop detected and stopped!\n");
+				}
+				// Restart worker
+				initPyodide();
+			}, 5000);
+			
+			const originalHandler = worker.onmessage;
+			worker.onmessage = function(e) {
+				if (e.data.type === 'done' || e.data.type === 'error') {
+					clearTimeout(timeout);
+				}
+				
+				// Call original handler
+				originalHandler(e);
+			};
+			
+			worker.postMessage({ type: 'run', code: code });
 		}
+
+
 
 		let llmEngine = null;
 
