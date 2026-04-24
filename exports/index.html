@@ -279,6 +279,14 @@ const engine = new Engine(GODOT_CONFIG);
 
 		initPyodide();
 
+		function normaliseCode(code) {
+			return code
+				.split('\n')
+				.map(line => line.replace(/\t/g, '    ').trimEnd())
+				.join('\n')
+				.trimEnd();
+		}
+
 		async function runPythonFromGodot() {
 			const code = window._pendingCode;
 			if (!code) {
@@ -289,11 +297,13 @@ const engine = new Engine(GODOT_CONFIG);
 				throw new Error("Pyodide not ready yet");
 			}
 			
+			const cleanCode = normaliseCode(code);
+
 			// Kill and restart worker if code takes >5 seconds
 			const timeout = setTimeout(() => {
 				worker.terminate();
 				if (window.godotTalk) {
-					window.godotTalk("⚠️ Code timeout - infinite loop detected and stopped!\n");
+					window.godotTalk("code timeout - infinite loop detected and stopped\n");
 				}
 				// Restart worker
 				initPyodide();
@@ -309,7 +319,7 @@ const engine = new Engine(GODOT_CONFIG);
 				originalHandler(e);
 			};
 			
-			worker.postMessage({ type: 'run', code: code });
+			worker.postMessage({ type: 'run', code: cleanCode });
 		}
 
 

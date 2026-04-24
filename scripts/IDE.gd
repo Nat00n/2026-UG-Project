@@ -35,6 +35,7 @@ func _ready():
 	editorTabButton.pressed.connect(_showEditorTab)
 	guideTabButton.pressed.connect(_showGuideTab)
 	showExampleButton.pressed.connect(_onShowExamplePressed)
+	inputCE.text_changed.connect(_onCodeChanged)
 
 	_setupSyntaxHighlighting()
 	_setupExampleButton()
@@ -174,27 +175,27 @@ func _setupSyntaxHighlighting():
 		"finally", "for", "from", "global", "if", "import", "in", "is",
 		"lambda", "not", "or", "pass", "raise", "return", "try", "while", "with", "yield"]
 	for kw in keywords:
-		highlighter.add_keyword_color(kw, Color.html("#569CD6"))
+		highlighter.add_keyword_color(kw, Color.html("#FF79C6"))
 
 	# Built-ins
 	var builtins = ["print", "len", "range", "int", "str", "float", "list",
 		"dict", "set", "tuple", "type", "enumerate", "zip", "map",
 		"filter", "sorted", "reversed", "min", "max", "sum", "abs"]
 	for b in builtins:
-		highlighter.add_keyword_color(b, Color.html("#DCDCAA"))
+		highlighter.add_keyword_color(b, Color.html("#8BE9FD"))
 
 	# Colors
-	highlighter.number_color = Color.html("#B5CEA8")
-	highlighter.symbol_color = Color.html("#D4D4D4")
-	highlighter.function_color = Color.html("#DCDCAA")
-	highlighter.member_variable_color = Color.html("#9CDCFE")
+	highlighter.number_color = Color.html("#BD93F9")
+	highlighter.symbol_color = Color.html("#F8F8F2")
+	highlighter.function_color = Color.html("#50FA7B")
+	highlighter.member_variable_color = Color.html("#F8F8F2")
 
 	# Strings
-	highlighter.add_color_region('"', '"', Color.html("#CE9178"))
-	highlighter.add_color_region("'", "'", Color.html("#CE9178"))
+	highlighter.add_color_region('"', '"', Color.html("#F1FA8C"))
+	highlighter.add_color_region("'", "'", Color.html("#F1FA8C"))
 
 	# Comments
-	highlighter.add_color_region("#", "", Color.html("#6A9955"), true)
+	highlighter.add_color_region("#", "", Color.html("#6272A4"), true)
 
 	inputCE.syntax_highlighter = highlighter
 
@@ -402,6 +403,10 @@ func onRun():
 		AudioManager.playSFX("code_run")
 		
 	_executeCode(inputCE.text, _currentObject, false)
+
+func _onCodeChanged():
+	if _currentObject:
+		_currentObject.saveScript(inputCE.text)
 
 # Called by interactable for silent background run
 func runScript(code: String, interactable):

@@ -3,10 +3,6 @@
 [ext_resource type="Script" uid="uid://drou7y54sj3e4" path="res://scripts/IDE.gd" id="1_q0psu"]
 
 [sub_resource type="CodeHighlighter" id="CodeHighlighter_dnq1y"]
-number_color = Color(0.70980394, 0.80784315, 0.65882355, 1)
-symbol_color = Color(0.83137256, 0.83137256, 0.83137256, 1)
-function_color = Color(0.8627451, 0.8627451, 0.6666667, 1)
-member_variable_color = Color(0.6117647, 0.8627451, 0.99607843, 1)
 
 [node name="CanvasLayer" type="CanvasLayer" unique_id=1106617920]
 offset = Vector2(115, 60)
