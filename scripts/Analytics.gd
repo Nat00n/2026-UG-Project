@@ -67,5 +67,3 @@ func sendEvent(eventType: String, objectId: String):
 			console.error('Analytics error:', err);
 		});
 	""" % ENDPOINT)
-	
-	print("sending event to anayltics sheet")

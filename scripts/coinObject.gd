@@ -180,18 +180,15 @@ func verifyCoinChange(coinList: Array):
 		sum += coin
 	
 	if sum != targetAmount:
-		print("[" + objectID + "] Incorrect sum! Got: " + str(sum) + ", Target: " + str(targetAmount))
 		AudioManager.playSFX("error")
 		return
 	
 	# Check all coins are valid denominations
 	for coin in coinList:
 		if not COIN_VALUES.has(coin):
-			print("[" + objectID + "] Invalid coin: " + str(coin))
 			AudioManager.playSFX("error")
 			return
 	
-	print("[" + objectID + "] Correct coin change! Sum: " + str(sum))
 	Global.submitScore()
 	roomTaskCompleted.emit(objectID)  # Complete room
 	Analytics.recordComplete(objectID)

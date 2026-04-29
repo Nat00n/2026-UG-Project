@@ -98,10 +98,6 @@ var biomeConfig = {
 	}
 }
 
-# ─────────────────────────────────────────────
-#  READY
-# ─────────────────────────────────────────────
-
 func _ready():
 	
 
@@ -112,19 +108,13 @@ func _ready():
 	var parentLevel = get_parent()
 	if parentLevel and parentLevel.get("levelId") != null:
 		levelId = parentLevel.levelId
-		print("[LevelBackground] Setting up for level: ", levelId)
 	else:
-		push_error("[LevelBackground] Could not find levelId from parent!")
 		levelId = "1-1"
 
 	loadBiome()
 	setupGroundTiles()
 	setupRailroad()
 	setupTrainCarriages()
-
-# ─────────────────────────────────────────────
-#  PANEL HELPER
-# ─────────────────────────────────────────────
 
 # Creates a second Sprite2D panel as a sibling of the template node, copies
 # its texture and layout, and positions both panels side-by-side so they fill
@@ -229,12 +219,6 @@ func setupGroundTiles():
 	# GroundBackdrop is drawn after GroundTileMap in the scene tree so it
 	# renders on top — raise the tilemap above it.
 	groundTileMap.z_index = 1
-
-	print("[LevelBackground] Painted ", tilesWide, "x", tilesHigh, " tiles from row ", startRow)
-
-# ─────────────────────────────────────────────
-#  RAILROAD
-# ─────────────────────────────────────────────
 
 func setupRailroad():
 	railroadSprite.texture = load("res://graphics/railtrack_v1.png")

@@ -44,49 +44,34 @@ func _ready():
 	nextSpawnTime = randf_range(SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_MAX)
 
 func paintBackground():
-	print("=== Starting paintBackground ===")
-	print("skyLayer: ", skyLayer)
-	print("groundLayer: ", groundLayer)
-	print("trackLayer: ", trackLayer)
 	
 	# Calculate layer positions relative to track
 	var grassRowAboveTrack = TRACK_ROW - 1
 	var transitionRow = TRACK_ROW - 2
 	
-	print("Transition row: ", transitionRow)
-	print("Grass row above track: ", grassRowAboveTrack)
-	print("Track row: ", TRACK_ROW)
-	
 	# Paint sky (from top to transition row)
-	print("Painting sky...")
 	for x in range(SCREEN_WIDTH_TILES):
 		for y in range(transitionRow):
 			var tileId = SKY_TILES[randi() % SKY_TILES.size()]
 			skyLayer.set_cell(Vector2i(x, y), 0, Vector2i(tileId, 0))
 	
 	# Paint transition row (grass with foliage, above the grass row)
-	print("Painting transition row...")
 	for x in range(SCREEN_WIDTH_TILES):
 		var tileId = TRANSITION_TILES[randi() % TRANSITION_TILES.size()]
 		groundLayer.set_cell(Vector2i(x, transitionRow), 0, Vector2i(tileId, 1))
 	
 	# Paint grass row (plain grass, directly above track)
-	print("Painting grass row above track...")
 	for x in range(SCREEN_WIDTH_TILES):
 		groundLayer.set_cell(Vector2i(x, grassRowAboveTrack), 0, Vector2i(TILE_GRASS, 0))
 	
 	# Paint track row
-	print("Painting track...")
 	for x in range(SCREEN_WIDTH_TILES):
 		trackLayer.set_cell(Vector2i(x, TRACK_ROW), 0, Vector2i(TILE_TRACK, 0))
 	
 	# Paint ground below track (everything beneath = plain grass)
-	print("Painting ground below track...")
 	for x in range(SCREEN_WIDTH_TILES):
 		for y in range(TRACK_ROW, SCREEN_HEIGHT_TILES):
 			groundLayer.set_cell(Vector2i(x, y), 0, Vector2i(TILE_GRASS, 0))
-	
-	print("=== Finished paintBackground ===")
 
 func _process(delta):
 	spawnTimer += delta

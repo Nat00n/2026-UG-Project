@@ -78,8 +78,6 @@ func receiveArray(sortedNodes: Array):
 			break
 	
 	_buildDisplay()
-	
-	print("[" + objectID + "] Received sorted array. Target: " + str(targetValue) + " at position: " + str(expectedPosition))
 
 func _process(delta):
 	# Mouse hover handled by base class
@@ -161,11 +159,9 @@ func queueCheck(index: int):
 	isAnimating = true
 
 func queueSelect(index: int):
-	# CRITICAL: Save position NOW, not after animation
 	foundPosition = index
 	checkQueue.append({"type": "select", "index": index})
 	isAnimating = true
-	print("[", objectID, "] queueSelect: saved foundPosition = ", foundPosition)
 
 # Verify position is correct
 func commitSearch():
@@ -175,8 +171,6 @@ func commitSearch():
 	verifySearchResult()
 
 func verifySearchResult():
-	print("\n[", objectID, "] === VERIFYING SEARCH RESULT ===")
-	print("  Found position: ", foundPosition)
 	
 	# If we're in standalone mode (no sort object), we need to find expected position
 	if not arrayReceivedFromSort:
@@ -186,31 +180,22 @@ func verifySearchResult():
 				expectedPosition = i
 				break
 	
-	print("  Expected position: ", expectedPosition)
-	print("  Target value: ", targetValue)
-	
 	# Check if commitSelect was called
 	if foundPosition == -1:
-		print("  x ERROR: commitSelect() was never called!")
-		print("  User's Python code must call: commitSelect(index)")
 		AudioManager.playSFX("error")
 		return
 	
 	# Verify correctness
 	if foundPosition < 0 or foundPosition >= dataNodes.size():
-		print("  x Found position out of bounds!")
 		AudioManager.playSFX("error")
 		return
 	
 	var valueAtFound = dataNodes[foundPosition]["value"]
-	print("  Value at found position: ", valueAtFound)
 	
 	if valueAtFound != targetValue:
-		print("  x Incorrect! Found position ", foundPosition, " has value ", valueAtFound, ", not ", targetValue)
 		AudioManager.playSFX("error")
 		return
-	
-	print("  o CORRECT! Found ", targetValue, " at position ", foundPosition)
+
 	Global.submitScore()
 	roomTaskCompleted.emit(objectID)  # Complete room
 	Analytics.recordComplete(objectID)

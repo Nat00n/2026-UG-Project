@@ -337,7 +337,6 @@ func commitKnapsack(selectedIndices: Array):
 	
 	# Validation checks
 	if selectedIndices.is_empty():
-		print("[Knapsack] Rejected: no items selected")
 		AudioManager.playSFX("error")
 		return
 	
@@ -347,11 +346,10 @@ func commitKnapsack(selectedIndices: Array):
 			totalWeight += items[idx]["weight"]
 	
 	if totalWeight > capacity:
-		print("[Knapsack] Rejected: total weight %d exceeds capacity %d" % [totalWeight, capacity])
 		AudioManager.playSFX("error")
 		return
 	
-	print("[Knapsack] Valid solution: %d items, weight %d/%d" % [selectedIndices.size(), totalWeight, capacity])
+	
 	
 	# Build slot offset map for animation
 	var offset = 0

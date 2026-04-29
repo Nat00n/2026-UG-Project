@@ -326,8 +326,6 @@ func onLLMReady(args):
 	_llmReady = true
 	aiButton.disabled = false
 	aiButton.text = "= AI Tips ="
-	
-	print("LLM ready")
 
 func onLLMProgress(args):
 	aiButton.text = "= AI Loading ="
@@ -339,7 +337,6 @@ func onAITips():
 	var llmReady = JavaScriptBridge.eval("window.llmReady === true")
 	if not llmReady:
 		aiButton.text = "= AI Loading ="
-		print("LLM not ready")
 		return
 		
 	Analytics.recordAiTip(_currentObject)

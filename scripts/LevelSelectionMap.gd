@@ -196,9 +196,6 @@ func _gui_input(event):
 			if mousePos.distance_to(nodePos) <= NODE_RADIUS:
 				if level.isUnlocked:
 					levelSelected.emit(levelId)
-					print("[LevelMap] Selected level: " + levelId)
-				else:
-					print("[LevelMap] Level " + levelId + " is locked")
 				accept_event()
 				break
 

@@ -1,16 +1,14 @@
 extends Node
 
 func _ready() -> void:
+	# connects to the SilentWolf system
 	SilentWolf.configure({
 		"api_key": "jIBgCejWMw2ZcYULjxpy74ydXswvr8ff7orLAr2O",
 		"game_id": "tasktrain",
 		"log_level": 1
 	})
-	SilentWolf.configure_scores({
-		"open_scene_on_close": "res://scenes/MainPage.tscn"
-	})
 	
-	# SilentWolf.Scores.wipe_leaderboard()
+	# SilentWolf.Scores.wipe_leaderboard() # Line used to reset the leaderboard data
 
 var username: String = ""
 var startTime: float = 0.0
@@ -36,14 +34,12 @@ func initScoreFromProgression():
 func submitScore():
 	var elapsed = int(Time.get_unix_time_from_system() - startTime)
 	var combined = gameScore * 10000 + (9999 - min(elapsed, 9999))
-	print("[Global] Submitting score: ", combined, " (", gameScore, " pts, ", elapsed, "s) for ", username)
 	SilentWolf.Scores.save_score(username, combined)
 
 # Cancel any active leaderboard loading
 func cancelLeaderboard():
 	if activeLeaderboardRequest:
 		activeLeaderboardRequest = null
-		print("[Global] Cancelled leaderboard request")
 
 func populateLeaderboard(container: VBoxContainer):
 	# Cancel any previous request
@@ -54,7 +50,6 @@ func populateLeaderboard(container: VBoxContainer):
 	
 	# Validate container still exists after waiting
 	if not is_instance_valid(container) or not container.is_inside_tree():
-		print("[Global] Container not valid or not in tree")
 		return
 	
 	# Mark this request as active
@@ -93,12 +88,10 @@ func populateLeaderboard(container: VBoxContainer):
 		
 		# Check if request was cancelled
 		if activeLeaderboardRequest != requestId:
-			print("[Global] Request was cancelled during wait")
 			return
 		
 		# Check if container is still valid
 		if not is_instance_valid(container) or not container.is_inside_tree():
-			print("[Global] Container no longer valid")
 			activeLeaderboardRequest = null
 			return
 

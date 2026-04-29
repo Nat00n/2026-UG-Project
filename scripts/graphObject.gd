@@ -321,13 +321,11 @@ func _stepPath():
 func verifyPath():
 	# Check path starts at start node
 	if pendingPath.is_empty() or pendingPath[0] != startNodeId:
-		print("[" + objectID + "] Path doesn't start at start node!")
 		AudioManager.playSFX("error")
 		return
 	
 	# Check path ends at goal node
 	if pendingPath[pendingPath.size() - 1] != goalNodeId:
-		print("[" + objectID + "] Path doesn't reach goal node!")
 		AudioManager.playSFX("error")
 		return
 	
@@ -336,11 +334,9 @@ func verifyPath():
 		var fromId = pendingPath[i]
 		var toId = pendingPath[i + 1]
 		if not _hasEdge(fromId, toId):
-			print("[" + objectID + "] Invalid edge in path: " + str(fromId) + " -> " + str(toId))
 			AudioManager.playSFX("error")
 			return
 	
-	print("[" + objectID + "] Valid path found from " + str(startNodeId) + " to " + str(goalNodeId))
 	Global.submitScore()
 	roomTaskCompleted.emit(objectID)  # Complete room
 	Analytics.recordComplete(objectID)

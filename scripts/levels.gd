@@ -33,14 +33,11 @@ func _ready():
 	# Load saved progress and initialize room indicator
 	var level = progressionManager.levels.get(levelId)
 	if level:
-		print("[Level] Loading saved progress for ", levelId)
-		print("  Completed rooms: ", level.completedRooms)
 		roomProgressIndicator.setup(totalRooms, level.completedRooms, currentRoomIndex)
 		
 		# Show return button if minimum already complete
 		updateReturnButtonVisibility()
 	else:
-		print("[Level] WARNING: Level ", levelId, " not found in progression manager!")
 		roomProgressIndicator.setup(totalRooms, [], currentRoomIndex)
 	
 	# Connect room change signal
@@ -67,7 +64,6 @@ func updateReturnButtonVisibility():
 	
 	if level.isMinimumComplete():
 		if not returnButton.visible:
-			print("[Level] Showing return button (minimum complete)")
 			returnButton.visible = true
 			
 			# Set pivot to center so it scales from the middle
@@ -82,12 +78,9 @@ func updateReturnButtonVisibility():
 			tween.parallel().tween_property(returnButton, "modulate", Color.WHITE, 1.2)
 
 func onReturnPressed():
-	"""Return to level selection screen"""
-	print("[Level] Returning to level select...")
 	get_tree().change_scene_to_file("res://scenes/LevelSelectionScreen.tscn")
 
 func connectObjectSignals():
-	print("[Level] Connecting object signals and mapping to rooms...")
 	
 	for roomIndex in range(roomManager.rooms.size()):
 		var room = roomManager.rooms[roomIndex]
@@ -100,52 +93,33 @@ func connectObjectSignals():
 				# CRITICAL: Map this object to its room index
 				objectToRoomMap[obj.objectID] = roomIndex
 				Analytics.registerObject(obj.objectID, levelId)
-				print("  o ", obj.objectID, " → Room ", roomIndex)
-			else:
-				print("  x ", obj.objectID, " has no signal!")
-	
-	print("[Level] Total objects mapped: ", objectToRoomMap.size())
-	print("[Level] Object-to-room mapping complete")
-	print()
 	
 	# Show which rooms are already complete from saved data
 	var level = progressionManager.levels.get(levelId)
 	if level and level.completedRooms.size() > 0:
-		print("[Level] Previously completed rooms: ", level.completedRooms)
 		roomProgressIndicator.updateCompletion(level.completedRooms, currentRoomIndex)
 
 func onObjectCompleted(objectId: String):
-	print("\n[Level] 🎯 Object completed: ", objectId)
 	
 	if not objectToRoomMap.has(objectId):
-		print("  ERROR: Object not in room map!")
-		print("  Available objects: ", objectToRoomMap.keys())
 		return
 	
 	var objectRoomIndex = objectToRoomMap[objectId]
-	print("  Object is in Room ", objectRoomIndex)
-	print("  Current room showing: ", currentRoomIndex)
 	
 	# Mark the OBJECT'S room as complete, not the current room
 	markRoomComplete(objectRoomIndex)
 
 func markRoomComplete(roomIndex: int):
-	print("[Level] Marking Room ", roomIndex, " complete")
 	
 	var level = progressionManager.levels.get(levelId)
 	if not level:
-		print("  ERROR: Level not found!")
 		return
 	
 	if level.isRoomCompleted(roomIndex):
-		print("  Already complete, skipping")
 		return
 	
 	# Complete the room
 	progressionManager.completeRoom(levelId, roomIndex)
-	
-	print("  o Room ", roomIndex, " marked complete")
-	print("  Progress: ", level.completedRooms.size(), "/", level.totalRooms)
 	
 	# Update the indicator
 	roomProgressIndicator.updateCompletion(level.completedRooms, currentRoomIndex)
@@ -155,14 +129,9 @@ func markRoomComplete(roomIndex: int):
 	
 	# Show message
 	if level.isFullyComplete():
-		print("  ! ALL ROOMS COMPLETE!")
 		AudioManager.playSFX("task_complete")
-	elif level.completedRooms.size() == 1:
-		print("  o First room complete - next level unlocked!")
-		print("  o Return button now available!")
 
 func onRoomChanged(newRoomIndex: int):
-	print("[Level] Room changed: ", currentRoomIndex, " → ", newRoomIndex)
 	currentRoomIndex = newRoomIndex
 	var level = progressionManager.levels.get(levelId)
 	if level:

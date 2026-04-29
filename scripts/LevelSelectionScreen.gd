@@ -23,29 +23,23 @@ func _ready():
 	
 	AudioManager.playMusic("level_select")
 	
-	# CRITICAL: Refresh display on ready
+	# Refresh display on ready
 	refreshDisplay()
 
-# CRITICAL: Refresh display when screen becomes visible
+# Refresh display when screen becomes visible
 func _notification(what):
 	if what == NOTIFICATION_VISIBILITY_CHANGED and visible:
 		if not progressionManager:
 			return
-		print("\n[LevelSelect] Screen shown - refreshing display")
 		refreshDisplay()
 
 func refreshDisplay():
 	if not progressionManager:
 		return
-	print("[LevelSelect] Refreshing display with current progression:")
-	for levelId in progressionManager.levels:
-		var level = progressionManager.levels[levelId]
-		print("  ", levelId, ": ", level.completedRooms.size(), "/", level.totalRooms, " (unlocked: ", level.isUnlocked, ")")
 	if levelMap:
 		levelMap.refreshDisplay()
 
 func _onLevelSelected(levelId: String):
-	print("\n[LevelSelect] Level selected: ", levelId)
 	
 	var level = progressionManager.levels[levelId]
 	
@@ -55,15 +49,12 @@ func _onLevelSelected(levelId: String):
 	# Update button text based on completion state
 	if level.isFullyComplete():
 		startButton.text = "Replay *"
-		print("  Status: Fully complete")
 	elif level.isMinimumComplete():
 		var roomsComplete = level.completedRooms.size()
 		var totalRooms = level.totalRooms
 		startButton.text = "Continue (%d/%d)" % [roomsComplete, totalRooms]
-		print("  Status: ", roomsComplete, "/", totalRooms, " rooms complete")
 	else:
 		startButton.text = "Start"
-		print("  Status: Not started")
 	
 	startButton.set_meta("levelId", levelId)
 	levelInfo.visible = true
@@ -71,8 +62,6 @@ func _onLevelSelected(levelId: String):
 func _onStartButtonPressed():
 	var levelId = startButton.get_meta("levelId")
 	var level = progressionManager.levels[levelId]
-	
-	print("[LevelSelect] Starting level: ", levelId)
 	
 	# Load the level scene
 	get_tree().change_scene_to_file(level.scenePath)

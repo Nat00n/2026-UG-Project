@@ -15,7 +15,6 @@ func _ready():
 	for node in get_parent().get_children():
 		if node is SearchObject:
 			linkedSearchObject = node
-			print("[" + objectID + "] Linked to search object: " + node.objectID)
 			break
 
 func _init_object():
@@ -147,11 +146,8 @@ func _isSorted() -> bool:
 # NEW: Verify correctness before completing
 func verifyAndComplete():
 	if not _isSorted():
-		print("[" + objectID + "] Array is NOT sorted correctly!")
 		AudioManager.playSFX("error")
 		return
-	
-	print("[" + objectID + "] Array sorted correctly!")
 	
 	# Check if we should send to search or complete room
 	if linkedSearchObject != null:
@@ -273,7 +269,6 @@ func _sendToSearch():
 			child.queue_free()
 		cardNodes.clear()
 		linkedSearchObject.receiveArray(dataNodes.duplicate(true))
-		print("[" + objectID + "] Sorted array sent to search. Room NOT complete yet.")
 	)
 	
 	hasSentToSearch = true
