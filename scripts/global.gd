@@ -1,62 +1,73 @@
-extends Node
+extends Node # Global Script - Autoload
+# Singleton accessible from any script via the 'Global' autoload name
+# Responsible for: player session data, score calculation, timer, and leaderboard population
 
 func _ready() -> void:
-	# connects to the SilentWolf system
+	# Initialise SilentWolf, the third-party leaderboard backend
 	SilentWolf.configure({
 		"api_key": "jIBgCejWMw2ZcYULjxpy74ydXswvr8ff7orLAr2O",
 		"game_id": "tasktrain",
 		"log_level": 1
 	})
 	
-	# SilentWolf.Scores.wipe_leaderboard() # Line used to reset the leaderboard data
+	# SilentWolf.Scores.wipe_leaderboard() # used to reset the leaderboard data
 
-var username: String = ""
-var startTime: float = 0.0
-var gameScore: int = 0
-var activeLeaderboardRequest = null
+var username: String = ""        # Set at the start menu, included in every score submission
+var startTime: float = 0.0       # Unix timestamp recorded when the player begins a run
+var gameScore: int = 0           # Accumulated score: 1 pt per room complete, +3 per fully complete level
+var activeLeaderboardRequest = null  # Tracks the current async leaderboard fetch so stale requests can be cancelled
+
+### Timer
 
 func startTimer():
+	# Record the moment the player enters the game so elapsed time can be computed later
 	startTime = Time.get_unix_time_from_system()
 
 func getFormattedTime() -> String:
+	# Returns elapsed time as MM:SS for display purposes.
 	var elapsed = int(Time.get_unix_time_from_system() - startTime)
 	return "%02d:%02d" % [elapsed / 60, elapsed % 60]
 
+### Score
+
 func initScoreFromProgression():
+	# Recomputes gameScore from saved progression data so returning players start with the right total
 	var pm = get_node("/root/LevelProgressionManager")
 	gameScore = 0
 	for levelId in pm.levels:
 		var level = pm.levels[levelId]
-		gameScore += level.completedRooms.size()
+		gameScore += level.completedRooms.size()       # +1 per completed room
 		if level.isFullyComplete():
-			gameScore += 3
+			gameScore += 3                             # +3 Bonus for fully completing a level
 
 func submitScore():
+	# Combines score and time into a single integer so the leaderboard can sort by score first,
+	# then by fastest time as a tiebreaker: combined = score * 10000 + (9999 - elapsed_seconds)
 	var elapsed = int(Time.get_unix_time_from_system() - startTime)
 	var combined = gameScore * 10000 + (9999 - min(elapsed, 9999))
 	SilentWolf.Scores.save_score(username, combined)
 
-# Cancel any active leaderboard loading
+### Leaderboard
+
 func cancelLeaderboard():
+	# Invalidates any in-progress leaderboard fetch. Called when the scene changes
+	# to prevent callbacks from writing into freed UI nodes
 	if activeLeaderboardRequest:
 		activeLeaderboardRequest = null
 
 func populateLeaderboard(container: VBoxContainer):
-	# Cancel any previous request
+	# Fetches the top scores asynchronously and builds a styled leaderboard inside 'container'
+	# Uses a requestId pattern so that if the scene changes mid-fetch, stale results are discarded
 	cancelLeaderboard()
-	
-	# Wait for the scene to be fully ready
 	await get_tree().process_frame
-	
-	# Validate container still exists after waiting
+
 	if not is_instance_valid(container) or not container.is_inside_tree():
 		return
-	
-	# Mark this request as active
+
 	var requestId = Time.get_ticks_msec()
 	activeLeaderboardRequest = requestId
-	
-	# Clear existing children
+
+	# Clear any previously rendered rows
 	for child in container.get_children():
 		child.queue_free()
 
@@ -67,35 +78,29 @@ func populateLeaderboard(container: VBoxContainer):
 
 	var state = {"responded": false, "scores": []}
 
+	# SilentWolf returns results via a signal, wrap it in a lambda so we can capture requestId
 	var callback = func(res):
-		# Ignore if this request was cancelled
 		if activeLeaderboardRequest != requestId:
 			return
 		state["responded"] = true
 		state["scores"] = res.get("scores", [])
 
-	# Request TOP 100 scores so we can filter to 10 unique users
+	# Request a large pool so we can filter down to 10 unique usernames
 	SilentWolf.Scores.get_scores(1000).sw_get_scores_complete.connect(callback, CONNECT_ONE_SHOT)
 
-	# Wait for response OR timeout (whichever comes first)
+	# Poll until the response arrives or 8 seconds elapse (network timeout guard)
 	var maxWaitTime = 8.0
 	var checkInterval = 0.1
 	var elapsed = 0.0
-	
 	while not state["responded"] and elapsed < maxWaitTime:
 		await get_tree().create_timer(checkInterval).timeout
 		elapsed += checkInterval
-		
-		# Check if request was cancelled
 		if activeLeaderboardRequest != requestId:
 			return
-		
-		# Check if container is still valid
 		if not is_instance_valid(container) or not container.is_inside_tree():
 			activeLeaderboardRequest = null
 			return
 
-	# Clear loading message
 	for child in container.get_children():
 		child.queue_free()
 
@@ -115,32 +120,26 @@ func populateLeaderboard(container: VBoxContainer):
 		activeLeaderboardRequest = null
 		return
 
-	# Filter to top 10 UNIQUE users
+	# Decode combined score, de-duplicate to one row per player, and stop after 10 unique entries
 	var seenNames: Array = []
 	var rank = 1
 	for entry in state["scores"]:
 		var playerName = entry["player_name"]
-		
-		# Skip if we've already seen this user
 		if playerName in seenNames:
 			continue
-		
-		# Add this unique user
 		seenNames.append(playerName)
 		var combined = int(entry["score"])
 		var entryScore = combined / 10000
 		var entryTime = 9999 - (combined % 10000)
 		container.add_child(_makeRow(rank, playerName, entryScore, entryTime / 60, entryTime % 60))
 		rank += 1
-		
-		# Stop after adding 10 unique users
 		if rank > 10:
 			break
-	
+
 	activeLeaderboardRequest = null
 
 func _makeRow(rank: int, playerName: String, score: int, mins: int, secs: int) -> PanelContainer:
-	# ... (keep the same as before)
+	# Builds a styled leaderboard row with gold/silver/bronze theming for the top three
 	var row = PanelContainer.new()
 	row.custom_minimum_size = Vector2(0, 68)
 	var style = StyleBoxFlat.new()

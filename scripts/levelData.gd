@@ -1,28 +1,31 @@
-extends Resource
+extends Resource # Level Data Script
 class_name LevelData
+# Data container for a single level
+# Stored as a Resource so it can be serialised and passed between the progression manager, level selection map, and level scenes
 
-@export var levelId: String
-@export var levelName: String
-@export var position: Vector2  # Position on the map
-@export var requiredLevelId: String = ""  # Empty string means it's unlocked by default
-@export var scenePath: String  # Path to the level scene
+@export var levelId: String         # Unique identifier, e.g. "1-1", "3-1"
+@export var levelName: String       # Display name shown in the level selection UI
+@export var position: Vector2       # Position of this node on the level selection map
+@export var requiredLevelId: String = ""  # ID of the level that must be minimally complete to unlock this one, Empty = always unlocked
+@export var scenePath: String       # File path to the level's .tscn scene
+@export var totalRooms: int = 1     # Total number of rooms (tasks) in this level
 
-# Room tracking
-@export var totalRooms: int = 1  # How many rooms are in this level
-
+# Runtime state — not exported, populated by LevelProgressionManager from localStorage
 var isUnlocked: bool = false
-var completedRooms: Array[int] = []  # Indices of completed rooms (0-based)
+var completedRooms: Array[int] = []  # Sorted list of completed room indices (0-based)
 
-# Computed properties
+### Computed Properties
+
 func isMinimumComplete() -> bool:
-	# Level is "minimally complete" if at least 1 room is done
+	# A level is considered to have minimum completion to unlock dependents once any single room is complete
 	return completedRooms.size() >= 1
 
 func isFullyComplete() -> bool:
-	# Level is "fully complete" if all rooms are done
+	# All rooms must be complete for the star badge and bonus score to be awarded
 	return completedRooms.size() >= totalRooms
 
 func getRoomCompletionRatio() -> float:
+	# Returns a 0–1 fraction for progress bar or indicator use
 	if totalRooms == 0:
 		return 0.0
 	return float(completedRooms.size()) / float(totalRooms)
@@ -31,6 +34,7 @@ func isRoomCompleted(roomIndex: int) -> bool:
 	return completedRooms.has(roomIndex)
 
 func completeRoom(roomIndex: int):
+	# safely ignored if the room is already in the completed list.
 	if not completedRooms.has(roomIndex):
 		completedRooms.append(roomIndex)
-		completedRooms.sort()  # Keep sorted for easier debugging
+		completedRooms.sort()  # Keep sorted for consistent iteration.

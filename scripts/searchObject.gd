@@ -1,20 +1,25 @@
-class_name SearchObject
+class_name SearchObject # Search Object Script
 extends InteractableObject
+# Implements the search algorithm visualisation task
+# The player writes a Python search algorithm using check() to highlight visited indices and commitSelect() to mark the found element
+# The object verifies the result afterwards
+# Can operate standalone (with its own random array) or receive a sorted array from a SortObject
 
-@onready var selectionBeam: Line2D = $selectionBeam
+@onready var selectionBeam: Line2D = $selectionBeam  # Line drawn from the object to the selected card
 
-var targetValue
-@export var sortReq: bool = false
+var targetValue         # The value the player's algorithm must locate
+@export var sortReq: bool = false  # If true, generate a pre-sorted array (for binary search tasks)
 
-var checkQueue: Array = []
+var checkQueue: Array = []   # Queued animation steps: check (cyan highlight) or select (yellow + beam)
 var isAnimating: bool = false
 var checkTimer: float = 0.0
-var checkDelay: float = 0.3
-var foundPosition: int = -1  # Track the position user selected
+var checkDelay: float = 0.3  # Seconds between each animated step
+var foundPosition: int = -1  # The index passed to commitSelect(), verified after animation
 
-# Track if array was received from sort
-var arrayReceivedFromSort: bool = false
-var expectedPosition: int = -1
+var arrayReceivedFromSort: bool = false  # True when array came from a linked SortObject
+var expectedPosition: int = -1          # Correct index of targetValue for verification
+
+### Setup
 
 func _init_object():
 	if is_instance_valid(selectionBeam):
@@ -24,7 +29,7 @@ func _init_object():
 
 func _ready():
 	super._ready()
-	# Generate own data only if no sort object in the same room
+	# Only generate a standalone array if no SortObject is present in the room
 	var hasSortObject = false
 	for node in get_parent().get_children():
 		if node is SortObject:
@@ -46,7 +51,7 @@ func resetDisplay():
 	checkTimer = 0.0
 	arrayReceivedFromSort = false
 	expectedPosition = -1
-	foundPosition = -1  # Reset found position
+	foundPosition = -1
 	for card in cardNodes:
 		if is_instance_valid(card):
 			card.modulate = Color.WHITE
@@ -56,42 +61,36 @@ func resetDisplay():
 		return
 	super.resetDisplay()
 
-# Called by SortObject when it sends the sorted array
 func receiveArray(sortedNodes: Array):
+	# Called by SortObject after its animation completes, replaces the local array with the sorted one
 	dataNodes = sortedNodes.duplicate(true)
 	initialDataNodes = dataNodes.duplicate(true)
 	checkQueue.clear()
 	isAnimating = false
 	checkTimer = 0.0
 	arrayReceivedFromSort = true
-	
 	if is_instance_valid(selectionBeam):
 		selectionBeam.visible = false
-	
 	targetValue = dataNodes[randi() % dataNodes.size()]["value"]
-	
-	# Find expected position for verification
+	# Pre-compute the expected position for later verification.
 	expectedPosition = -1
 	for i in range(dataNodes.size()):
 		if dataNodes[i]["value"] == targetValue:
 			expectedPosition = i
 			break
-	
 	_buildDisplay()
 
+### Animation
+
 func _process(delta):
-	# Mouse hover handled by base class
+	# Mouse hover (duplicated from base class to support the GraphObject override pattern)
 	var mouse = get_global_mouse_position()
-	# Calculate Sprite2D bounds
 	var sprite_size = Vector2.ZERO
 	if visual.texture:
 		sprite_size = visual.texture.get_size() * visual.scale
-
-	# Account for centered sprite
 	var sprite_pos = visual.global_position
 	if visual.centered:
 		sprite_pos -= sprite_size / 2.0
-
 	var rect = Rect2(sprite_pos, sprite_size)
 	var wasHovered = _hovered
 	_hovered = rect.has_point(mouse)
@@ -107,33 +106,33 @@ func _process(delta):
 		isAnimating = false
 
 func _restoreTileStyle(card: PanelContainer):
+	# Reverts a card's background to the default tile texture after highlighting
 	var tileStyle = StyleBoxTexture.new()
 	tileStyle.texture = _getCardTileTexture()
 	card.add_theme_stylebox_override("panel", tileStyle)
 
 func _stepCheck():
+	# Processes one step from the queue, highlights the checked or selected card
 	if checkQueue.is_empty():
 		isAnimating = false
 		return
-
 	var step = checkQueue.pop_front()
-
-	# Clear all highlights — restore tile style instead of removing it
+	# Clear all highlights before applying the new one
 	for i in range(cardNodes.size()):
 		cardNodes[i].get_child(0).remove_theme_color_override("font_color")
 		cardNodes[i].modulate = Color.WHITE
 		_restoreTileStyle(cardNodes[i])
 
 	if step["type"] == "check":
+		# Cyan = currently inspecting
 		var card = cardNodes[step["index"]]
 		card.get_child(0).add_theme_color_override("font_color", Color.CYAN)
 		card.modulate = Color(0.5, 1.0, 1.0)
-
 	elif step["type"] == "select":
+		# Yellow = found result, also draws the selection beam from the object to the card
 		var card = cardNodes[step["index"]]
 		card.get_child(0).add_theme_color_override("font_color", Color.YELLOW)
 		card.modulate = Color(1.0, 1.0, 0.5)
-
 		var cardCentre = card.global_position + Vector2(cardWidth / 2.0, 0)
 		var spriteSize = visual.texture.get_size() * visual.scale
 		var spritePos = visual.global_position
@@ -145,61 +144,51 @@ func _stepCheck():
 		selectionBeam.add_point(to_local(cardCentre))
 		selectionBeam.visible = true
 
-func _makeStyleBox(color: Color) -> StyleBoxFlat:
-	var style = StyleBoxFlat.new()
-	style.bg_color = color
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 4
-	style.corner_radius_bottom_right = 4
-	return style
+### Bridge Methods
 
 func queueCheck(index: int):
 	checkQueue.append({"type": "check", "index": index})
 	isAnimating = true
 
 func queueSelect(index: int):
-	foundPosition = index
+	foundPosition = index  # Record selected index for post-animation verification.
 	checkQueue.append({"type": "select", "index": index})
 	isAnimating = true
 
-# Verify position is correct
 func commitSearch():
+	# Waits for all animation steps to complete, then verifies the result.
 	isAnimating = true
-	# Wait for animation to finish, then verify
 	await get_tree().create_timer(checkDelay * checkQueue.size() + 0.3).timeout
 	verifySearchResult()
 
+### Verification
+
 func verifySearchResult():
-	
-	# If we're in standalone mode (no sort object), we need to find expected position
+	# find where targetValue actually is in the array
 	if not arrayReceivedFromSort:
 		expectedPosition = -1
 		for i in range(dataNodes.size()):
 			if dataNodes[i]["value"] == targetValue:
 				expectedPosition = i
 				break
-	
-	# Check if commitSelect was called
+
 	if foundPosition == -1:
 		AudioManager.playSFX("error")
 		return
-	
-	# Verify correctness
 	if foundPosition < 0 or foundPosition >= dataNodes.size():
 		AudioManager.playSFX("error")
 		return
-	
-	var valueAtFound = dataNodes[foundPosition]["value"]
-	
-	if valueAtFound != targetValue:
+	# The player's selected index must contain the target value
+	if dataNodes[foundPosition]["value"] != targetValue:
 		AudioManager.playSFX("error")
 		return
 
 	Global.submitScore()
-	roomTaskCompleted.emit(objectID)  # Complete room
+	roomTaskCompleted.emit(objectID)
 	Analytics.recordComplete(objectID)
 	AudioManager.playSFX("task_complete")
+
+### Preamble & Guide
 
 func getPreambleFunctions() -> String:
 	return """
