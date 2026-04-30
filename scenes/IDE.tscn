@@ -29,7 +29,7 @@ anchor_bottom = 1.0
 offset_bottom = -1.0
 grow_horizontal = 2
 grow_vertical = 2
-split_offsets = PackedInt32Array(42, 7, 0)
+split_offsets = PackedInt32Array(42, 7, 174)
 split_offset = 42
 
 [node name="HSplitContainer" type="HSplitContainer" parent="Panel/VSplitContainer" unique_id=316253582]

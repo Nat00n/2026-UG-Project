@@ -240,19 +240,7 @@ func _setNodeColor(nodeId: int, color: Color):
 ### Process (animation tick)
 
 func _process(delta):
-	# Hover detection (custom because GraphObject doesn't use the card display)
-	var mouse = get_global_mouse_position()
-	var sprite_size = Vector2.ZERO
-	if visual.texture:
-		sprite_size = visual.texture.get_size() * visual.scale
-	var sprite_pos = visual.global_position
-	if visual.centered:
-		sprite_pos -= sprite_size / 2.0
-	var rect = Rect2(sprite_pos, sprite_size)
-	var wasHovered = _hovered
-	_hovered = rect.has_point(mouse)
-	if _hovered != wasHovered:
-		hoverLabel.visible = _hovered
+	super._process(delta)  # handles hover
 
 	# Step through the visit queue at visitDelay intervals
 	if isVisiting and not visitQueue.is_empty():

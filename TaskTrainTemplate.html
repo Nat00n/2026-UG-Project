@@ -299,15 +299,18 @@ const engine = new Engine(GODOT_CONFIG);
 			
 			const cleanCode = normaliseCode(code);
 
-			// Kill and restart worker if code takes >5 seconds
+			// Kill worker after 5 seconds
 			const timeout = setTimeout(() => {
-				worker.terminate();
-				if (window.godotTalk) {
-					window.godotTalk("code timeout - infinite loop detected and stopped\n");
+				if (worker) {
+					worker.terminate();
+					workerReady = false;
+					if (window.godotTalk) {
+						window.godotTalk("Execution stopped - infinite loop detected (5 second timeout)\n");
+					}
+					// Restart worker for next run
+					initPyodide();
 				}
-				// Restart worker
-				initPyodide();
-			}, 5000);
+			}, 100);
 			
 			const originalHandler = worker.onmessage;
 			worker.onmessage = function(e) {

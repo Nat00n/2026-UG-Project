@@ -51,35 +51,6 @@ func completeRoom(levelId: String, roomIndex: int):
 	updateLevelStates()
 	saveProgression()
 
-### Query Helpers
-
-func _getUnlockedLevelsList() -> Array:
-	var unlocked = []
-	for levelId in levels:
-		if levels[levelId].isUnlocked:
-			unlocked.append(levelId)
-	return unlocked
-
-func isLevelUnlocked(levelId: String) -> bool:
-	if levelId in levels:
-		return levels[levelId].isUnlocked
-	return false
-
-func isLevelMinimumComplete(levelId: String) -> bool:
-	if levelId in levels:
-		return levels[levelId].isMinimumComplete()
-	return false
-
-func isLevelFullyComplete(levelId: String) -> bool:
-	if levelId in levels:
-		return levels[levelId].isFullyComplete()
-	return false
-
-func getRoomCompletion(levelId: String) -> Array[int]:
-	if levelId in levels:
-		return levels[levelId].completedRooms
-	return []
-
 ### Unlock Logic
 
 func updateLevelStates():
@@ -152,23 +123,3 @@ func loadProgression():
 					levels[levelId].completedRooms.append(room)
 
 	updateLevelStates()
-
-func resetProgression():
-	# Clears all in-memory state and removes the localStorage entry. Used for testing.
-	completedLevels.clear()
-	pendingSavedData.clear()
-	for levelId in levels:
-		levels[levelId].completedRooms.clear()
-	JavaScriptBridge.eval("""
-		localStorage.removeItem('%s');
-	""" % SAVE_KEY)
-	updateLevelStates()
-
-func getUnlockedLevelsInArea(areaIndex: int) -> Array[LevelData]:
-	# Returns all unlocked levels belonging to a given area index (unused in current build)
-	var areaLevels: Array[LevelData] = []
-	for levelId in levels:
-		var level = levels[levelId]
-		if level.areaIndex == areaIndex and level.isUnlocked:
-			areaLevels.append(level)
-	return areaLevels

@@ -29,6 +29,8 @@ var _llmProgressCallback # Notified with loading progress updates
 var _onEditorTab := true
 var _lastTabPerObject := {}  # Remembers which tab was active per object for UX continuity
 
+const maxOutputLines = 400 # limits lines for the outputbox, helps with memory issues
+
 ### Ready
 
 func _ready():
@@ -140,7 +142,7 @@ func talk(args):
 
 	else:
 		# Unrecognised prefix, treated as plain print() output and display in the console
-		outputRCT.append_text(msg + "\n")
+		_appendOutput(msg + "\n")
 
 ### Open / Close
 
@@ -155,7 +157,7 @@ func open(objectName: String, interactable):
 	_currentObject = interactable
 	Analytics.startTask(_currentObject)
 	outputRCT.clear()
-	outputRCT.append_text("--- %s ---\n" % objectName)
+	_appendOutput("--- %s ---\n" % objectName)
 	inputCE.text = interactable.savedScript
 
 	# Restore the last-used tab for returning players, default to Guide for first open
@@ -350,10 +352,10 @@ func onAIResponse(args):
 	aiButton.disabled = false
 	aiButton.text = "= AI Tips ="
 	outputRCT.push_color(Color.html("#DCDCAA"))
-	outputRCT.append_text("\n AI Tips:\n")
+	_appendOutput("\n AI Tips:\n")
 	outputRCT.pop()
 	outputRCT.push_color(Color.html("#9CDCFE"))
-	outputRCT.append_text(msg + "\n")
+	_appendOutput(msg + "\n")
 	outputRCT.pop()
 
 ### Code Execution
@@ -373,6 +375,20 @@ func _onCodeChanged():
 func runScript(code: String, interactable):
 	# Public entry point for silent background execution
 	_executeCode(code, interactable, true)
+
+func _appendOutput(text: String):
+	# FIFO system for output text, as to not cause memory issues
+	outputRCT.append_text(text)
+	
+	var lineCount = outputRCT.get_line_count()
+	if lineCount > maxOutputLines + 100:
+		var linesToRemove = lineCount - maxOutputLines
+		var lines = outputRCT.get_parsed_text().split("\n")
+		lines = lines.slice(linesToRemove)
+		outputRCT.clear()
+		outputRCT.append_text("\n".join(lines))
+	
+	outputRCT.scroll_to_line(outputRCT.get_line_count() - 1)
 
 func _buildPreamble() -> String:
 	# Constructs the Python code injected before the player's script
@@ -399,7 +415,7 @@ func _executeCode(code: String, target, silent: bool):
 	_executingObject = target
 	if not silent:
 		outputRCT.clear()
-		outputRCT.append_text("Running...\n")
+		_appendOutput("Running...\n")
 	if target.has_method("resetDisplay"):
 		target.resetDisplay()
 

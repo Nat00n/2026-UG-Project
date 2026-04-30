@@ -98,8 +98,3 @@ func isTrackClear() -> bool:
 		if trainData.sprite.position.x < MIN_TRAIN_DISTANCE:
 			return false
 	return true
- 
-func clearAllTrains():
-	for trainData in trainsOnScreen:
-		trainData.sprite.queue_free()
-	trainsOnScreen.clear()

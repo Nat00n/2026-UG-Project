@@ -16,9 +16,6 @@ var checkTimer: float = 0.0
 var checkDelay: float = 0.3  # Seconds between each animated step
 var foundPosition: int = -1  # The index passed to commitSelect(), verified after animation
 
-var arrayReceivedFromSort: bool = false  # True when array came from a linked SortObject
-var expectedPosition: int = -1          # Correct index of targetValue for verification
-
 ### Setup
 
 func _init_object():
@@ -49,8 +46,6 @@ func resetDisplay():
 	checkQueue.clear()
 	isAnimating = false
 	checkTimer = 0.0
-	arrayReceivedFromSort = false
-	expectedPosition = -1
 	foundPosition = -1
 	for card in cardNodes:
 		if is_instance_valid(card):
@@ -68,34 +63,16 @@ func receiveArray(sortedNodes: Array):
 	checkQueue.clear()
 	isAnimating = false
 	checkTimer = 0.0
-	arrayReceivedFromSort = true
 	if is_instance_valid(selectionBeam):
 		selectionBeam.visible = false
 	targetValue = dataNodes[randi() % dataNodes.size()]["value"]
-	# Pre-compute the expected position for later verification.
-	expectedPosition = -1
-	for i in range(dataNodes.size()):
-		if dataNodes[i]["value"] == targetValue:
-			expectedPosition = i
-			break
+	
 	_buildDisplay()
 
 ### Animation
 
 func _process(delta):
-	# Mouse hover (duplicated from base class to support the GraphObject override pattern)
-	var mouse = get_global_mouse_position()
-	var sprite_size = Vector2.ZERO
-	if visual.texture:
-		sprite_size = visual.texture.get_size() * visual.scale
-	var sprite_pos = visual.global_position
-	if visual.centered:
-		sprite_pos -= sprite_size / 2.0
-	var rect = Rect2(sprite_pos, sprite_size)
-	var wasHovered = _hovered
-	_hovered = rect.has_point(mouse)
-	if _hovered != wasHovered:
-		hoverLabel.visible = _hovered
+	super._process(delta)  # handles hover
 
 	if isAnimating and not checkQueue.is_empty():
 		checkTimer += delta
@@ -164,14 +141,6 @@ func commitSearch():
 ### Verification
 
 func verifySearchResult():
-	# find where targetValue actually is in the array
-	if not arrayReceivedFromSort:
-		expectedPosition = -1
-		for i in range(dataNodes.size()):
-			if dataNodes[i]["value"] == targetValue:
-				expectedPosition = i
-				break
-
 	if foundPosition == -1:
 		AudioManager.playSFX("error")
 		return

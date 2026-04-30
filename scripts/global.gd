@@ -23,11 +23,6 @@ func startTimer():
 	# Record the moment the player enters the game so elapsed time can be computed later
 	startTime = Time.get_unix_time_from_system()
 
-func getFormattedTime() -> String:
-	# Returns elapsed time as MM:SS for display purposes.
-	var elapsed = int(Time.get_unix_time_from_system() - startTime)
-	return "%02d:%02d" % [elapsed / 60, elapsed % 60]
-
 ### Score
 
 func initScoreFromProgression():

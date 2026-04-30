@@ -112,6 +112,3 @@ func onRoomChanged(newRoomIndex: int):
  
 func onPause():
 	pauseMenu.openPause()
- 
-func returnToLevelSelection():
-	get_tree().change_scene_to_file("res://scenes/LevelSelectionScreen.tscn")

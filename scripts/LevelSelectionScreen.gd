@@ -53,6 +53,3 @@ func _onStartButtonPressed():
  
 func _onPause():
 	pauseMenu.openPause()
- 
-func onLevelCompleted(levelId: String):
-	levelMap.refreshDisplay()

@@ -24,12 +24,6 @@ func isFullyComplete() -> bool:
 	# All rooms must be complete for the star badge and bonus score to be awarded
 	return completedRooms.size() >= totalRooms
 
-func getRoomCompletionRatio() -> float:
-	# Returns a 0–1 fraction for progress bar or indicator use
-	if totalRooms == 0:
-		return 0.0
-	return float(completedRooms.size()) / float(totalRooms)
-
 func isRoomCompleted(roomIndex: int) -> bool:
 	return completedRooms.has(roomIndex)
 
