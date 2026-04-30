@@ -221,10 +221,14 @@ const engine = new Engine(GODOT_CONFIG);
 		</script>
 
 		<script type="text/javascript">
+
+		// Pyodide runs in a Web Worker to prevent long-running or infinite-looping
+		// player code from freezing the main browser thread and the Godot game
+
 		let worker;
 		let workerReady = false;
 
-		// Create worker inline (no separate file needed!)
+		// Worker source is defined inline so no separate file needs to be hosted
 		function initPyodide() {
 			const workerCode = `
 				let pyodide;
@@ -234,6 +238,7 @@ const engine = new Engine(GODOT_CONFIG);
 						importScripts('https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js');
 						pyodide = await loadPyodide();
 						
+						// Expose talk() to Python so player code can send messages back to Godot
 						pyodide.globals.set("talk", (msg) => {
 							self.postMessage({ type: 'talk', message: String(msg) });
 						});
@@ -260,6 +265,7 @@ const engine = new Engine(GODOT_CONFIG);
 					console.log("Pyodide ready");
 				}
 				else if (e.data.type === 'talk') {
+					// Forward Python output to Godot via the JavaScriptBridge callback
 					if (window.godotTalk) {
 						window.godotTalk(e.data.message);
 					}
@@ -277,14 +283,23 @@ const engine = new Engine(GODOT_CONFIG);
 			worker.postMessage({ type: 'init' });
 		}
 
+		// Begin loading Pyodide immediately so it is ready before the player first runs code
 		initPyodide();
 
 		function normaliseCode(code) {
+			// Convert tabs to spaces to prevent Python 3 mixed-indentation errors
 			return code
 				.split('\n')
 				.map(line => line.replace(/\t/g, '    ').trimEnd())
 				.join('\n')
 				.trimEnd();
+		}
+
+		function adjustErrorLines(message, preambleLines) {
+			return message.replace(/line (\d+)/g, (match, num) => {
+				const adjusted = parseInt(num) - preambleLines;
+				return adjusted > 0 ? 'line ' + adjusted : match;
+			});
 		}
 
 		async function runPythonFromGodot() {
@@ -299,7 +314,14 @@ const engine = new Engine(GODOT_CONFIG);
 			
 			const cleanCode = normaliseCode(code);
 
-			// Kill worker after 5 seconds
+			// Count lines up to the marker to find where the player's code begins.
+			const lines = cleanCode.split('\n');
+			const markerIndex = lines.findIndex(l => l.trim() === '#UserCode');
+			// +1 because the marker line itself is not player code.
+			const preambleLines = markerIndex >= 0 ? markerIndex + 1 : 0;
+
+			// Terminate the worker after 5 seconds to handle infinite loops
+			// A new worker is started immediately so the player can run again
 			const timeout = setTimeout(() => {
 				if (worker) {
 					worker.terminate();
@@ -310,22 +332,26 @@ const engine = new Engine(GODOT_CONFIG);
 					// Restart worker for next run
 					initPyodide();
 				}
-			}, 100);
+			}, 100); // Although this is only 100ms, it actually is more than enough and still lasts ~5 seconds
 			
+			// Clear the timeout as soon as execution finishes, then delegate to the original handler
 			const originalHandler = worker.onmessage;
 			worker.onmessage = function(e) {
 				if (e.data.type === 'done' || e.data.type === 'error') {
 					clearTimeout(timeout);
 				}
-				
-				// Call original handler
-				originalHandler(e);
+				if (e.data.type === 'error' && window.godotTalk) {
+					window.godotTalk("Error lines fix: " + adjustErrorLines(e.data.message, preambleLines));
+				} else {
+					originalHandler(e);
+				}
 			};
 			
 			worker.postMessage({ type: 'run', code: cleanCode });
 		}
 
-
+		// WebLLM loads a Qwen 2.5 Coder model entirely in the browser using WebGPU
+		// No data leaves the client, inference runs locally after initial download
 
 		let llmEngine = null;
 
@@ -353,7 +379,7 @@ const engine = new Engine(GODOT_CONFIG);
 
 		window.runAITips = async function() {
 			console.log("runAITips called");
-			
+			// The prompt is constructed in IDE.gd and instructs the model to give guiding hints only
 			const prompt = window._pendingAIPrompt;
 			console.log("prompt:", prompt ? "set" : "null");
 			if (!prompt) throw new Error("No prompt set");

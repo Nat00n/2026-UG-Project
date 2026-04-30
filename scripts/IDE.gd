@@ -403,7 +403,6 @@ class GodotOutput(io.TextIOBase):
 		return len(s)
 
 sys.stdout = GodotOutput()
-sys.stderr = GodotOutput()
 
 array = """ + _currentObject.getArrayString() + _currentObject.getPreambleFunctions()
 
@@ -419,7 +418,8 @@ func _executeCode(code: String, target, silent: bool):
 	if target.has_method("resetDisplay"):
 		target.resetDisplay()
 
-	var wrapped = _buildPreamble() + "\n" + code
+	var wrapped = _buildPreamble() + "\n#UserCode\n" + code
+
 	JavaScriptBridge.eval("window._pendingCode = %s;" % JSON.stringify(wrapped))
 	JavaScriptBridge.eval("""
 		(async () => {

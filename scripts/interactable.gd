@@ -161,7 +161,7 @@ func _input(event):
 func _loadScript():
 	# Reads the player's previously saved code for this object from localStorage
 	var result = JavaScriptBridge.eval("""
-        localStorage.getItem('%s') || ''
+		localStorage.getItem('%s') || ''
 	""" % _getStorageKey())
 	if result != null:
 		savedScript = str(result)
@@ -170,7 +170,7 @@ func saveScript(code: String):
 	# Writes the current code to localStorage, called whenever the player types, runs code or closes the IDE
 	savedScript = code
 	JavaScriptBridge.eval("""
-        localStorage.setItem('%s', %s);
+		localStorage.setItem('%s', %s);
 	""" % [_getStorageKey(), JSON.stringify(code)])
 
 func _getStorageKey() -> String:

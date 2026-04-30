@@ -295,6 +295,13 @@ const engine = new Engine(GODOT_CONFIG);
 				.trimEnd();
 		}
 
+		function adjustErrorLines(message, preambleLines) {
+			return message.replace(/line (\d+)/g, (match, num) => {
+				const adjusted = parseInt(num) - preambleLines;
+				return adjusted > 0 ? 'line ' + adjusted : match;
+			});
+		}
+
 		async function runPythonFromGodot() {
 			const code = window._pendingCode;
 			if (!code) {
@@ -306,6 +313,12 @@ const engine = new Engine(GODOT_CONFIG);
 			}
 			
 			const cleanCode = normaliseCode(code);
+
+			// Count lines up to the marker to find where the player's code begins.
+			const lines = cleanCode.split('\n');
+			const markerIndex = lines.findIndex(l => l.trim() === '#UserCode');
+			// +1 because the marker line itself is not player code.
+			const preambleLines = markerIndex >= 0 ? markerIndex + 1 : 0;
 
 			// Terminate the worker after 5 seconds to handle infinite loops
 			// A new worker is started immediately so the player can run again
@@ -327,9 +340,11 @@ const engine = new Engine(GODOT_CONFIG);
 				if (e.data.type === 'done' || e.data.type === 'error') {
 					clearTimeout(timeout);
 				}
-				
-				// Call original handler
-				originalHandler(e);
+				if (e.data.type === 'error' && window.godotTalk) {
+					window.godotTalk("Error: " + adjustErrorLines(e.data.message, preambleLines));
+				} else {
+					originalHandler(e);
+				}
 			};
 			
 			worker.postMessage({ type: 'run', code: cleanCode });
