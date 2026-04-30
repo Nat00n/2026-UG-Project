@@ -25,7 +25,6 @@ var _currentObject       # The InteractableObject currently open in the IDE
 var _executingObject     # The object whose script is currently running (may differ during silent runs)
 var _llmReady := false
 var _llmReadyCallback    # Notified by JavaScript when the WebLLM model finishes loading
-var _llmProgressCallback # Notified with loading progress updates
 var _onEditorTab := true
 var _lastTabPerObject := {}  # Remembers which tab was active per object for UX continuity
 
@@ -35,6 +34,9 @@ const maxOutputLines = 400 # limits lines for the outputbox, helps with memory i
 
 func _ready():
 	panel.visible = false
+	if _llmReady == false:
+		aiButton.disabled = true
+		aiButton.text = "= AI Loading ="
 
 	closeButton.pressed.connect(onClose)
 	runButton.pressed.connect(onRun)
@@ -58,9 +60,6 @@ func _ready():
 
 		_llmReadyCallback = JavaScriptBridge.create_callback(onLLMReady)
 		JavaScriptBridge.get_interface("window").godotLLMReady = _llmReadyCallback
-
-		_llmProgressCallback = JavaScriptBridge.create_callback(onLLMProgress)
-		JavaScriptBridge.get_interface("window").godotLoadProgress = _llmProgressCallback
 
 ### Message Router (talk)
 
@@ -309,9 +308,6 @@ func onLLMReady(args):
 	_llmReady = true
 	aiButton.disabled = false
 	aiButton.text = "= AI Tips ="
-
-func onLLMProgress(args):
-	aiButton.text = "= AI Loading ="
 
 func onAITips():
 	# Sends a Socratic tutoring prompt to the in-browser LLM and shows a loading state

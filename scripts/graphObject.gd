@@ -6,8 +6,8 @@ extends InteractableObject
 # and commitPath() to declare the final route from startNode to goalNode
 
 @export var nodeCount: int = 15
-@export var startNodeId: int = 0
-@export var goalNodeId: int = nodeCount - 1
+var startNodeId: int = 0
+var goalNodeId: int = nodeCount - 1
 
 var graphNodes: Array = []      # Array of dicts: {id, pos (Vector2), neighbours: [{id, weight}]}
 var nodeCircles: Array = []     # PanelContainer nodes representing each graph node on screen

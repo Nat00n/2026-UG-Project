@@ -375,15 +375,7 @@ const engine = new Engine(GODOT_CONFIG);
 			const webllm = await import("https://esm.run/@mlc-ai/web-llm");
 
 			llmEngine = await webllm.CreateMLCEngine(
-				"Qwen2.5-Coder-1.5B-Instruct-q4f16_1-MLC",
-				{
-					initProgressCallback: (progress) => {
-						console.log("LLM progress:", progress.text);
-						if (window.godotLoadProgress) {
-							window.godotLoadProgress(progress.text);
-						}
-					}
-				}
+				"Qwen2.5-Coder-1.5B-Instruct-q4f16_1-MLC"
 			);
 
 			console.log("WebLLM ready");
@@ -426,7 +418,7 @@ const engine = new Engine(GODOT_CONFIG);
 		}
 
 		window.addEventListener("load", () => {
-			setTimeout(initWebLLM, 2000);
+			setTimeout(initWebLLM, 2000); // loads the LLM 2 seconds after the page loads
 		});
 
 		</script>
