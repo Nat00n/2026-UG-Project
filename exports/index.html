@@ -247,6 +247,12 @@ const engine = new Engine(GODOT_CONFIG);
 					}
 					else if (e.data.type === 'run') {
 						try {
+							// Clear globals from the previous run so variables don't leak between objects.
+							pyodide.globals.clear();
+							// Re-expose talk() since clearing globals removes it too.
+							pyodide.globals.set("talk", (msg) => {
+								self.postMessage({ type: 'talk', message: String(msg) });
+							});
 							await pyodide.runPythonAsync(e.data.code);
 							self.postMessage({ type: 'done' });
 						} catch (error) {

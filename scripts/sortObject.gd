@@ -259,6 +259,8 @@ func getPreambleFunctions() -> String:
 	# Python helpers injected before the player's code
 	# Swaps and moves update the local array mirror so the player's algorithm can reference array indices correctly
 	return """
+array = %s
+
 def swap(i, j):
 	talk("__swap__:" + str(i) + ":" + str(j))
 	array[i], array[j] = array[j], array[i]
@@ -276,7 +278,7 @@ def showSplit(start, mid, end):
 
 def commitSort():
 	talk("__commit__")
-"""
+""" % getArrayString()
 
 func getBaseGuide() -> String:
 	return """[b]Available Data:[/b]

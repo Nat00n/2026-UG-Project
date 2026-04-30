@@ -417,7 +417,7 @@ class GodotOutput(io.TextIOBase):
 
 sys.stdout = GodotOutput()
 
-array = """ + _currentObject.getArrayString() + _currentObject.getPreambleFunctions()
+""" + _currentObject.getPreambleFunctions()
 
 func _executeCode(code: String, target, silent: bool):
 	# Resets the object's output display,

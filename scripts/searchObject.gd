@@ -161,6 +161,7 @@ func verifySearchResult():
 
 func getPreambleFunctions() -> String:
 	return """
+array = %s
 targetValue = %d
 
 def check(index):
@@ -168,7 +169,7 @@ def check(index):
 
 def commitSelect(index):
 	talk("__commitSelect__:" + str(index))
-""" % targetValue
+""" % [getArrayString(), targetValue]
 
 func getBaseGuide() -> String:
 	return """[b]Available Data:[/b]
