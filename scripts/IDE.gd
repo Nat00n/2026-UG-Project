@@ -140,6 +140,9 @@ func talk(args):
 				indices.append(int(p))
 		target.commitKnapsack(indices)
 
+	elif msg.begins_with("__error__:"):
+		_highlightErrorLine(int(msg.split(":")[1]))
+
 	else:
 		# Unrecognised prefix, treated as plain print() output and display in the console
 		_appendOutput(msg + "\n")
@@ -200,6 +203,16 @@ func _setupSyntaxHighlighting():
 	highlighter.add_color_region("#", "", Color.html("#6272A4"), true)
 
 	inputCE.syntax_highlighter = highlighter
+	
+func _clearErrorHighlights():
+	for i in range(inputCE.get_line_count()):
+		inputCE.set_line_background_color(i, Color.TRANSPARENT)
+
+func _highlightErrorLine(line: int):
+	# CodeEdit lines are 0-indexed, player-facing line numbers are 1-indexed.
+	var idx = line - 1
+	if idx >= 0 and idx < inputCE.get_line_count():
+		inputCE.set_line_background_color(idx, Color(1.0, 0.2, 0.2, 0.25))
 
 ### Tab System
 
@@ -412,6 +425,7 @@ func _executeCode(code: String, target, silent: bool):
 	# passes it to the JavaScript runPythonFromGodot() function which calls Pyodide,
 	# then clears the executing object reference once the async call returns
 	_executingObject = target
+	_clearErrorHighlights()
 	if not silent:
 		outputRCT.clear()
 		_appendOutput("Running...\n")

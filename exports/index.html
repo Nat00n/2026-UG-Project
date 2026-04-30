@@ -296,10 +296,16 @@ const engine = new Engine(GODOT_CONFIG);
 		}
 
 		function adjustErrorLines(message, preambleLines) {
-			return message.replace(/line (\d+)/g, (match, num) => {
-				const adjusted = parseInt(num) - preambleLines;
-				return adjusted > 0 ? 'line ' + adjusted : match;
+			let adjustedLine = -1;
+			const adjusted = message.replace(/line (\d+)/g, (match, num) => {
+				const n = parseInt(num) - preambleLines;
+				if (n > 0) {
+					adjustedLine = n;
+					return 'line ' + n;
+				}
+				return match;
 			});
+			return { message: adjusted, line: adjustedLine };
 		}
 
 		async function runPythonFromGodot() {
@@ -341,7 +347,11 @@ const engine = new Engine(GODOT_CONFIG);
 					clearTimeout(timeout);
 				}
 				if (e.data.type === 'error' && window.godotTalk) {
-					window.godotTalk("Error lines fix: " + adjustErrorLines(e.data.message, preambleLines));
+					const result = adjustErrorLines(e.data.message, preambleLines);
+					window.godotTalk(result.message);
+					if (result.line > 0) {
+						window.godotTalk('__error__:' + result.line);
+					}
 				} else {
 					originalHandler(e);
 				}
