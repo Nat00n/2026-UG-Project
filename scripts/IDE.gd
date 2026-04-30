@@ -179,6 +179,7 @@ func open(objectName: String, interactable):
 func _setupSyntaxHighlighting():
 	# Configures the CodeHighlighter with Dracula-inspired colours for Python keywords,
 	# builtins, numbers, strings, and comments
+	# https://marketplace.visualstudio.com/items?itemName=dracula-theme.theme-dracula
 	var highlighter = CodeHighlighter.new()
 
 	var keywords = ["False", "None", "True", "and", "as", "assert", "async", "await",

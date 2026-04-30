@@ -55,8 +55,8 @@ func queueSwap(i: int, j: int):
 func queuePivot(index: int):
 	swapQueue.append({"type": "pivot", "index": index})
 
-func queueMove(fromIndex: int, toIndex: int):
-	swapQueue.append({"type": "move", "from": fromIndex, "to": toIndex})
+func queueMove(i: int, j: int):
+	swapQueue.append({"type": "move", "from": i, "to": j})
 
 func queueHighlightSplit(start: int, mid: int, end: int):
 	swapQueue.append({"type": "split", "start": start, "mid": mid, "end": end})
@@ -265,10 +265,10 @@ def swap(i, j):
 	talk("__swap__:" + str(i) + ":" + str(j))
 	array[i], array[j] = array[j], array[i]
 
-def move(fromIndex, toIndex):
-	talk("__move__:" + str(fromIndex) + ":" + str(toIndex))
-	val = array.pop(fromIndex)
-	array.insert(toIndex, val)
+def move(i, j):
+	talk("__move__:" + str(i) + ":" + str(j))
+	val = array.pop(i)
+	array.insert(j, val)
 
 def setPivot(index):
 	talk("__pivot__:" + str(index))
@@ -292,8 +292,8 @@ Example: [3, 1, 4, 1, 5]
 [code]swap(i, j)[/code]
 Swaps the elements at index i and j in the array and triggers the swap animation.
 
-[code]move(fromIndex, toIndex)[/code]
-Removes the element at fromIndex and inserts it at toIndex. Useful for insertion sort.
+[code]move(i, j)[/code]
+Removes the element at index i and inserts it at the index at j. Useful for insertion sort.
 
 [code]setPivot(index)[/code]
 Highlights the element at index as the current pivot (shown in orange).
