@@ -44,6 +44,13 @@ Students write Python code to solve algorithm challenges across four categories:
 
 No installation, downloads, or account creation required.
 
+### Development Setup
+
+1. Install [Godot 4.6](https://godotengine.org)
+2. Clone this repository
+3. Open `project.godot` in Godot Editor
+4. To test, run locally
+
 ### Running Locally
 
 Recommended that you use Chrome or Edge for full features
@@ -61,13 +68,6 @@ python -m http.server 8000
 
 # Open browser to http://localhost:8000
 ```
-
-### Development Setup
-
-1. Install [Godot 4.6](https://godotengine.org)
-2. Clone this repository
-3. Open `project.godot` in Godot Editor
-4. Run in Godot or export to HTML5
 
 ## Credit To Assets
 
