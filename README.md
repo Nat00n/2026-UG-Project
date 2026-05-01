@@ -61,7 +61,7 @@ git clone https://github.com/yourusername/TaskTrain.git
 cd TaskTrain
 
 # Navigate to export directory
-cd export/
+cd exports/
 
 # Start local server (required for Pyodide/WebLLM)
 python -m http.server 8000
